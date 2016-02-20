@@ -63,7 +63,7 @@ namespace API.Controllers
             return new UserInfoViewModel
             {
                 Email = User.Identity.GetUserName(),
-                HasRegistered = externalLogin == null,
+                HasRegistered = externalLogin != null,
                 LoginProvider = externalLogin != null ? externalLogin.LoginProvider : null
             };
         }
@@ -223,6 +223,7 @@ namespace API.Controllers
         }
 
         // GET api/Account/ExternalLogin
+        //TODO Må skrives om til å ta autentisere med eksternt token og retunere intern token
         [OverrideAuthentication]
         [HostAuthentication(DefaultAuthenticationTypes.ExternalCookie)]
         [AllowAnonymous]
@@ -343,7 +344,9 @@ namespace API.Controllers
         }
 
         // POST api/Account/RegisterExternal
-        [OverrideAuthentication]
+        //[OverrideAuthentication] 
+        //TODO Finn ut hva overrideAut gjør
+        //TODO Eksternal login må kalles først, det er ikke ønskerlig
         [HostAuthentication(DefaultAuthenticationTypes.ExternalBearer)]
         [Route("RegisterExternal")]
         public async Task<IHttpActionResult> RegisterExternal(RegisterExternalBindingModel model)
@@ -353,8 +356,9 @@ namespace API.Controllers
                 return BadRequest(ModelState);
             }
 
-            var info = await Authentication.GetExternalLoginInfoAsync();
-            if (info == null)
+            var info = await Authentication.GetExternalLoginInfoAsync(); //TODO Hvorfor virker ikke GetExternalLoginInfoAsync
+            var login = ExternalLoginData.FromIdentity(User.Identity as ClaimsIdentity);
+            if (login == null)
             {
                 return InternalServerError();
             }
@@ -367,7 +371,7 @@ namespace API.Controllers
                 return GetErrorResult(result);
             }
 
-            result = await UserManager.AddLoginAsync(user.Id, info.Login);
+            result = await UserManager.AddLoginAsync(user.Id, new UserLoginInfo(login.LoginProvider, login.ProviderKey));
             if (!result.Succeeded)
             {
                 return GetErrorResult(result); 

@@ -28,8 +28,8 @@ namespace API
 
             // Enable the application to use a cookie to store information for the signed in user
             // and to use a cookie to temporarily store information about a user logging in with a third party login provider
-            //app.UseCookieAuthentication(new CookieAuthenticationOptions());
-            //app.UseExternalSignInCookie(DefaultAuthenticationTypes.ExternalCookie);
+            app.UseCookieAuthentication(new CookieAuthenticationOptions());
+            app.UseExternalSignInCookie(DefaultAuthenticationTypes.ExternalCookie);
 
             // Configure the application for OAuth based flow
             PublicClientId = "self";
@@ -59,11 +59,11 @@ namespace API
             //    appId: "",
             //    appSecret: "");
 
-            //app.UseGoogleAuthentication(new GoogleOAuth2AuthenticationOptions()
-            //{
-            //    ClientId = "",
-            //    ClientSecret = ""
-            //});
+            app.UseGoogleAuthentication(new GoogleOAuth2AuthenticationOptions()
+            {
+                ClientId = "964416381714-sm1e6562te0dm694pql5rvuc547ho7ej.apps.googleusercontent.com",
+                ClientSecret = "muQIVTH-JhgM_lqgiv7i7WUL"
+            });
         }
     }
 }
