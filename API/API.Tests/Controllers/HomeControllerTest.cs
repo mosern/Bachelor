@@ -1,9 +1,9 @@
 ﻿using System.Web.Mvc;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using API;
-using API.Controllers;
+using Api;
+using Api.Controllers;
 
-namespace API.Tests.Controllers
+namespace Api.Tests.Controllers
 {
     [TestClass]
     public class HomeControllerTest

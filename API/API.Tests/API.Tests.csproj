@@ -6,11 +6,11 @@
     <ProductVersion>
     </ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{3060E135-FD24-476A-9C39-06C19DC19FD6}</ProjectGuid>
+    <ProjectGuid>{09F60F6E-DE3B-4D5E-A4DD-6225D90EBE59}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>API.Tests</RootNamespace>
-    <AssemblyName>API.Tests</AssemblyName>
+    <RootNamespace>Api.Tests</RootNamespace>
+    <AssemblyName>Api.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -102,9 +102,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\API\API.csproj">
-      <Project>{6A3E47B5-05FD-4120-8F59-6F528B7775B8}</Project>
-      <Name>API</Name>
+    <ProjectReference Include="..\Api\Api.csproj">
+      <Project>{76A3BABD-ED22-43D4-ABBA-F459C67D6651}</Project>
+      <Name>Api</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

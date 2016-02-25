@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.Owin;
-using Owin;
+﻿using Owin;
 
-[assembly: OwinStartup(typeof(API.Startup))]
-
-namespace API
+namespace Api
 {
     public partial class Startup
     {
