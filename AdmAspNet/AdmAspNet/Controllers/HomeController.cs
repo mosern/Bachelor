@@ -40,7 +40,7 @@ namespace AdmAspNet.Controllers
             }
             catch(Exception e)
             {
-                ViewBag.response = e.Message;
+                ViewBag.response = e.Message + e.InnerException + e.StackTrace;
             }
 
 
