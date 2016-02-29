@@ -28,7 +28,7 @@ namespace AdmAspNet.Controllers
         private AuthenticationContext authContext = null;
         private static AuthenticationResult authResult = null;
 
-        public ActionResult Index()
+        public async Task<ActionResult> Index()
         {
             string debug = "";
             try
@@ -36,7 +36,7 @@ namespace AdmAspNet.Controllers
                 debug += "start - ";
                 authContext = new AuthenticationContext(authority);
                 debug += "authContext - ";
-                authResult = authContext.AcquireToken(apiResourceId, clientId, redirectUri);
+                authResult = await authContext.AcquireTokenSilentAsync(apiResourceId, clientId);
                 debug += "authResult - ";
                 var test = Get();
                 debug += "Get - ";
