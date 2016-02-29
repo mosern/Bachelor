@@ -32,7 +32,8 @@ namespace AdmAspNet.Controllers
         {
             authContext = new AuthenticationContext(authority);
             authResult = authContext.AcquireToken(apiResourceId, clientId, redirectUri);
-            ViewBag.response = GetAsync();
+            var test = GetAsync().Result;
+            ViewBag.response = test;
 
             return View();
         }
