@@ -30,10 +30,19 @@ namespace AdmAspNet.Controllers
 
         public ActionResult Index()
         {
-            authContext = new AuthenticationContext(authority);
-            authResult = authContext.AcquireToken(apiResourceId, clientId, redirectUri);
-            var test = Get();
-            ViewBag.response = test;
+            try
+            {
+                authContext = new AuthenticationContext(authority);
+                authResult = authContext.AcquireToken(apiResourceId, clientId, redirectUri);
+
+                var test = Get();
+                ViewBag.response = test;
+            }
+            catch(Exception e)
+            {
+                ViewBag.response = e.Message;
+            }
+
 
             return View();
         }
@@ -59,7 +68,7 @@ namespace AdmAspNet.Controllers
 
             using (var client = new HttpClient())
             {
-
+                
                 client.BaseAddress = new Uri("https://bachelorapi.azurewebsites.net/");
                 client.DefaultRequestHeaders.Accept.Clear();
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
