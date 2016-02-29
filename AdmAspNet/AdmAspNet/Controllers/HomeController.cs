@@ -30,17 +30,22 @@ namespace AdmAspNet.Controllers
 
         public ActionResult Index()
         {
+            string debug = "";
             try
             {
+                debug += "start - ";
                 authContext = new AuthenticationContext(authority);
+                debug += "authContext - ";
                 authResult = authContext.AcquireToken(apiResourceId, clientId, redirectUri);
-
+                debug += "authResult - ";
                 var test = Get();
+                debug += "Get - ";
                 ViewBag.response = test;
+                debug += "ferdig";
             }
             catch(Exception e)
             {
-                ViewBag.response = e.Message + e.InnerException + e.StackTrace;
+                ViewBag.response = debug + e.Message + e.InnerException + e.StackTrace;
             }
 
 
