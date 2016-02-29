@@ -32,7 +32,7 @@ namespace AdmAspNet.Controllers
         {
             authContext = new AuthenticationContext(authority);
             authResult = authContext.AcquireToken(apiResourceId, clientId, redirectUri);
-            var test = GetAsync().Result;
+            var test = Get();
             ViewBag.response = test;
 
             return View();
@@ -52,7 +52,7 @@ namespace AdmAspNet.Controllers
             return View();
         }
 
-        static async Task<HttpContent> GetAsync()
+        string Get()
         {
 
 
@@ -65,14 +65,13 @@ namespace AdmAspNet.Controllers
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authResult.AccessToken);
 
-
-                HttpResponseMessage response = await client.GetAsync("api/values");
+                HttpResponseMessage response = client.GetAsync("api/values").Result;
                 if (response.IsSuccessStatusCode)
                 {
-                    return response.Content;
+                    return response.Content.ReadAsStringAsync().Result;
                 }
-
-                return null;
+                var test = response.Content.ReadAsStringAsync().Result;
+                return test;
              
             }
         }
