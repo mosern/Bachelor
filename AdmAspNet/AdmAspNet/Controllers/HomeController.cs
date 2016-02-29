@@ -36,7 +36,7 @@ namespace AdmAspNet.Controllers
                 debug += "start - ";
                 authContext = new AuthenticationContext(authority);
                 debug += "authContext - ";
-                authResult = await authContext.AcquireTokenSilentAsync(apiResourceId, clientId);
+                authResult = await authContext.AcquireTokenAsync(apiResourceId, new ClientCredential(clientId, "GJE1VbfDIujEx / E2uSkOcEqkxsR1DntM94zF6yoFbkA ="));
                 debug += "authResult - ";
                 var test = Get();
                 debug += "Get - ";
