@@ -40,7 +40,7 @@ namespace AdmAspNet.Controllers
                 debug += "authResult - ";
                 var test = Get();
                 debug += "Get - ";
-                ViewBag.response = test;
+                ViewBag.response = debug + apiBaseAddress + test;
                 debug += "ferdig";
             }
             catch(Exception e)
