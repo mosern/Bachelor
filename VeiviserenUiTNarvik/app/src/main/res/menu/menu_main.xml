@@ -2,9 +2,18 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="no.hesa.veiviserenuitnarvik.MainActivity">
+
+    <item
+        android:id="@+id/action_login"
+        android:orderInCategory="90"
+        android:title="@string/action_log_in"
+        android:icon="@android:drawable/ic_secure"
+        app:showAsAction="always"/>
+
     <item
         android:id="@+id/action_settings"
         android:orderInCategory="100"
         android:title="@string/action_settings"
-        app:showAsAction="never" />
+        android:icon="@android:drawable/ic_menu_preferences"
+        app:showAsAction="always"/>
 </menu>
