@@ -15,10 +15,10 @@ namespace AdmAspNet.Controllers
     [Authorize]
     public class HomeController : Controller
     {
-        private static string aadInstance = ConfigurationManager.AppSettings["ida:AADInstance"];
-        private static string tenant = ConfigurationManager.AppSettings["ida:Tenant"];
-        private static string clientId = ConfigurationManager.AppSettings["ida:ClientId"];
-        Uri redirectUri = new Uri(ConfigurationManager.AppSettings["ida:RedirectUri"]);
+        private static string aadInstance = ConfigurationManager.AppSettings["AADInstance"];
+        private static string tenant = ConfigurationManager.AppSettings["Tenant"];
+        private static string clientId = ConfigurationManager.AppSettings["ClientId"];
+        private static string clientSecret = ConfigurationManager.AppSettings["ClientSecret"];
 
         private static string authority = String.Format(aadInstance+"{0}", tenant);
 
@@ -36,7 +36,7 @@ namespace AdmAspNet.Controllers
                 debug += "start - ";
                 authContext = new AuthenticationContext(authority);
                 debug += "authContext - ";
-                authResult = await authContext.AcquireTokenAsync(apiResourceId, new ClientCredential(clientId, "GJE1VbfDIujEx/E2uSkOcEqkxsR1DntM94zF6yoFbkA="));
+                authResult = await authContext.AcquireTokenAsync(apiResourceId, new ClientCredential(clientId, clientSecret));
                 debug += "authResult - ";
                 var test = Get();
                 debug += "Get - ";
@@ -74,12 +74,12 @@ namespace AdmAspNet.Controllers
             using (var client = new HttpClient())
             {
                 
-                client.BaseAddress = new Uri("https://bachelorapi.azurewebsites.net/");
+                client.BaseAddress = new Uri(apiBaseAddress);
                 client.DefaultRequestHeaders.Accept.Clear();
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authResult.AccessToken);
 
-                HttpResponseMessage response = client.GetAsync("api/values").Result;
+                HttpResponseMessage response = client.GetAsync("values").Result;
                 if (response.IsSuccessStatusCode)
                 {
                     return response.Content.ReadAsStringAsync().Result;
