@@ -79,7 +79,7 @@ namespace AdmAspNet.Controllers
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authResult.AccessToken);
 
-                HttpResponseMessage response = client.GetAsync("values").Result;
+                HttpResponseMessage response = client.GetAsync("/values").Result;
                 if (response.IsSuccessStatusCode)
                 {
                     return response.Content.ReadAsStringAsync().Result;
