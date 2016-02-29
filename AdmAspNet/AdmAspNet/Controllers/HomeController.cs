@@ -74,12 +74,12 @@ namespace AdmAspNet.Controllers
             using (var client = new HttpClient())
             {
                 
-                client.BaseAddress = new Uri("https://bachelorapi.azurewebsites.net/api");
+                client.BaseAddress = new Uri(apiBaseAddress);
                 client.DefaultRequestHeaders.Accept.Clear();
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authResult.AccessToken);
 
-                HttpResponseMessage response = client.GetAsync("values").Result;
+                HttpResponseMessage response = client.GetAsync("api/values").Result;
                 if (response.IsSuccessStatusCode)
                 {
                     return response.Content.ReadAsStringAsync().Result;
