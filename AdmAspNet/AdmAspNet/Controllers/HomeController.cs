@@ -20,10 +20,10 @@ namespace AdmAspNet.Controllers
         private static string clientId = ConfigurationManager.AppSettings["ida:ClientId"];
         private static string clientSecret = ConfigurationManager.AppSettings["ClientSecret"];
 
-        private static string authority = String.Format(aadInstance, tenant);
+        private static string authority = String.Format(aadInstance + "/{0}", tenant);
 
         private static string apiResourceId = ConfigurationManager.AppSettings["ApiResourceId"];
-        private static string apiBaseAddress = ConfigurationManager.AppSettings["ApiBaseAddressLocal"];
+        private static string apiBaseAddress = ConfigurationManager.AppSettings["ApiBaseAddress"];
 
         private AuthenticationContext authContext = null;
         private static AuthenticationResult authResult = null;
