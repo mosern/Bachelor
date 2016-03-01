@@ -15,9 +15,9 @@ namespace AdmAspNet.Controllers
     [Authorize]
     public class HomeController : Controller
     {
-        private static string aadInstance = ConfigurationManager.AppSettings["AADInstance"];
-        private static string tenant = ConfigurationManager.AppSettings["Tenant"];
-        private static string clientId = ConfigurationManager.AppSettings["ClientId"];
+        private static string aadInstance = ConfigurationManager.AppSettings["ida:AADInstance"];
+        private static string tenant = ConfigurationManager.AppSettings["ida:Tenant"];
+        private static string clientId = ConfigurationManager.AppSettings["ida:ClientId"];
         private static string clientSecret = ConfigurationManager.AppSettings["ClientSecret"];
 
         private static string authority = String.Format(aadInstance+"{0}", tenant);
