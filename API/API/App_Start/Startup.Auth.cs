@@ -19,7 +19,7 @@ namespace Api
                 {
                     Tenant = ConfigurationManager.AppSettings["ida:Tenant"],
                     TokenValidationParameters = new TokenValidationParameters {
-                    //     ValidAudience = ConfigurationManager.AppSettings["ida:Audience"]
+                         ValidAudience = ConfigurationManager.AppSettings["ida:Audience"]
                     },
                 });
         }
