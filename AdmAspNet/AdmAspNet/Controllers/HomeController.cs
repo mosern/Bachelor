@@ -23,7 +23,7 @@ namespace AdmAspNet.Controllers
         private static string authority = String.Format(aadInstance, tenant);
 
         private static string apiResourceId = ConfigurationManager.AppSettings["ApiResourceId"];
-        private static string apiBaseAddress = ConfigurationManager.AppSettings["ApiBaseAddress"];
+        private static string apiBaseAddress = ConfigurationManager.AppSettings["ApiBaseAddressLocal"];
 
         private AuthenticationContext authContext = null;
         private static AuthenticationResult authResult = null;
