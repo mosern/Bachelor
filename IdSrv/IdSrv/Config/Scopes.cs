@@ -16,7 +16,16 @@ namespace IdSrv.Config
                     // identity scopes
 
                     StandardScopes.OpenId,
-                    StandardScopes.Profile
+                    StandardScopes.Profile,
+
+                    new Scope
+                    {
+                        Name = "api",
+                        DisplayName = "API",
+                        Type = ScopeType.Resurce,
+                        Emphasize = false,
+                        Enabled = true
+                    }
 
                  };
 
