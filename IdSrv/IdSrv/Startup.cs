@@ -12,6 +12,7 @@ namespace IdSrv
     {
         public void Configuration(IAppBuilder app)
         {
+            
             var options = new IdentityServerOptions()
                 {
                     Factory = new IdentityServerServiceFactory()
@@ -20,7 +21,11 @@ namespace IdSrv
                         .UseInMemoryScopes(Scopes.Get())
                 };
 
-            app.UseIdentityServer(options);
+            app.Map("/identity", idsrv =>
+                {
+                    idsrv.UseIdentityServer(options);
+                });
+
         }
  
     }
