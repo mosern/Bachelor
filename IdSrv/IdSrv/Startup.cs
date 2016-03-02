@@ -12,19 +12,15 @@ namespace IdSrv
     {
         public void Configuration(IAppBuilder app)
         {
-            app.Map("/identity", idSrv =>
-            {
-                idSrv.UseIdentityServer(new IdentityServerOptions
+            var options = new IdentityServerOptions()
                 {
-                    SiteName = "Bachelor IdentityServer",
-                    IssuerUri = "BachelorIdSrv.azurewebsites.net",
-
                     Factory = new IdentityServerServiceFactory()
                         .UseInMemoryUsers(Users.Get())
                         .UseInMemoryClients(Clients.Get())
                         .UseInMemoryScopes(Scopes.Get())
-                });
-            });
+                };
+
+            app.UseIdentityServer(options);
         }
  
     }
