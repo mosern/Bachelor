@@ -23,7 +23,6 @@ namespace IdSrv
                         .UseInMemoryClients(Clients.Get())
                         .UseInMemoryScopes(Scopes.Get()),
 
-                RequireSsl = false
                 };
 
             app.Map("/identity", idsrv =>
