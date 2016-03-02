@@ -40,7 +40,7 @@ namespace IdSrv
             }
             catch(Exception e)
             {
-                throw new Exception(e.Message + string.Format(@"{0}\Certificates\idsrv3test.pfx", AppDomain.CurrentDomain.BaseDirectory);
+                throw new Exception(e.Message + string.Format(@"{0}\Certificates\idsrv3test.pfx", AppDomain.CurrentDomain.BaseDirectory));
             }
         }
 
