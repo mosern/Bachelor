@@ -10,50 +10,90 @@ using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.OpenIdConnect;
 using Owin;
+using System.Text;
+using Newtonsoft.Json.Linq;
+using System.Diagnostics;
 
 namespace AdmAspNet
 {
     public partial class Startup
     {
-        private string ClientId = ConfigurationManager.AppSettings["ida:ClientId"];
-        private string Authority = ConfigurationManager.AppSettings["ida:AADInstance"] + "common";
+        private string ClientId = ConfigurationManager.AppSettings["ClientId"];
+        private string Authority = ConfigurationManager.AppSettings["Authority"];
+        private string RedirectURI = ConfigurationManager.AppSettings["RedirectURI"];
 
+        //Inspired by the Pluralsight course "Building and Securing a RESTful API for Multiple Clients in ASP.NET", my code may be similar to the code in the exercise-files.
+        //https://app.pluralsight.com/library/courses/building-securing-restful-api-aspdotnet/exercise-files
         public void ConfigureAuth(IAppBuilder app)
         {
-            app.SetDefaultSignInAsAuthenticationType(CookieAuthenticationDefaults.AuthenticationType);
+            app.UseCookieAuthentication(new CookieAuthenticationOptions
+            {
+                AuthenticationType = "Cookies"
+            });
 
-            app.UseCookieAuthentication(new CookieAuthenticationOptions { });
-
-            app.UseOpenIdConnectAuthentication(
-                new OpenIdConnectAuthenticationOptions
+            app.UseOpenIdConnectAuthentication(new OpenIdConnectAuthenticationOptions
                 {
                     ClientId = ClientId,
                     Authority = Authority,
-                    TokenValidationParameters = new System.IdentityModel.Tokens.TokenValidationParameters
-                    {
-                        // instead of using the default validation (validating against a single issuer value, as we do in line of business apps), 
-                        // we inject our own multitenant validation logic
-                        ValidateIssuer = false,
-                        // If the app needs access to the entire organization, then add the logic
-                        // of validating the Issuer here.
-                        // IssuerValidator
-                    },
+                    RedirectUri = RedirectURI,
+                    SignInAsAuthenticationType = "Cookies",
+                    ResponseType="code id_token",
+                    Scope="openid",
+
                     Notifications = new OpenIdConnectAuthenticationNotifications()
-                    {   
-                        SecurityTokenValidated = (context) =>
+                    {
+                        MessageReceived = async n =>
                         {
-                            // If your authentication logic is based on users then add your logic here
-                            return Task.FromResult(0);
-                        } ,                    
-                        AuthenticationFailed = (context) =>
-                        {
-                            // Pass in the context back to the app
-                            context.OwinContext.Response.Redirect("/Home/Error");
-                            context.HandleResponse(); // Suppress the exception
-                            return Task.FromResult(0);
+                            DecodeAndWrite(n.ProtocolMessage.IdToken);
                         }
                     }
+
                 });
+        }
+
+        //Writen by Kevin Dockx as a part of the Pluralsight course "Building and Securing a RESTful API for Multiple Clients in ASP.NET"
+        //https://app.pluralsight.com/library/courses/building-securing-restful-api-aspdotnet/exercise-files
+        public static void DecodeAndWrite(string token)
+        {
+            try
+            {
+
+
+                var parts = token.Split('.');
+
+                string partToConvert = parts[1];
+                partToConvert = partToConvert.Replace('-', '+');
+                partToConvert = partToConvert.Replace('_', '/');
+                switch (partToConvert.Length % 4)
+                {
+                    case 0:
+                        break;
+                    case 2:
+                        partToConvert += "==";
+                        break;
+                    case 3:
+                        partToConvert += "=";
+                        break;
+                    default:
+                        break;
+                }
+
+                var partAsBytes = Convert.FromBase64String(partToConvert);
+                var partAsUTF8String = Encoding.UTF8.GetString(partAsBytes, 0, partAsBytes.Count());
+
+                // Json .NET
+                var jwt = JObject.Parse(partAsUTF8String);
+
+                // Write to output
+                Debug.Write(jwt.ToString());
+
+            }
+            catch (Exception ex)
+            {
+                // something went wrong
+                Debug.Write(ex.Message);
+
+            }
         }
     }
 }
