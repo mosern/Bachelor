@@ -13,15 +13,17 @@ namespace IdSrv
     {
         public void Configuration(IAppBuilder app)
         {
-            
-            var options = new IdentityServerOptions()
-                {
-                    //SigningCertificate = LoadCertificate(),
 
-                    Factory = new IdentityServerServiceFactory()
+            var options = new IdentityServerOptions()
+            {
+                //SigningCertificate = LoadCertificate(),
+
+                Factory = new IdentityServerServiceFactory()
                         .UseInMemoryUsers(Users.Get())
                         .UseInMemoryClients(Clients.Get())
-                        .UseInMemoryScopes(Scopes.Get())
+                        .UseInMemoryScopes(Scopes.Get()),
+
+                RequireSsl = false
                 };
 
             app.Map("/identity", idsrv =>
