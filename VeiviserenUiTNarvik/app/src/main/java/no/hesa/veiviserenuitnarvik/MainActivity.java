@@ -26,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+        //Initialize library here.. do so by calling new PositionLibrary();
     }
 
     @Override
