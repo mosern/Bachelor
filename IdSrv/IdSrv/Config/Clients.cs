@@ -16,7 +16,7 @@ namespace IdSrv.Config
                 {
                     Enabled = true,
                     ClientName = "Adm",
-                    ClientId = "mvc",
+                    ClientId = "adm",
                     Flow = Flows.Hybrid,
                     RequireConsent = true,
                     
