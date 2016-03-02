@@ -17,7 +17,7 @@ namespace IdSrv.Config
                     Enabled = true,
                     ClientName = "Adm",
                     ClientId = "adm",
-                    Flow = Flows.Implicit,
+                    Flow = Flows.Hybrid,
                     RequireConsent = true,
                     
                     RedirectUris = new List<string>
