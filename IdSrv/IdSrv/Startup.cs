@@ -2,7 +2,8 @@
 using IdSrv.Config;
 using Microsoft.Owin;
 using Owin;
-
+using System;
+using System.Security.Cryptography.X509Certificates;
 
 [assembly: OwinStartupAttribute(typeof(IdSrv.Startup))]
 
@@ -15,6 +16,8 @@ namespace IdSrv
             
             var options = new IdentityServerOptions()
                 {
+                    SigningCertificate = LoadCertificate(),
+
                     Factory = new IdentityServerServiceFactory()
                         .UseInMemoryUsers(Users.Get())
                         .UseInMemoryClients(Clients.Get())
@@ -26,7 +29,15 @@ namespace IdSrv
                     idsrv.UseIdentityServer(options);
                 });
 
+
         }
- 
+
+        X509Certificate2 LoadCertificate()
+        {
+            return new X509Certificate2(
+                string.Format(@"{0}\bin\idsrv3test.pfx",
+                AppDomain.CurrentDomain.BaseDirectory), "idsrv3test");
+        }
+
     }
 }
