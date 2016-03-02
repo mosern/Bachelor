@@ -4,9 +4,9 @@ using Microsoft.Owin;
 using Owin;
 
 
-[assembly: OwinStartup(typeof(ExpenseTracker.IdSrv.Startup))]
+[assembly: OwinStartupAttribute(typeof(IdSrv.Startup))]
 
-namespace ExpenseTracker.IdSrv
+namespace IdSrv
 {
     public class Startup
     {
