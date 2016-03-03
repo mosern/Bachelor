@@ -33,9 +33,9 @@ namespace AdmAspNet
 
             app.UseOpenIdConnectAuthentication(new OpenIdConnectAuthenticationOptions
                 {
-                    ClientId = ClientId,
-                    Authority = Authority,
-                    RedirectUri = RedirectURI,
+                    ClientId = "adm",
+                    Authority = "https://localhost:44305/identity",
+                    RedirectUri = "https://localhost:44300",
                     SignInAsAuthenticationType = "Cookies",
                     ResponseType="id_token",
 
