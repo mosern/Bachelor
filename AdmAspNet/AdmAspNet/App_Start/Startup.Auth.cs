@@ -33,11 +33,11 @@ namespace AdmAspNet
 
             app.UseOpenIdConnectAuthentication(new OpenIdConnectAuthenticationOptions
                 {
-                    ClientId = "adm",
-                    Authority = "https://localhost:44305/identity",
-                    RedirectUri = "https://localhost:44300",
+                    ClientId = ClientId,
+                    Authority = Authority,
+                    RedirectUri = RedirectURI,
                     SignInAsAuthenticationType = "Cookies",
-                    ResponseType="id_token",
+                    ResponseType="code id_token token",
 
                     Notifications = new OpenIdConnectAuthenticationNotifications()
                     {
