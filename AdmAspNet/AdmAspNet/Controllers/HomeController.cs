@@ -54,7 +54,7 @@ namespace AdmAspNet.Controllers
                 var test = response.Content.ReadAsStringAsync().Result;
                 return test;
              
-            }*/
-        }
+            }
+        }*/
     }
 }
