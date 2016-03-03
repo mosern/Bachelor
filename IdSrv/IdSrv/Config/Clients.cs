@@ -22,7 +22,6 @@ namespace IdSrv.Config
 
                     RedirectUris = new List<string>
                     {
-                        "https://localhost:44300",
                         "https://bacheloradm.azurewebsites.net/"
                     },
 
