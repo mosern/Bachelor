@@ -60,7 +60,7 @@ namespace AdmAspNet.Controllers
                 {
                     return response.Content.ReadAsStringAsync().Result + response.StatusCode;
                 }
-                var test = response.Content.ReadAsStringAsync().Result + response.StatusCode;
+                var test = response.Content.ReadAsStringAsync().Result + "Statuscode - " + response.StatusCode + " ResponseHeaders - " + response.Headers + " RequestMessage - " + response.RequestMessage;
                 return test;
              
             }
