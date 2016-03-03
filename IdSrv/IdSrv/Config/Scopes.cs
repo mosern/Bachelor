@@ -22,6 +22,7 @@ namespace IdSrv.Config
                     {
                         Name = "api",
                         DisplayName = "API",
+                        Description = "Access to the api",
                         Type = ScopeType.Resource,
                         Emphasize = false,
                         Enabled = true

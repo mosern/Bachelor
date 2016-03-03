@@ -30,9 +30,12 @@ namespace IdSrv.Config
                         "https://bacheloradm.azurewebsites.net/",
                     },
 
-                    AllowAccessToAllScopes = true,                    
-
-                    
+                    AllowedScopes = new List<string>
+                    {
+                        StandardScopes.OpenId.Name,
+                        StandardScopes.Profile.Name,
+                        "api",
+                    },                      
                 }
             };
         }

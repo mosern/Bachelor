@@ -16,53 +16,53 @@ namespace IdSrv.Config
 
                new InMemoryUser
             {
-                Username = "Kevin",
+                Username = "Andreas",
                 Password = "secret",
                 Subject = "1",
 
                 Claims = new[]
                 {
-                    new Claim(Constants.ClaimTypes.GivenName, "Kevin"),
-                    new Claim(Constants.ClaimTypes.FamilyName, "Dockx"),
+                    new Claim(Constants.ClaimTypes.GivenName, "Andreas"),
+                    new Claim(Constants.ClaimTypes.FamilyName, "Mosvoll"),
                }
             }
             ,
             new InMemoryUser
             {
-                Username = "Sven",
+                Username = "Henning",
                 Password = "secret",
                 Subject = "2",
 
                 Claims = new[]
                 {
-                    new Claim(Constants.ClaimTypes.GivenName, "Sven"),
-                    new Claim(Constants.ClaimTypes.FamilyName, "Vercauteren"),
+                    new Claim(Constants.ClaimTypes.GivenName, "Henning"),
+                    new Claim(Constants.ClaimTypes.FamilyName, "Fredriksen"),
                }
             },
 
             new InMemoryUser
             {
-                Username = "Nils",
+                Username = "Evgeniia",
                 Password = "secret",
                 Subject = "3",
 
                 Claims = new[]
                 {
-                    new Claim(Constants.ClaimTypes.GivenName, "Nils"),
-                    new Claim(Constants.ClaimTypes.FamilyName, "Missorten"),
+                    new Claim(Constants.ClaimTypes.GivenName, "Evgeniia"),
+                    new Claim(Constants.ClaimTypes.FamilyName, "Gladkova"),
                }
             },
 
             new InMemoryUser
             {
-                Username = "Kenneth",
+                Username = "Simon",
                 Password = "secret",
                 Subject = "4",
 
                 Claims = new[]
                 {
-                    new Claim(Constants.ClaimTypes.GivenName, "Kenneth"),
-                    new Claim(Constants.ClaimTypes.FamilyName, "Mills"),
+                    new Claim(Constants.ClaimTypes.GivenName, "Simon"),
+                    new Claim(Constants.ClaimTypes.FamilyName, "Ingebrigtsen"),
                }
             }
 
