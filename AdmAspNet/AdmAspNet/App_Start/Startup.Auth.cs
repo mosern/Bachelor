@@ -37,7 +37,7 @@ namespace AdmAspNet
                     ClientId = ClientId,
                     Authority = Authority,
                     RedirectUri = RedirectURI,
-                    SignInAsAuthenticationType = "Cookies",
+                    SignInAsAuthenticationType = "Bearer",
                     ResponseType="code id_token token",
 
                     Notifications = new OpenIdConnectAuthenticationNotifications()
@@ -47,23 +47,6 @@ namespace AdmAspNet
                             DecodeAndWrite(n.ProtocolMessage.IdToken);
                         },
 
-                        RedirectToIdentityProvider = (context) =>
-                        {
-                            //Ensure the URI is picked up dynamically from the request;
-                            string appBaseUrl = context.Request.Scheme + "://" + context.Request.Host + context.Request.PathBase + context.Request.Uri.PathAndQuery;
-                            context.ProtocolMessage.RedirectUri = RedirectURI;
-                            context.ProtocolMessage.PostLogoutRedirectUri = appBaseUrl;
-                            return Task.FromResult(0);
-                        },
-                        AuthenticationFailed = (context) =>
-                        {
-                            if (context.Exception.Message.StartsWith("OICE_20004") || context.Exception.Message.Contains("IDX10311"))
-                            {
-                                context.SkipToNextMiddleware();
-                                return Task.FromResult(0);
-                            }
-                            return Task.FromResult(0);
-                        },
                     }
 
                 });
