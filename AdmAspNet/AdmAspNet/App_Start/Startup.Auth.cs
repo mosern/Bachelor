@@ -47,14 +47,14 @@ namespace AdmAspNet
                             DecodeAndWrite(n.ProtocolMessage.IdToken);
                         },
 
-                        /*RedirectToIdentityProvider = (context) =>
+                        RedirectToIdentityProvider = (context) =>
                         {
                             // Ensure the URI is picked up dynamically from the request;
-                            string appBaseUrl = context.Request.Scheme + "://" + context.Request.Host + context.Request.PathBase + context.Request.Uri.PathAndQuery;
-                            context.ProtocolMessage.RedirectUri = context.Request.Scheme + "://" + context.Request.Host + context.Request.PathBase + context.Request.Uri.PathAndQuery;
-                            context.ProtocolMessage.PostLogoutRedirectUri = appBaseUrl;
+                            //string appBaseUrl = context.Request.Scheme + "://" + context.Request.Host + context.Request.PathBase + context.Request.Uri.PathAndQuery;
+                            context.ProtocolMessage.RedirectUri = RedirectURI;
+                            //context.ProtocolMessage.PostLogoutRedirectUri = appBaseUrl;
                             return Task.FromResult(0);
-                        },*/
+                        },
                         AuthenticationFailed = (context) =>
                         {
                             if (context.Exception.Message.StartsWith("OICE_20004") || context.Exception.Message.Contains("IDX10311"))
