@@ -49,10 +49,10 @@ namespace AdmAspNet
 
                         RedirectToIdentityProvider = (context) =>
                         {
-                            // Ensure the URI is picked up dynamically from the request;
-                            //string appBaseUrl = context.Request.Scheme + "://" + context.Request.Host + context.Request.PathBase + context.Request.Uri.PathAndQuery;
+                            //Ensure the URI is picked up dynamically from the request;
+                            string appBaseUrl = context.Request.Scheme + "://" + context.Request.Host + context.Request.PathBase + context.Request.Uri.PathAndQuery;
                             context.ProtocolMessage.RedirectUri = RedirectURI;
-                            //context.ProtocolMessage.PostLogoutRedirectUri = appBaseUrl;
+                            context.ProtocolMessage.PostLogoutRedirectUri = appBaseUrl;
                             return Task.FromResult(0);
                         },
                         AuthenticationFailed = (context) =>
