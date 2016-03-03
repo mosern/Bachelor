@@ -19,11 +19,13 @@ namespace IdSrv.Config
                     ClientId = "adm",
                     Flow = Flows.Hybrid,
                     RequireConsent = true,
-                    
+
                     RedirectUris = new List<string>
                     {
                         "https://bacheloradm.azurewebsites.net/"
-                    }                    
+                    },
+
+                    AllowAccessToAllScopes = true,                    
 
                 }
             };
