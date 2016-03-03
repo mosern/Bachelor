@@ -42,7 +42,7 @@ namespace AdmAspNet
                     PostLogoutRedirectUri = RedirectURI,
                     SignInAsAuthenticationType = "Cookies",
                     ResponseType="code id_token token",
-                    Scope = "openid",
+                    Scope = "openid api",
 
                     Notifications = new OpenIdConnectAuthenticationNotifications()
                     {
@@ -62,6 +62,8 @@ namespace AdmAspNet
 
                             // keep the id_token for logout
                             nid.AddClaim(new Claim("id_token", n.ProtocolMessage.IdToken));
+
+                            nid.AddClaim(new Claim("access_token", n.ProtocolMessage.AccessToken));
 
 
                             n.AuthenticationTicket = new AuthenticationTicket(

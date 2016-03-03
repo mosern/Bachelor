@@ -6,6 +6,7 @@ using System.Configuration;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
@@ -15,6 +16,7 @@ namespace AdmAspNet.Controllers
     
     public class HomeController : Controller
     {
+        string apiBaseAddress = ConfigurationManager.AppSettings["apiBaseAddress"];
 
         public ActionResult Index()
         {
@@ -24,7 +26,8 @@ namespace AdmAspNet.Controllers
         [Authorize]
         public ActionResult About()
         {
-            ViewBag.Message = "Your application description page.";
+
+            ViewBag.Message = "Your application description page." + Get();
 
             return View();
         }
@@ -36,15 +39,21 @@ namespace AdmAspNet.Controllers
             return View();
         }
 
-        /*string Get()
+        string Get()
         {
 
             using (var client = new HttpClient())
             {
+                var token = (User.Identity as ClaimsIdentity).FindFirst("access_token");
+                if(token != null)
+                {
+                    client.SetBearerToken(token.Value);
+                }
+
+
                 client.BaseAddress = new Uri(apiBaseAddress);
                 client.DefaultRequestHeaders.Accept.Clear();
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authResult.AccessToken);
 
                 HttpResponseMessage response = client.GetAsync("api/values").Result;
                 if (response.IsSuccessStatusCode)
@@ -55,6 +64,6 @@ namespace AdmAspNet.Controllers
                 return test;
              
             }
-        }*/
+        }
     }
 }
