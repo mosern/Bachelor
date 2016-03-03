@@ -16,7 +16,7 @@ namespace AdmAspNet.Controllers
     
     public class HomeController : Controller
     {
-        string apiBaseAddress = ConfigurationManager.AppSettings["apiBaseAddress"];
+        private static string apiBaseAddress = ConfigurationManager.AppSettings["apiBaseAddress"];
 
         public ActionResult Index()
         {
@@ -27,7 +27,7 @@ namespace AdmAspNet.Controllers
         public ActionResult About()
         {
             string test = Get();
-            ViewBag.Message = "Your application description page." + test + " -";
+            ViewBag.Message = "Your application description page." + test + " - " + apiBaseAddress;
 
             return View();
         }
