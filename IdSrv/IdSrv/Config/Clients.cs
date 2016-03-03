@@ -22,6 +22,7 @@ namespace IdSrv.Config
 
                     RedirectUris = new List<string>
                     {
+                        "https://bacheloradm.azurewebsites.net/",
                         "https://bacheloradm.azurewebsites.net/home/about"
                     },
 
