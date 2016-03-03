@@ -37,8 +37,9 @@ namespace AdmAspNet
                     ClientId = ClientId,
                     Authority = Authority,
                     RedirectUri = RedirectURI,
-                    SignInAsAuthenticationType = "Bearer",
+                    SignInAsAuthenticationType = "Cookies",
                     ResponseType="code id_token token",
+                    Scope = "openid",
 
                     Notifications = new OpenIdConnectAuthenticationNotifications()
                     {
