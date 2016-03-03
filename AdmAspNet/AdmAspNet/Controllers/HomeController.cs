@@ -12,43 +12,12 @@ using System.Web.Mvc;
 
 namespace AdmAspNet.Controllers
 {
-    [Authorize]
+    
     public class HomeController : Controller
     {
-        private static string aadInstance = ConfigurationManager.AppSettings["ida:AADInstance"];
-        private static string tenant = ConfigurationManager.AppSettings["ida:Tenant"];
-        private static string clientId = ConfigurationManager.AppSettings["ida:ClientId"];
-        private static string clientSecret = ConfigurationManager.AppSettings["ClientSecret"];
-
-        private static string authority = String.Format(aadInstance + "{0}", tenant);
-
-        private static string apiResourceId = ConfigurationManager.AppSettings["ApiResourceId"];
-        private static string apiBaseAddress = ConfigurationManager.AppSettings["ApiBaseAddress"];
-
-        private AuthenticationContext authContext = null;
-        private static AuthenticationResult authResult = null;
 
         public async Task<ActionResult> Index()
         {
-            string debug = "";
-            try
-            {
-                debug += "start - ";
-                authContext = new AuthenticationContext(authority);
-                debug += "authContext - ";
-                authResult = await authContext.AcquireTokenAsync(apiResourceId, new ClientCredential(clientId, clientSecret));
-                debug += "authResult - ";
-                var test = Get();
-                debug += "Get - ";
-                ViewBag.response = debug + apiBaseAddress + test;
-                debug += "ferdig";
-            }
-            catch(Exception e)
-            {
-                ViewBag.response = debug + authResult + "Message - " + e.Message + "INNER - " + e.InnerException + "TRACE - " + e.StackTrace;
-            }
-
-
             return View();
         }
 
