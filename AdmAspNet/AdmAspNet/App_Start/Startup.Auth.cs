@@ -37,6 +37,7 @@ namespace AdmAspNet
                     ClientId = ClientId,
                     Authority = Authority,
                     RedirectUri = RedirectURI,
+                    PostLogoutRedirectUri = RedirectURI,
                     SignInAsAuthenticationType = "Cookies",
                     ResponseType="code id_token token",
                     Scope = "openid",
