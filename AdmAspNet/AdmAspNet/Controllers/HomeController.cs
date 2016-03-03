@@ -26,8 +26,8 @@ namespace AdmAspNet.Controllers
         [Authorize]
         public ActionResult About()
         {
-
-            ViewBag.Message = "Your application description page." + Get();
+            string test = Get();
+            ViewBag.Message = "Your application description page." + test;
 
             return View();
         }
