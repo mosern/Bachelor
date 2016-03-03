@@ -32,6 +32,7 @@ namespace IdSrv.Config
 
                     AllowAccessToAllScopes = true,                    
 
+                    
                 }
             };
         }

@@ -17,6 +17,11 @@ namespace IdSrv
             {
                 idsrvApp.UseIdentityServer(new IdentityServerOptions
                 {
+                    AuthenticationOptions = new AuthenticationOptions()
+                    {
+                        EnablePostSignOutAutoRedirect = true,
+                    },
+                    
                     SigningCertificate = LoadCertificate(),
 
                     Factory = new IdentityServerServiceFactory()
