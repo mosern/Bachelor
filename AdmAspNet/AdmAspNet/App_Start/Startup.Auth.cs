@@ -45,7 +45,7 @@ namespace AdmAspNet
                         MessageReceived = async n =>
                         {
                             DecodeAndWrite(n.ProtocolMessage.IdToken);
-                        }
+                        },
 
                         RedirectToIdentityProvider = (context) =>
                         {
