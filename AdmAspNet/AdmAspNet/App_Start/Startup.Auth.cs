@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
-using System.IdentityModel.Claims;
 using System.IdentityModel.Tokens;
 using System.Threading.Tasks;
 using System.Web;
@@ -13,6 +12,9 @@ using Owin;
 using System.Text;
 using Newtonsoft.Json.Linq;
 using System.Diagnostics;
+using System.Security.Claims;
+using Thinktecture.IdentityModel.Client;
+using Microsoft.IdentityModel.Protocols;
 
 namespace AdmAspNet
 {
@@ -49,9 +51,44 @@ namespace AdmAspNet
                             DecodeAndWrite(n.ProtocolMessage.IdToken);
                         },
 
+                        SecurityTokenValidated = async n =>
+                        {
+                            var id = n.AuthenticationTicket.Identity;
+
+                            var nid = new ClaimsIdentity(
+                                id.AuthenticationType,
+                                JwtClaimTypes.GivenName,
+                                JwtClaimTypes.Role);
+
+                            // keep the id_token for logout
+                            nid.AddClaim(new Claim("id_token", n.ProtocolMessage.IdToken));
+
+
+                            n.AuthenticationTicket = new AuthenticationTicket(
+                                nid,
+                                n.AuthenticationTicket.Properties);
+                        },
+
+                        RedirectToIdentityProvider = n =>
+                        {
+                            if (n.ProtocolMessage.RequestType == OpenIdConnectRequestType.LogoutRequest)
+                            {
+                                var idTokenHint = n.OwinContext.Authentication.User.FindFirst("id_token");
+
+                                if (idTokenHint != null)
+                                {
+                                    n.ProtocolMessage.IdTokenHint = idTokenHint.Value;
+                                }
+                            }
+
+                            return Task.FromResult(0);
+                        }
+
+
+
                     }
 
-                });
+            });
         }
 
         //Writen by Kevin Dockx as a part of the Pluralsight course "Building and Securing a RESTful API for Multiple Clients in ASP.NET"
