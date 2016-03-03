@@ -16,7 +16,7 @@ namespace IdSrv
 
             var options = new IdentityServerOptions()
             {
-                //SigningCertificate = LoadCertificate(),
+                SigningCertificate = LoadCertificate(),
 
                 Factory = new IdentityServerServiceFactory()
                         .UseInMemoryUsers(Users.Get())
@@ -37,11 +37,20 @@ namespace IdSrv
         {
             try
             {
-                return new X509Certificate2(string.Format(@"{0}Certificates\idsrv3test.pfx", AppDomain.CurrentDomain.BaseDirectory), "idsrv3test");
+                X509Store certStore = new X509Store(StoreName.My, StoreLocation.CurrentUser);
+                certStore.Open(OpenFlags.ReadOnly);
+                X509Certificate2Collection certCollection = certStore.Certificates.Find(X509FindType.FindByThumbprint, "6B7ACC520305BFDB4F7252DAEB2177CC091FAAE1", false);
+                // Get the first cert with the thumbprint
+                if (certCollection.Count > 0)
+                {
+                    return certCollection[0];
+                }
+
+                return null;
             }
             catch(Exception e)
             {
-                throw new Exception(e.Message + string.Format(@"{0}Certificates\idsrv3test.pfx", AppDomain.CurrentDomain.BaseDirectory));
+                throw e;
             }
         }
 
