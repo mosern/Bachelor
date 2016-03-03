@@ -13,24 +13,20 @@ namespace IdSrv
     {
         public void Configuration(IAppBuilder app)
         {
-
-            var options = new IdentityServerOptions()
+            app.Map("/identity", idsrvApp =>
             {
-                SigningCertificate = LoadCertificate(),
+                idsrvApp.UseIdentityServer(new IdentityServerOptions
+                {
+                    SigningCertificate = LoadCertificate(),
 
-                Factory = new IdentityServerServiceFactory()
+                    Factory = new IdentityServerServiceFactory()
                         .UseInMemoryUsers(Users.Get())
                         .UseInMemoryClients(Clients.Get())
                         .UseInMemoryScopes(Scopes.Get()),
 
-                };
-
-            app.Map("/identity", idsrv =>
-                {
-                    idsrv.UseIdentityServer(options);
                 });
-
-
+            });
+           
         }
 
         X509Certificate2 LoadCertificate()
