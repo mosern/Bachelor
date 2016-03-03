@@ -39,7 +39,8 @@ namespace IdSrv
                 // Get the first cert with the thumbprint
                 if (certCollection.Count > 0)
                 {
-                    return new X509Certificate2(certCollection[0], "idsrv3test");
+                    //return new X509Certificate2(certCollection[0], "idsrv3test");
+                    return certCollection[0];
                 }
 
                 return null;
