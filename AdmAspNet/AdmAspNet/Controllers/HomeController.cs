@@ -58,9 +58,9 @@ namespace AdmAspNet.Controllers
                 HttpResponseMessage response = client.GetAsync("api/values").Result;
                 if (response.IsSuccessStatusCode)
                 {
-                    return response.Content.ReadAsStringAsync().Result;
+                    return response.Content.ReadAsStringAsync().Result + response.StatusCode;
                 }
-                var test = response.Content.ReadAsStringAsync().Result;
+                var test = response.Content.ReadAsStringAsync().Result + response.StatusCode;
                 return test;
              
             }
