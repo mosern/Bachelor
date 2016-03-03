@@ -17,7 +17,7 @@ namespace IdSrv
             {
                 idsrvApp.UseIdentityServer(new IdentityServerOptions
                 {
-                    //SigningCertificate = LoadCertificate(),
+                    SigningCertificate = LoadCertificate(),
 
                     Factory = new IdentityServerServiceFactory()
                         .UseInMemoryUsers(Users.Get())
