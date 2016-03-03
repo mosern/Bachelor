@@ -36,7 +36,7 @@ namespace AdmAspNet.Controllers
             return View();
         }
 
-        string Get()
+        /*string Get()
         {
 
             using (var client = new HttpClient())
@@ -54,7 +54,7 @@ namespace AdmAspNet.Controllers
                 var test = response.Content.ReadAsStringAsync().Result;
                 return test;
              
-            }
+            }*/
         }
     }
 }
