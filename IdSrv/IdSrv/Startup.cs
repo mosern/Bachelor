@@ -23,7 +23,7 @@ namespace IdSrv
                         EnablePostSignOutAutoRedirect = true,
                     },
 
-                    SigningCertificate = LoadCertificate2(),
+                    SigningCertificate = LoadCertificate(),
 
                     Factory = new IdentityServerServiceFactory()
                         .UseInMemoryUsers(Users.Get())
