@@ -18,7 +18,7 @@ namespace Api
         {
             app.UseIdentityServerBearerTokenAuthentication(new IdentityServerBearerTokenAuthenticationOptions
             {
-                Authority = "https://bacheloridsrv.azurewebsites.net/identity/",
+                Authority = "https://bacheloridsrv2.azurewebsites.net/identity/",
                 RequiredScopes = new[] { "api" }
             });
 
