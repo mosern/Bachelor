@@ -22,12 +22,12 @@ namespace IdSrv.Config
 
                     RedirectUris = new List<string>
                     {
-                        "https://bacheloradm.azurewebsites.net/",
+                        "https://bacheloradm2.azurewebsites.net/",
                     },
 
                     PostLogoutRedirectUris = new List<string>
                     {
-                        "https://bacheloradm.azurewebsites.net/",
+                        "https://bacheloradm2.azurewebsites.net/",
                     },
 
                     AllowedScopes = new List<string>
