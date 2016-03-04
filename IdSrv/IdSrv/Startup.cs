@@ -21,8 +21,10 @@ namespace IdSrv
                     {
                         EnablePostSignOutAutoRedirect = true,
                     },
-                    
-                    SigningCertificate = LoadCertificate(),
+
+                    //Had to deactivate SSL because AzurePass sub ran out and Dreamspark sub does not support sertificates
+                    //SigningCertificate = LoadCertificate(),
+                    RequireSsl = false,
 
                     Factory = new IdentityServerServiceFactory()
                         .UseInMemoryUsers(Users.Get())
