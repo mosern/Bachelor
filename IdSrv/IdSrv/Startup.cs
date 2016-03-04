@@ -2,6 +2,7 @@
 using IdSrv.Config;
 using Microsoft.Owin;
 using Owin;
+using Serilog;
 using System;
 using System.Security.Cryptography.X509Certificates;
 
@@ -22,9 +23,7 @@ namespace IdSrv
                         EnablePostSignOutAutoRedirect = true,
                     },
 
-                    //Had to deactivate SSL because AzurePass sub ran out and Dreamspark sub does not support sertificates
-                    //SigningCertificate = LoadCertificate(),
-                    RequireSsl = false,
+                    SigningCertificate = LoadCertificate(),
 
                     Factory = new IdentityServerServiceFactory()
                         .UseInMemoryUsers(Users.Get())
@@ -33,7 +32,12 @@ namespace IdSrv
 
                 });
             });
-           
+
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Debug()
+                .WriteTo.Trace()
+                .CreateLogger();
+
         }
 
         X509Certificate2 LoadCertificate()
@@ -56,6 +60,12 @@ namespace IdSrv
             {
                 throw e;
             }
+        }
+
+        X509Certificate2 LoadCertificate2()
+        {
+            return new X509Certificate2(
+                string.Format(@"{0}\Certificates\idsrv3test.pfx", AppDomain.CurrentDomain.BaseDirectory), "idsrv3test");
         }
 
     }
