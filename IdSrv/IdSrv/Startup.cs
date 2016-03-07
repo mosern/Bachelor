@@ -25,10 +25,12 @@ namespace IdSrv
 
                     SigningCertificate = LoadCertificate(),
 
-                    Factory = new IdentityServerServiceFactory()
-                        .UseInMemoryUsers(Users.Get())
-                        .UseInMemoryClients(Clients.Get())
-                        .UseInMemoryScopes(Scopes.Get()),
+                    Factory = Database.Configure("Bachelor"),
+
+                    //Factory = new IdentityServerServiceFactory()
+                    //    .UseInMemoryUsers(Users.Get())
+                    //   .UseInMemoryClients(Clients.Get())
+                    //    .UseInMemoryScopes(Scopes.Get()),
 
                 });
             });
