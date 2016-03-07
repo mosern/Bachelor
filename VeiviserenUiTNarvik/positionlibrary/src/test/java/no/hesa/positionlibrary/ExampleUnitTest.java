@@ -16,6 +16,7 @@ public class ExampleUnitTest {
     double x_expected = 0;
     double y_expected = 0;
     double z_expected = 0;
+    double radius = 6371 * 1000; //earth raduis (meters)
 
 
     @Test
@@ -25,16 +26,17 @@ public class ExampleUnitTest {
 
     @Test
     public void TestPosition() {
-        double x1 = 6371 * 1000 * Math.cos(68.43618) * Math.cos(17.43358);
-        double y1 = 6371 * 1000 * Math.cos(68.43618) * Math.sin(17.43358);
-        double x2 = 6371 * 1000 * Math.cos(68.43629) * Math.cos(17.43362);
-        double y2 = 6371 * 1000 * Math.cos(68.43629) * Math.sin(17.43362);
-        double x3 = 6371 * 1000 * Math.cos(68.43623) * Math.cos(17.43362);
-        double y3 = 6371 * 1000 * Math.cos(68.43623) * Math.sin(17.43362);
+        //Converting from longitude\latitude to Cartesian coordinates
+        double x1 = radius * Math.cos(68.43618 * Math.PI/180) * Math.cos(17.43358 * Math.PI/180);
+        double y1 = radius * Math.cos(68.43618 * Math.PI/180) * Math.sin(17.43358 * Math.PI/180);
+        double x2 = radius * Math.cos(68.43629 * Math.PI/180) * Math.cos(17.43362 * Math.PI/180);
+        double y2 = radius * Math.cos(68.43629 * Math.PI/180) * Math.sin(17.43362 * Math.PI/180);
+        double x3 = radius * Math.cos(68.43623 * Math.PI/180) * Math.cos(17.43362 * Math.PI/180);
+        double y3 = radius * Math.cos(68.43623 * Math.PI/180) * Math.sin(17.43362 * Math.PI/180);
 
-        x_expected = 6371 * 1000 * Math.cos(68.43622) * Math.cos(17.43377);
-        y_expected = 6371 * 1000 * Math.cos(68.43622) * Math.sin(17.43377);
-        z_expected = 6371 * 1000 * Math.sin(68.43622);
+        x_expected = radius * Math.cos(68.43622 * Math.PI/180) * Math.cos(17.43377 * Math.PI/180);
+        y_expected = radius * Math.cos(68.43622 * Math.PI/180) * Math.sin(17.43377 * Math.PI/180);
+        z_expected = radius * Math.sin(68.43622 * Math.PI/180);
 
         double[][] positions = new double[][]{{x1, y1},{x2, y2},{x3, y3}};
         double[] distances = new double[] {9.22,9.97,5.57};
@@ -50,6 +52,8 @@ public class ExampleUnitTest {
     private void testResults(double[] expectedPosition, final double delta, LeastSquaresOptimizer.Optimum optimum, RealVector x) {
 
         double[] calculatedPosition = optimum.getPoint().toArray();
+        calculatedPosition[0] = (180/Math.PI) * Math.asin(z_expected/(radius));
+        calculatedPosition[1] = (180/Math.PI) * Math.atan2(y_expected, x_expected);
 
         int numberOfIterations = optimum.getIterations();
         int numberOfEvaluations = optimum.getEvaluations();
@@ -83,9 +87,6 @@ public class ExampleUnitTest {
         }
 
         System.out.println(output.toString());
-
-        calculatedPosition[0] = (180/Math.PI) * Math.asin(z_expected/(6371 * 1000));
-        calculatedPosition[1] = (180/Math.PI) * Math.atan2(y_expected, x_expected);
 
         // expected == calculated?
         for (int i = 0; i < calculatedPosition.length; i++) {
