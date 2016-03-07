@@ -182,7 +182,21 @@
       <DependentUpon>201603070828221_InitialCreate.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\ScopeConfiguration\Configuration.cs" />
+    <Compile Include="Migrations\UserDBConfiguration\201603071101003_InitialCreate.cs" />
+    <Compile Include="Migrations\UserDBConfiguration\201603071101003_InitialCreate.Designer.cs">
+      <DependentUpon>201603071101003_InitialCreate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\UserDBConfiguration\201603071120320_Anotations.cs" />
+    <Compile Include="Migrations\UserDBConfiguration\201603071120320_Anotations.Designer.cs">
+      <DependentUpon>201603071120320_Anotations.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\UserDBConfiguration\201603071254281_baseModel.cs" />
+    <Compile Include="Migrations\UserDBConfiguration\201603071254281_baseModel.Designer.cs">
+      <DependentUpon>201603071254281_baseModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\UserDBConfiguration\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\LocalUserService.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -244,6 +258,21 @@
     <EmbeddedResource Include="Migrations\ScopeConfiguration\201603070828221_InitialCreate.resx">
       <DependentUpon>201603070828221_InitialCreate.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\UserDBConfiguration\201603071101003_InitialCreate.resx">
+      <DependentUpon>201603071101003_InitialCreate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\UserDBConfiguration\201603071120320_Anotations.resx">
+      <DependentUpon>201603071120320_Anotations.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\UserDBConfiguration\201603071254281_baseModel.resx">
+      <DependentUpon>201603071254281_baseModel.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\UserDB\UserDB.csproj">
+      <Project>{ef583653-98e2-49f8-8ad9-cdd590ea7dc0}</Project>
+      <Name>UserDB</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
