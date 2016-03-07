@@ -34,7 +34,6 @@ public class WifiPosition {
             for (int i = 0; i < scanResults.size(); i++) {
                 distances[i] = distanceToAccessPoint(scanResults.get(i).level,scanResults.get(i).frequency);
             }
-            //Do something with the data here..
         }
     }
 
