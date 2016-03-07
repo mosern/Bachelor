@@ -13,9 +13,9 @@ import static org.junit.Assert.*;
  * To work on unit tests, switch the Test Artifact in the Build Variants view.
  */
 public class ExampleUnitTest {
-    double x_expected = 0;
-    double y_expected = 0;
-    double z_expected = 0;
+    double x_expected = 0; //x-coordinate foe expected position
+    double y_expected = 0; //y-coordinate foe expected position
+    double z_expected = 0; //z-coordinate foe expected position
     double radius = 6371 * 1000; //earth raduis (meters)
 
 
@@ -34,6 +34,7 @@ public class ExampleUnitTest {
         double x3 = radius * Math.cos(68.43623 * Math.PI/180) * Math.cos(17.43362 * Math.PI/180);
         double y3 = radius * Math.cos(68.43623 * Math.PI/180) * Math.sin(17.43362 * Math.PI/180);
 
+        //Calculating Cartesian coordinates for expected position
         x_expected = radius * Math.cos(68.43622 * Math.PI/180) * Math.cos(17.43377 * Math.PI/180);
         y_expected = radius * Math.cos(68.43622 * Math.PI/180) * Math.sin(17.43377 * Math.PI/180);
         z_expected = radius * Math.sin(68.43622 * Math.PI/180);
@@ -43,7 +44,6 @@ public class ExampleUnitTest {
         TrilaterationFunction trilaterationFunction = new TrilaterationFunction(positions,distances);
         LinearLeastSquaresSolver lSolver = new LinearLeastSquaresSolver(trilaterationFunction);
         NonLinearLeastSquaresSolver nlSolver = new NonLinearLeastSquaresSolver(trilaterationFunction, new LevenbergMarquardtOptimizer());
-        //double[] expectedPosition = new double[] {x_expected,y_expected};
         double[] expectedPosition = new double[] {68.43622,17.43377};
         RealVector x = lSolver.solve();
         LeastSquaresOptimizer.Optimum optimum = nlSolver.solve();
@@ -52,6 +52,7 @@ public class ExampleUnitTest {
     private void testResults(double[] expectedPosition, final double delta, LeastSquaresOptimizer.Optimum optimum, RealVector x) {
 
         double[] calculatedPosition = optimum.getPoint().toArray();
+        //Converting calculated results from Cartesian coordinates to longitude\latitude
         calculatedPosition[0] = (180/Math.PI) * Math.asin(z_expected/(radius));
         calculatedPosition[1] = (180/Math.PI) * Math.atan2(y_expected, x_expected);
 
