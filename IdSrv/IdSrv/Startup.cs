@@ -1,5 +1,7 @@
 ﻿using IdentityServer3.Core.Configuration;
+using IdentityServer3.Core.Services;
 using IdSrv.Config;
+using IdSrv.Services;
 using Microsoft.Owin;
 using Owin;
 using Serilog;
@@ -16,6 +18,12 @@ namespace IdSrv
         {
             app.Map("/identity", idsrvApp =>
             {
+                var factory = Database.Configure("Bachelor");
+
+                var userService = new LocalUserService();
+
+                factory.UserService = new Registration<IUserService>(resolver => userService);
+
                 idsrvApp.UseIdentityServer(new IdentityServerOptions
                 {
                     AuthenticationOptions = new AuthenticationOptions()
@@ -25,14 +33,16 @@ namespace IdSrv
 
                     SigningCertificate = LoadCertificate(),
 
-                    Factory = Database.Configure("Bachelor"),
+                    Factory = factory,
 
-                    //Factory = new IdentityServerServiceFactory()
-                    //    .UseInMemoryUsers(Users.Get())
-                    //   .UseInMemoryClients(Clients.Get())
-                    //    .UseInMemoryScopes(Scopes.Get()),
+                    
 
-                });
+                //Factory = new IdentityServerServiceFactory()
+                //    .UseInMemoryUsers(Users.Get())
+                //   .UseInMemoryClients(Clients.Get())
+                //    .UseInMemoryScopes(Scopes.Get()),
+
+            });
             });
 
             Log.Logger = new LoggerConfiguration()
