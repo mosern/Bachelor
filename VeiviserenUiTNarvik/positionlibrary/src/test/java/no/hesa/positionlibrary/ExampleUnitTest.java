@@ -13,6 +13,11 @@ import static org.junit.Assert.*;
  * To work on unit tests, switch the Test Artifact in the Build Variants view.
  */
 public class ExampleUnitTest {
+    double x_expected = 0;
+    double y_expected = 0;
+    double z_expected = 0;
+
+
     @Test
     public void addition_isCorrect() throws Exception {
         assertEquals(4, 2 + 2);
@@ -20,11 +25,23 @@ public class ExampleUnitTest {
 
     @Test
     public void TestPosition() {
-        double[][] positions = new double[][]{{68.43618,17.43358},{68.43629,17.43362},{68.43623,17.43362}};
+        double x1 = 6371 * 1000 * Math.cos(68.43618) * Math.cos(17.43358);
+        double y1 = 6371 * 1000 * Math.cos(68.43618) * Math.sin(17.43358);
+        double x2 = 6371 * 1000 * Math.cos(68.43629) * Math.cos(17.43362);
+        double y2 = 6371 * 1000 * Math.cos(68.43629) * Math.sin(17.43362);
+        double x3 = 6371 * 1000 * Math.cos(68.43623) * Math.cos(17.43362);
+        double y3 = 6371 * 1000 * Math.cos(68.43623) * Math.sin(17.43362);
+
+        x_expected = 6371 * 1000 * Math.cos(68.43622) * Math.cos(17.43377);
+        y_expected = 6371 * 1000 * Math.cos(68.43622) * Math.sin(17.43377);
+        z_expected = 6371 * 1000 * Math.sin(68.43622);
+
+        double[][] positions = new double[][]{{x1, y1},{x2, y2},{x3, y3}};
         double[] distances = new double[] {9.22,9.97,5.57};
         TrilaterationFunction trilaterationFunction = new TrilaterationFunction(positions,distances);
         LinearLeastSquaresSolver lSolver = new LinearLeastSquaresSolver(trilaterationFunction);
         NonLinearLeastSquaresSolver nlSolver = new NonLinearLeastSquaresSolver(trilaterationFunction, new LevenbergMarquardtOptimizer());
+        //double[] expectedPosition = new double[] {x_expected,y_expected};
         double[] expectedPosition = new double[] {68.43622,17.43377};
         RealVector x = lSolver.solve();
         LeastSquaresOptimizer.Optimum optimum = nlSolver.solve();
@@ -66,6 +83,9 @@ public class ExampleUnitTest {
         }
 
         System.out.println(output.toString());
+
+        calculatedPosition[0] = (180/Math.PI) * Math.asin(z_expected/(6371 * 1000));
+        calculatedPosition[1] = (180/Math.PI) * Math.atan2(y_expected, x_expected);
 
         // expected == calculated?
         for (int i = 0; i < calculatedPosition.length; i++) {

@@ -1,19 +1,16 @@
 package no.hesa.positionlibrary;
-import android.test.ActivityInstrumentationTestCase2;
 import org.apache.commons.math3.fitting.leastsquares.LeastSquaresOptimizer.Optimum;
 import org.apache.commons.math3.fitting.leastsquares.LevenbergMarquardtOptimizer;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.RealVector;
 import org.apache.commons.math3.linear.SingularMatrixException;
 import org.junit.*;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
-
 import static org.junit.Assert.assertEquals;
+
 /**
  * Created by ThaSimon on 07.03.2016.
  */
-@RunWith(JUnit4.class)
+
 public class WifiPositionTest {
     @Test
     public void TestPosition() {
