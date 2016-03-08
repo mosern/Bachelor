@@ -15,6 +15,9 @@ using System.Diagnostics;
 using System.Security.Claims;
 using Thinktecture.IdentityModel.Client;
 using Microsoft.IdentityModel.Protocols;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Net;
 
 namespace AdmAspNet
 {
@@ -35,7 +38,7 @@ namespace AdmAspNet
 
             app.UseOpenIdConnectAuthentication(new OpenIdConnectAuthenticationOptions
                 {
-                    
+
                     ClientId = ClientId,
                     Authority = Authority,
                     RedirectUri = RedirectURI,
@@ -53,10 +56,14 @@ namespace AdmAspNet
 
                         SecurityTokenValidated = async n =>
                         {
-                            var id = n.AuthenticationTicket.Identity;
+                            var identity = n.AuthenticationTicket.Identity;
+
+                            var userInfo = await CallUserInfoEndpoint(n.ProtocolMessage.AccessToken);
+
+                            var usernameClaim = new Claim("username", userInfo.Value<string>("username"));
 
                             var nid = new ClaimsIdentity(
-                                id.AuthenticationType,
+                                identity.AuthenticationType,
                                 JwtClaimTypes.GivenName,
                                 JwtClaimTypes.Role);
 
@@ -64,6 +71,8 @@ namespace AdmAspNet
                             nid.AddClaim(new Claim("id_token", n.ProtocolMessage.IdToken));
 
                             nid.AddClaim(new Claim("access_token", n.ProtocolMessage.AccessToken));
+
+                            nid.AddClaim(usernameClaim);
 
 
                             n.AuthenticationTicket = new AuthenticationTicket(
@@ -135,6 +144,27 @@ namespace AdmAspNet
                 // something went wrong
                 Debug.Write(ex.Message);
 
+            }
+        }
+
+        //Writen by Kevin Dockx as a part of the Pluralsight course "Building and Securing a RESTful API for Multiple Clients in ASP.NET"
+        //https://app.pluralsight.com/library/courses/building-securing-restful-api-aspdotnet/exercise-files
+        public async static Task<JObject> CallUserInfoEndpoint(string accessToken)
+        {
+            var client = new HttpClient();
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+
+            var response = await client.GetAsync(ConfigurationManager.AppSettings["Authority"] + "/connect/userInfo");
+
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                var json = await response.Content.ReadAsStringAsync();
+                return JObject.Parse(json); //.ToString();
+
+            }
+            else
+            {
+                return null;
             }
         }
     }
