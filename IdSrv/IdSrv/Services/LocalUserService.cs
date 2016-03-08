@@ -25,5 +25,17 @@ namespace IdSrv.Services
 
             return Task.FromResult(0);
         }
+
+        /*public override Task GetProfileDataAsync(ProfileDataRequestContext context)
+        {
+            // issue the claims for the user
+            var user = Users.SingleOrDefault(x => x.Subject == context.Subject.GetSubjectId());
+            if (user != null)
+            {
+                context.IssuedClaims = user.Claims.Where(x => context.RequestedClaimTypes.Contains(x.Type));
+            }
+
+            return Task.FromResult(0);*/
+        }
     }
 }

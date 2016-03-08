@@ -12,6 +12,11 @@ namespace UserDB
     /// </summary>
     public class Context : DbContext
     {
+        public Context() : base("Bachelor")
+        {
+
+        }
+
         public virtual DbSet<User> User { get; set; }
         public virtual DbSet<Provider> Provider { get; set; }
         public virtual DbSet<UserProvider> UserProvider { get; set; }
