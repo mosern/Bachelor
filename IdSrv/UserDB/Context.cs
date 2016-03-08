@@ -20,6 +20,7 @@ namespace UserDB
         public virtual DbSet<User> User { get; set; }
         public virtual DbSet<Provider> Provider { get; set; }
         public virtual DbSet<UserProvider> UserProvider { get; set; }
+        public virtual DbSet<Claims> Claims { get; set; }
 
     }
 }

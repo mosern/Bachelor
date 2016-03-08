@@ -194,6 +194,10 @@
     <Compile Include="Migrations\UserDBConfiguration\201603071254281_baseModel.Designer.cs">
       <DependentUpon>201603071254281_baseModel.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\UserDBConfiguration\201603080842031_claims.cs" />
+    <Compile Include="Migrations\UserDBConfiguration\201603080842031_claims.Designer.cs">
+      <DependentUpon>201603080842031_claims.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\UserDBConfiguration\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\LocalUserService.cs" />
@@ -266,6 +270,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\UserDBConfiguration\201603071254281_baseModel.resx">
       <DependentUpon>201603071254281_baseModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\UserDBConfiguration\201603080842031_claims.resx">
+      <DependentUpon>201603080842031_claims.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

@@ -4,6 +4,7 @@ using IdentityServer3.Core.Services.Default;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web;
 using UserDB;
@@ -13,6 +14,7 @@ namespace IdSrv.Services
     public class LocalUserService : UserServiceBase
     {
         public static Repository<User> Users = new Repository<User>();
+        public static Repository<Claims> Claims = new Repository<Claims>();
         public static List<User> UsersL = Users.List();
 
         public override Task AuthenticateLocalAsync(LocalAuthenticationContext context)
@@ -26,16 +28,25 @@ namespace IdSrv.Services
             return Task.FromResult(0);
         }
 
-        /*public override Task GetProfileDataAsync(ProfileDataRequestContext context)
+        public override Task GetProfileDataAsync(ProfileDataRequestContext context)
         {
             // issue the claims for the user
-            var user = Users.SingleOrDefault(x => x.Subject == context.Subject.GetSubjectId());
-            if (user != null)
+            var user = UsersL.SingleOrDefault(u => u.Username.Equals(context.Subject.Identity.Name));
+            var claims = Claims.List().Where(c => c.UserId == user.Id).ToList();
+            List<Claim> enClaims = new List<Claim>();
+
+            foreach(Claims clame in claims)
             {
-                context.IssuedClaims = user.Claims.Where(x => context.RequestedClaimTypes.Contains(x.Type));
+                enClaims.Add(new Claim(clame.Type, clame.Value));
             }
 
-            return Task.FromResult(0);*/
+
+            if (user != null)
+            {
+                context.IssuedClaims = enClaims as IEnumerable<Claim>;
+            }
+
+            return Task.FromResult(0);
         }
     }
 }
