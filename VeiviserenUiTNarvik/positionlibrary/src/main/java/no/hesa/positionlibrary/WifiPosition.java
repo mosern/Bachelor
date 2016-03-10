@@ -12,7 +12,6 @@ import java.util.List;
  * A class that takes care of positioning using wifi access-points
  */
 
-//Simoooon!
 public class WifiPosition {
     private List<ScanResult> scanResults = null;
     private final BroadcastReceiver wifiReceiver = new BroadcastReceiver() {
