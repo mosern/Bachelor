@@ -4,6 +4,6 @@
     <string name="action_log_in">Log in</string>
 
     <!-- TEMP -->
-    <string name="content_text">Dette er content_main.xml, loades fra activity_main.xml</string>
+    <string name="content_text">Dette er content_main.xml, loads fra activity_main.xml</string>
 
 </resources>
