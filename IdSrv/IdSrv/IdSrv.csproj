@@ -167,6 +167,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\MakeObject.cs" />
     <Compile Include="Migrations\ClientConfiguration\201603070828350_InitialCreate.cs" />
     <Compile Include="Migrations\ClientConfiguration\201603070828350_InitialCreate.Designer.cs">
       <DependentUpon>201603070828350_InitialCreate.cs</DependentUpon>

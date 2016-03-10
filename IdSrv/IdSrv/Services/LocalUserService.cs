@@ -1,6 +1,7 @@
 ﻿using IdentityServer3.Core.Models;
 using IdentityServer3.Core.Services;
 using IdentityServer3.Core.Services.Default;
+using IdSrv.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,17 +34,10 @@ namespace IdSrv.Services
             // issue the claims for the user
             var user = UsersL.SingleOrDefault(u => u.Username.Equals(context.Subject.Identity.Name));
             var claims = Claims.List().Where(c => c.UserId == user.Id).ToList();
-            List<Claim> enClaims = new List<Claim>();
-
-            foreach(Claims clame in claims)
-            {
-                enClaims.Add(new Claim(clame.Type, clame.Value));
-            }
-
 
             if (user != null)
             {
-                context.IssuedClaims = enClaims as IEnumerable<Claim>;
+                context.IssuedClaims = MakeObject.IEClaimFromListClaims(claims);
             }
 
             return Task.FromResult(0);
