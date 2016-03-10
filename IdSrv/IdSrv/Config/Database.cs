@@ -14,6 +14,8 @@ namespace IdSrv.Config
         /// <summary>
         /// Inspired by sample from IdentityServer3 developers
         /// https://github.com/IdentityServer/IdentityServer3.Samples/blob/master/source/EntityFramework/SelfHost/Config/Factory.cs
+        /// 
+        /// writen by: Andreas Mosvoll
         /// </summary>
         /// <param name="connectStr"></param>
         /// <returns></returns>
@@ -40,8 +42,10 @@ namespace IdSrv.Config
         }
 
         /// <summary>
-        /// Copied from IdentityServer3 sample made by developers behind IdentityServer3
+        /// Inspired by sample from IdentityServer3 developers
         /// https://github.com/IdentityServer/IdentityServer3.Samples/blob/master/source/EntityFramework/SelfHost/Config/Factory.cs
+        /// 
+        /// writen by: Andreas Mosvoll
         /// </summary>
         /// <param name="clients"></param>
         /// <param name="options"></param>
@@ -49,37 +53,52 @@ namespace IdSrv.Config
         {
             using (var db = new ClientConfigurationDbContext(options.ConnectionString, options.Schema))
             {
-                if (!db.Clients.Any())
+                foreach (var c in clients)
                 {
-                    foreach (var c in clients)
+                    var e = c.ToEntity();
+                    var dbClient = db.Clients.Where(cl => cl.ClientId == c.ClientId).FirstOrDefault();
+                    if(dbClient == null)
                     {
-                        var e = c.ToEntity();
                         db.Clients.Add(e);
                     }
-                    db.SaveChanges();
+                    else
+                    {
+                        e.Id = dbClient.Id;
+                        db.Entry(dbClient).CurrentValues.SetValues(e);
+                    } 
                 }
+                db.SaveChanges();
             }
         }
 
         /// <summary>
-        /// Copied from IdentityServer3 sample made by developers behind IdentityServer3
+        /// Inspired by sample from IdentityServer3 developers
         /// https://github.com/IdentityServer/IdentityServer3.Samples/blob/master/source/EntityFramework/SelfHost/Config/Factory.cs
+        /// 
+        /// writen by: Andreas Mosvoll
         /// </summary>
         /// <param name="scopes"></param>
         /// <param name="options"></param>
         public static void ConfigureScopes(IEnumerable<Scope> scopes, EntityFrameworkServiceOptions options)
         {
+
             using (var db = new ScopeConfigurationDbContext(options.ConnectionString, options.Schema))
             {
-                if (!db.Scopes.Any())
+                foreach (var s in scopes)
                 {
-                    foreach (var s in scopes)
+                    var e = s.ToEntity();
+                    var dbScope = db.Scopes.Where(sc => sc.Name == s.Name).FirstOrDefault();
+                    if (dbScope == null)
                     {
-                        var e = s.ToEntity();
                         db.Scopes.Add(e);
                     }
-                    db.SaveChanges();
+                    else {
+                        e.Id = dbScope.Id;
+                        db.Entry(dbScope).CurrentValues.SetValues(e);
+                    }             
                 }
+                db.SaveChanges();
+
             }
         }
     }

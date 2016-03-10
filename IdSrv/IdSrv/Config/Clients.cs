@@ -37,7 +37,7 @@ namespace IdSrv.Config
                         StandardScopes.Profile.Name,
                         "api",
                         "roles",
-                    },                      
+                    },                   
                 }
             };
         }
