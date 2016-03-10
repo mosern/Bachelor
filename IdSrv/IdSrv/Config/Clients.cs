@@ -36,6 +36,7 @@ namespace IdSrv.Config
                         StandardScopes.OpenId.Name,
                         StandardScopes.Profile.Name,
                         "api",
+                        "roles",
                     },                      
                 }
             };
