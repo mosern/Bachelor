@@ -1,5 +1,9 @@
 package no.hesa.veiviserenuitnarvik;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -8,11 +12,21 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 
 import no.hesa.positionlibrary.PositionLibrary;
 
 public class MainActivity extends AppCompatActivity {
     private PositionLibrary positionLibrary = null;
+    private final BroadcastReceiver outputReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals("no.hesa.positionlibrary.Output")) {
+                TextView textView = (TextView) findViewById(R.id.text);
+                textView.setText(intent.getStringExtra("DistanceOutput"));
+            }
+        }
+    };
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
         //Initialize library here.. do so by calling new PositionLibrary();
         positionLibrary = new PositionLibrary();
         positionLibrary.wifiPosition.registerBroadcast(this);
+        registerReceiver(outputReceiver,new IntentFilter("no.hesa.positionlibrary.Output"));
     }
 
     @Override
@@ -60,5 +75,6 @@ public class MainActivity extends AppCompatActivity {
         if (positionLibrary != null) {
             positionLibrary.wifiPosition.unRegisterBroadcast(this);
         }
+        unregisterReceiver(outputReceiver);
     }
 }

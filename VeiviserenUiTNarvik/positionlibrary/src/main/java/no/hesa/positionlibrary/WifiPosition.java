@@ -21,7 +21,7 @@ public class WifiPosition {
             if (intent.getAction().equals(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION)) {
                 WifiManager wifiManager = (WifiManager) c.getSystemService(Context.WIFI_SERVICE);
                 scanResults = wifiManager.getScanResults();
-                calculateDistances();
+                calculateDistances(c);
             }
         }
     };
@@ -38,7 +38,7 @@ public class WifiPosition {
         c.unregisterReceiver(wifiReceiver);
     }
 
-    public String calculateDistances() {
+    public void calculateDistances(Context c) {
         if (scanResults != null) {
             double distances[] = new double[scanResults.size()];
             for (int i = 0; i < scanResults.size(); i++) {
@@ -48,9 +48,12 @@ public class WifiPosition {
             for (int i = 0; i < distances.length; i++) {
                 outputBuilder.append("Distance to access point: "+distances[i]+"\n");
             }
-            return outputBuilder.toString();
+            Intent intent = new Intent();
+            intent.setAction("no.hesa.positionlibrary.Output");
+            intent.putExtra("DistanceOutput", outputBuilder.toString());
+            c.sendBroadcast(intent);
         }
-        return "No output to show (input is null)";
+
     }
 
     /**
