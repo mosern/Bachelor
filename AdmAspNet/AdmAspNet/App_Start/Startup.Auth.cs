@@ -58,9 +58,7 @@ namespace AdmAspNet
                         {
                             var identity = n.AuthenticationTicket.Identity;
 
-                            var userInfo = await CallUserInfoEndpoint(n.ProtocolMessage.AccessToken);
-
-                            var usernameClaim = new Claim("username", userInfo.Value<string>("username"));
+                            var usernameClaim = n.AuthenticationTicket.Identity.FindFirst("username");
 
                             var nid = new ClaimsIdentity(
                                 identity.AuthenticationType,
