@@ -45,7 +45,7 @@ namespace AdmAspNet
                     PostLogoutRedirectUri = RedirectURI,
                     SignInAsAuthenticationType = "Cookies",
                     ResponseType="code id_token token",
-                    Scope = "openid api",
+                    Scope = "openid api roles",
 
                     Notifications = new OpenIdConnectAuthenticationNotifications()
                     {
@@ -59,6 +59,7 @@ namespace AdmAspNet
                             var identity = n.AuthenticationTicket.Identity;
 
                             var usernameClaim = n.AuthenticationTicket.Identity.FindFirst("username");
+                            var roles = n.AuthenticationTicket.Identity.FindAll("roles");
 
                             var nid = new ClaimsIdentity(
                                 identity.AuthenticationType,
