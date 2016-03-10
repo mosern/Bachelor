@@ -25,14 +25,16 @@ public class WifiPosition {
             }
         }
     };
+
     public WifiPosition() {
         //Add logic here, initialize listeners, method calls and so on..
     }
+
     public void calculateDistances() {
         if (scanResults != null) {
             double distances[] = new double[scanResults.size()];
             for (int i = 0; i < scanResults.size(); i++) {
-                distances[i] = distanceToAccessPoint(scanResults.get(i).level,scanResults.get(i).frequency);
+                distances[i] = distanceToAccessPoint(scanResults.get(i).level, scanResults.get(i).frequency);
             }
         }
     }

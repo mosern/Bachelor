@@ -12,49 +12,56 @@ import static org.junit.Assert.*;
 /**
  * To work on unit tests, switch the Test Artifact in the Build Variants view.
  */
-public class ExampleUnitTest {
-    double x_expected = 0; //x-coordinate foe expected position
-    double y_expected = 0; //y-coordinate foe expected position
-    double z_expected = 0; //z-coordinate foe expected position
-    double radius = 6371 * 1000; //earth raduis (meters)
+public class WiFiPositionUnitTest {
+    private double x1_degree = 68.43618; //x-coordinate for fist Wi-Fi access point
+    private double y1_degree = 17.43358; //y-coordinate for fist Wi-Fi access point
+    private double x2_degree = 68.43629; //x-coordinate for second Wi-Fi access point
+    private double y2_degree = 17.43362; //y-coordinate for second Wi-Fi access point
+    private double x3_degree = 68.43623; //x-coordinate for third Wi-Fi access point
+    private double y3_degree = 17.43362; //y-coordinate for third Wi-Fi access point
 
+    private double x_expected_degree = 68.43622; //x-coordinate for expected position
+    private double y_expected_degree = 17.43377; //y-coordinate for expected position
 
-    @Test
-    public void addition_isCorrect() throws Exception {
-        assertEquals(4, 2 + 2);
-    }
+    private double x_expected_cartesian = 0; //x-coordinate for expected position
+    private double y_expected_cartesian = 0; //y-coordinate for expected position
+    private double z_expected_cartesian = 0; //z-coordinate for expected position
+
+    private double radius = 6371 * 1000; //earth raduis (meters)
 
     @Test
     public void TestPosition() {
         //Converting from longitude\latitude to Cartesian coordinates
-        double x1 = radius * Math.cos(68.43618 * Math.PI/180) * Math.cos(17.43358 * Math.PI/180);
-        double y1 = radius * Math.cos(68.43618 * Math.PI/180) * Math.sin(17.43358 * Math.PI/180);
-        double x2 = radius * Math.cos(68.43629 * Math.PI/180) * Math.cos(17.43362 * Math.PI/180);
-        double y2 = radius * Math.cos(68.43629 * Math.PI/180) * Math.sin(17.43362 * Math.PI/180);
-        double x3 = radius * Math.cos(68.43623 * Math.PI/180) * Math.cos(17.43362 * Math.PI/180);
-        double y3 = radius * Math.cos(68.43623 * Math.PI/180) * Math.sin(17.43362 * Math.PI/180);
+        double x1_cartesian = radius * Math.cos(x1_degree * Math.PI/180) * Math.cos(y1_degree * Math.PI/180);
+        double y1_cartesian = radius * Math.cos(x1_degree * Math.PI/180) * Math.sin(y1_degree * Math.PI / 180);
+        double x2_cartesian = radius * Math.cos(x2_degree * Math.PI/180) * Math.cos(y2_degree * Math.PI / 180);
+        double y2_cartesian = radius * Math.cos(x2_degree * Math.PI/180) * Math.sin(y2_degree * Math.PI / 180);
+        double x3_cartesian = radius * Math.cos(x3_degree * Math.PI/180) * Math.cos(y3_degree * Math.PI / 180);
+        double y3_cartesian = radius * Math.cos(x3_degree * Math.PI/180) * Math.sin(y3_degree * Math.PI / 180);
 
         //Calculating Cartesian coordinates for expected position
-        x_expected = radius * Math.cos(68.43622 * Math.PI/180) * Math.cos(17.43377 * Math.PI/180);
-        y_expected = radius * Math.cos(68.43622 * Math.PI/180) * Math.sin(17.43377 * Math.PI/180);
-        z_expected = radius * Math.sin(68.43622 * Math.PI/180);
+        x_expected_cartesian = radius * Math.cos(x_expected_degree * Math.PI/180) * Math.cos(y_expected_degree * Math.PI/180);
+        y_expected_cartesian = radius * Math.cos(x_expected_degree * Math.PI/180) * Math.sin(y_expected_degree * Math.PI/180);
+        z_expected_cartesian = radius * Math.sin(x_expected_degree * Math.PI/180);
 
-        double[][] positions = new double[][]{{x1, y1},{x2, y2},{x3, y3}};
+        double[][] positions = new double[][]{{x1_cartesian, y1_cartesian},{x2_cartesian, y2_cartesian},{x3_cartesian, y3_cartesian}};
         double[] distances = new double[] {9.22,9.97,5.57};
         TrilaterationFunction trilaterationFunction = new TrilaterationFunction(positions,distances);
         LinearLeastSquaresSolver lSolver = new LinearLeastSquaresSolver(trilaterationFunction);
         NonLinearLeastSquaresSolver nlSolver = new NonLinearLeastSquaresSolver(trilaterationFunction, new LevenbergMarquardtOptimizer());
-        double[] expectedPosition = new double[] {68.43622,17.43377};
+        double[] expectedPosition = new double[] {x_expected_degree, y_expected_degree};
         RealVector x = lSolver.solve();
         LeastSquaresOptimizer.Optimum optimum = nlSolver.solve();
+
         testResults(expectedPosition,0.0001,optimum,x);
     }
+
     private void testResults(double[] expectedPosition, final double delta, LeastSquaresOptimizer.Optimum optimum, RealVector x) {
 
         double[] calculatedPosition = optimum.getPoint().toArray();
         //Converting calculated results from Cartesian coordinates to longitude\latitude
-        calculatedPosition[0] = (180/Math.PI) * Math.asin(z_expected/(radius));
-        calculatedPosition[1] = (180/Math.PI) * Math.atan2(y_expected, x_expected);
+        calculatedPosition[0] = (180/Math.PI) * Math.asin(z_expected_cartesian/(radius));
+        calculatedPosition[1] = (180/Math.PI) * Math.atan2(y_expected_cartesian, x_expected_cartesian);
 
         int numberOfIterations = optimum.getIterations();
         int numberOfEvaluations = optimum.getEvaluations();
