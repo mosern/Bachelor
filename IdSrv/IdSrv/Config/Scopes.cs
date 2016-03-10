@@ -26,6 +26,17 @@ namespace IdSrv.Config
                         Type = ScopeType.Resource,
                         Emphasize = false,
                         Enabled = true
+                    },
+
+                    new Scope
+                    {
+                        Enabled = true,
+                        Name = "roles",
+                        Type = ScopeType.Identity,
+                        Claims = new List<ScopeClaim>
+                        {
+                            new ScopeClaim("role")
+                        }
                     }
 
                  };
