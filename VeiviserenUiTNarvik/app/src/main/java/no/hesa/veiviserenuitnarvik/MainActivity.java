@@ -9,8 +9,10 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
-public class MainActivity extends AppCompatActivity {
+import no.hesa.positionlibrary.PositionLibrary;
 
+public class MainActivity extends AppCompatActivity {
+    private PositionLibrary positionLibrary = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,6 +29,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         //Initialize library here.. do so by calling new PositionLibrary();
+        positionLibrary = new PositionLibrary();
+        positionLibrary.wifiPosition.registerBroadcast(this);
     }
 
     @Override
@@ -49,5 +53,12 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (positionLibrary != null) {
+            positionLibrary.wifiPosition.unRegisterBroadcast(this);
+        }
     }
 }

@@ -3,6 +3,7 @@ package no.hesa.positionlibrary;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 
@@ -25,17 +26,31 @@ public class WifiPosition {
         }
     };
 
+
     public WifiPosition() {
-        //Add logic here, initialize listeners, method calls and so on..
+        //Add logic here, initialize listeners, method calls and so on
     }
 
-    public void calculateDistances() {
+    public void registerBroadcast(Context c) {
+        c.registerReceiver(wifiReceiver,new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
+    }
+    public void unRegisterBroadcast(Context c) {
+        c.unregisterReceiver(wifiReceiver);
+    }
+
+    public String calculateDistances() {
         if (scanResults != null) {
             double distances[] = new double[scanResults.size()];
             for (int i = 0; i < scanResults.size(); i++) {
                 distances[i] = distanceToAccessPoint(scanResults.get(i).level, scanResults.get(i).frequency);
             }
+            StringBuilder outputBuilder = new StringBuilder();
+            for (int i = 0; i < distances.length; i++) {
+                outputBuilder.append("Distance to access point: "+distances[i]+"\n");
+            }
+            return outputBuilder.toString();
         }
+        return "No output to show (input is null)";
     }
 
     /**
