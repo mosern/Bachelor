@@ -51,6 +51,7 @@ namespace IdSrv.Config
         /// <param name="options"></param>
         public static void ConfigureClients(IEnumerable<Client> clients, EntityFrameworkServiceOptions options)
         {
+            //TODO Update allowed scopes ol.
             using (var db = new ClientConfigurationDbContext(options.ConnectionString, options.Schema))
             {
                 foreach (var c in clients)
@@ -81,7 +82,7 @@ namespace IdSrv.Config
         /// <param name="options"></param>
         public static void ConfigureScopes(IEnumerable<Scope> scopes, EntityFrameworkServiceOptions options)
         {
-
+            //TODO Update Claims ol.
             using (var db = new ScopeConfigurationDbContext(options.ConnectionString, options.Schema))
             {
                 foreach (var s in scopes)
