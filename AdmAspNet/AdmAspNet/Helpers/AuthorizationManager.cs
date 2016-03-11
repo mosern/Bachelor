@@ -7,7 +7,7 @@ using Thinktecture.IdentityModel.Owin.ResourceAuthorization;
 
 namespace AdmAspNet.Helpers
 {
-    https://identityserver.github.io/Documentation/docsv2/overview/mvcGettingStarted.html
+    //https://identityserver.github.io/Documentation/docsv2/overview/mvcGettingStarted.html
     public class AuthorizationManager : ResourceAuthorizationManager
     {
         public override Task<bool> CheckAccessAsync(ResourceAuthorizationContext context)
