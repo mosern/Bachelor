@@ -21,7 +21,7 @@ namespace IdSrv
             {
                 var factory = Database.Configure("Bachelor");
 
-                var userService = new LocalUserService();
+                var userService = new UserService();
 
                 factory.UserService = new Registration<IUserService>(resolver => userService);
 
