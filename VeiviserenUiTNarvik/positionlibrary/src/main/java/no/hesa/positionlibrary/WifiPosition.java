@@ -25,6 +25,8 @@ public class WifiPosition {
             }
         }
     };
+    private double[] distances = null; //distances to nearest Wi-Fi access points
+    private double[] helpArray = null; //helper array (used for sorting)
 
 
     public WifiPosition() {
@@ -32,7 +34,7 @@ public class WifiPosition {
     }
 
     public void registerBroadcast(Context c) {
-        c.registerReceiver(wifiReceiver,new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
+        c.registerReceiver(wifiReceiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
     }
     public void unRegisterBroadcast(Context c) {
         c.unregisterReceiver(wifiReceiver);
@@ -40,20 +42,33 @@ public class WifiPosition {
 
     public void calculateDistances(Context c) {
         if (scanResults != null) {
-            double distances[] = new double[scanResults.size()];
+            distances = new double[scanResults.size()];
             for (int i = 0; i < scanResults.size(); i++) {
                 distances[i] = distanceToAccessPoint(scanResults.get(i).level, scanResults.get(i).frequency);
             }
+
+            //Sorting array with distances to Wi-Fi access points
+            helpArray = new double[distances.length];
+            mergeSort(0, distances.length - 1);
+
             StringBuilder outputBuilder = new StringBuilder();
-            for (int i = 0; i < distances.length; i++) {
-                outputBuilder.append("Distance to access point: "+distances[i]+"\n");
+
+            //Checking number of access points
+            int length = 0;
+            if(distances.length > 3)
+                length = 3;
+            else
+                length = distances.length;
+
+            for (int i = 0; i < length; i++) {
+                outputBuilder.append("Distance to access point: " + distances[i] + "\n");
             }
+
             Intent intent = new Intent();
             intent.setAction("no.hesa.positionlibrary.Output");
             intent.putExtra("DistanceOutput", outputBuilder.toString());
             c.sendBroadcast(intent);
         }
-
     }
 
     /**
@@ -66,4 +81,52 @@ public class WifiPosition {
         double exp = (27.55 - (20 * Math.log10(freqInMHz)) + Math.abs(levelInDb)) / 20.0;
         return Math.pow(10.0, exp);
     }
+
+    /**
+     * Sort distances to Wi-Fi access point recursively in ascending order
+     * @param low
+     * @param high
+     */
+    private void mergeSort(int low, int high){
+        if(low < high){
+            int middle = low + (high - low) / 2;
+            mergeSort(low, middle);
+            mergeSort(middle + 1, high);
+            merge(low, middle, high);
+        }
+    }
+
+    /**
+     * Sort and merge arrays from mergeSort
+     * @param low
+     * @param middle
+     * @param high
+     */
+    private void merge(int low, int middle, int high){
+        for(int i = low; i <= high; i++)
+            helpArray[i] = distances[i];
+
+        int i = low;
+        int j = middle + 1;
+        int k = low;
+
+        while(i <= middle && j <= high){
+            if (helpArray[i] <= helpArray[j]) {
+                distances[k] = helpArray[i];
+                i++;
+            }
+            else {
+                distances[k] = helpArray[j];
+                j++;
+            }
+            k++;
+        }
+
+        while (i <= middle) {
+            distances[k] = helpArray[i];
+            k++;
+            i++;
+        }
+    }
+
 }
