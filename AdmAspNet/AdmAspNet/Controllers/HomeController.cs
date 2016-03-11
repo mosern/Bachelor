@@ -25,6 +25,7 @@ namespace AdmAspNet.Controllers
         }
 
         [ResourceAuthorize("Read","About")]
+        [HandleForbidden]
         public ActionResult About()
         {
             string test = Get();
@@ -34,6 +35,7 @@ namespace AdmAspNet.Controllers
         }
 
         [ResourceAuthorize("Read","ContactDetails")]
+        [HandleForbidden]
         public ActionResult Contact()
         {
             ViewBag.Message = "Your contact page.";

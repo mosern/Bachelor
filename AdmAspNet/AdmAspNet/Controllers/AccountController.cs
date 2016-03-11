@@ -6,6 +6,7 @@ using System.Web.Mvc;
 using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.OpenIdConnect;
 using Microsoft.Owin.Security;
+using System.Configuration;
 
 namespace AdmAspNet.Controllers
 {
@@ -21,24 +22,12 @@ namespace AdmAspNet.Controllers
             }
         }
 
-        public void SignOut()
+        public ActionResult SignOut()
         {
-            string callbackUrl = Url.Action("SignOutCallback", "Account", routeValues: null, protocol: Request.Url.Scheme);
+            Request.GetOwinContext().Authentication.SignOut();
+            return Redirect("/");
 
-            HttpContext.GetOwinContext().Authentication.SignOut(
-                new AuthenticationProperties { RedirectUri = callbackUrl },
-                OpenIdConnectAuthenticationDefaults.AuthenticationType, CookieAuthenticationDefaults.AuthenticationType);
         }
 
-        public ActionResult SignOutCallback()
-        {
-            if (Request.IsAuthenticated)
-            {
-                // Redirect to home page if the user is authenticated.
-                return RedirectToAction("Index", "Home");
-            }
-
-            return View();
-        }
     }
 }
