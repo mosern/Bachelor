@@ -26,9 +26,9 @@ namespace AdmAspNet.Helpers
             switch (context.Action.First().Value)
             {
                 case "Read":
-                    return Eval(context.Principal.HasClaim("role", "Administrator"));
+                    return Eval(context.Principal.HasClaim("role", "administrator"));
                 case "Write":
-                    return Eval(context.Principal.HasClaim("role", "Administrator"));
+                    return Eval(context.Principal.HasClaim("role", "administrator"));
                 default:
                     return Nok();
             }
