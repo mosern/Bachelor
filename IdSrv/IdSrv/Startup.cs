@@ -3,6 +3,7 @@ using IdentityServer3.Core.Services;
 using IdSrv.Config;
 using IdSrv.Services;
 using Microsoft.Owin;
+using Microsoft.Owin.Security.Google;
 using Owin;
 using Serilog;
 using System;
@@ -29,6 +30,7 @@ namespace IdSrv
                     AuthenticationOptions = new AuthenticationOptions()
                     {
                         EnablePostSignOutAutoRedirect = true,
+                        IdentityProviders = ConfigureIdentityProviders
                     },
 
                     SigningCertificate = LoadCertificate(),
@@ -51,6 +53,21 @@ namespace IdSrv
                 .CreateLogger();
 
         }
+
+        private void ConfigureIdentityProviders(IAppBuilder app, string signInAsType)
+        {
+            app.UseGoogleAuthentication(new GoogleOAuth2AuthenticationOptions
+            {
+                AuthenticationType = "Google",
+                Caption = "Sign-in with Google",
+                SignInAsAuthenticationType = signInAsType,
+
+                ClientId = "112937482750-ql6c3ueds1f5h85bm1clqvlk9vqvcer0.apps.googleusercontent.com",
+                ClientSecret = "k56_hupJKDoLWk58wqd0_eHF"
+            });
+        }
+
+
 
         X509Certificate2 LoadCertificate()
         {
