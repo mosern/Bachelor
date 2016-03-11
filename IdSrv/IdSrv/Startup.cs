@@ -33,7 +33,7 @@ namespace IdSrv
                         IdentityProviders = ConfigureIdentityProviders
                     },
 
-                    SigningCertificate = LoadCertificate(),
+                    SigningCertificate = LoadCertificate2(),
 
                     Factory = factory,
 

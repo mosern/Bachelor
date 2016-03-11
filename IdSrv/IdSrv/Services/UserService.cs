@@ -51,6 +51,18 @@ namespace IdSrv.Services
 
                 User createdUser = Users.Create(newUser);
 
+                Provider provider = new Repository<Provider>().List().SingleOrDefault(p => p.Name == context.ExternalIdentity.Provider);
+
+                UserProvider newUserProvider = new UserProvider();
+                newUserProvider.UserId = createdUser.Id;
+                newUserProvider.ProviderId = provider.Id;
+                newUserProvider.Identifier = context.ExternalIdentity.ProviderId;
+
+                UserProviders.Create(newUserProvider);
+
+                Claims.Create(new Claims() { Type = "username", Value = createdUser.Username, UserId = createdUser.Id });
+
+                UsersL = Users.List();
                 context.AuthenticateResult = new AuthenticateResult(createdUser.Id.ToString(), createdUser.Username);
             }
             return Task.FromResult(0);
@@ -60,10 +72,10 @@ namespace IdSrv.Services
         {
             // issue the claims for the user
             var user = UsersL.SingleOrDefault(u => u.Username.Equals(context.Subject.Identity.Name));
-            var claims = Claims.List().Where(c => c.UserId == user.Id).ToList();
 
             if (user != null)
             {
+                var claims = Claims.List().Where(c => c.UserId == user.Id).ToList();
                 context.IssuedClaims = MakeObject.IEClaimFromListClaims(claims);
             }
 
