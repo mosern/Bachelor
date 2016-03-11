@@ -34,7 +34,11 @@ namespace IdSrv.Services
         public override Task AuthenticateExternalAsync(ExternalAuthenticationContext context)
         {
             var userProvider = UserProviders.List().FirstOrDefault(u => u.Identifier == context.ExternalIdentity.ProviderId);
-            var user = UsersL.SingleOrDefault(x => x.Id == userProvider.UserId);
+            User user = null;
+
+            if (userProvider != null)
+            user = UsersL.SingleOrDefault(x => x.Id == userProvider.UserId);
+
             if (user != null)
             {
                 context.AuthenticateResult = new AuthenticateResult(user.Id.ToString(), user.Username);
