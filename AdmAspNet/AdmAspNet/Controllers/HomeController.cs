@@ -10,6 +10,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using Thinktecture.IdentityModel.Mvc;
 
 namespace AdmAspNet.Controllers
 {
@@ -32,7 +33,7 @@ namespace AdmAspNet.Controllers
             return View();
         }
 
-        [Authorize(Roles = "Administrator")]
+        [ResourceAuthorize("Read","ContactDetails")]
         public ActionResult Contact()
         {
             ViewBag.Message = "Your contact page.";

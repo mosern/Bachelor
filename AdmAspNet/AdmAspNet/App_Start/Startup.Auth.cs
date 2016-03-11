@@ -18,6 +18,7 @@ using Microsoft.IdentityModel.Protocols;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net;
+using AdmAspNet.Helpers;
 
 namespace AdmAspNet
 {
@@ -99,6 +100,8 @@ namespace AdmAspNet
                     }
 
             });
+
+            app.UseResourceAuthorization(new AuthorizationManager());
         }
 
         //Writen by Kevin Dockx as a part of the Pluralsight course "Building and Securing a RESTful API for Multiple Clients in ASP.NET"
