@@ -74,6 +74,8 @@ namespace AdmAspNet
 
                             nid.AddClaim(usernameClaim);
 
+                            nid.AddClaims(roles);
+
 
                             n.AuthenticationTicket = new AuthenticationTicket(
                                 nid,

@@ -24,7 +24,7 @@ namespace AdmAspNet.Controllers
             return View();
         }
 
-        [Authorize]
+        [ResourceAuthorize("Read","About")]
         public ActionResult About()
         {
             string test = Get();
