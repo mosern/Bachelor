@@ -7,16 +7,55 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.indooratlas.android.sdk.IALocation;
+import com.indooratlas.android.sdk.IALocationListener;
+import com.indooratlas.android.sdk.IALocationManager;
+import com.indooratlas.android.sdk.IALocationRequest;
+
 import no.hesa.positionlibrary.PositionLibrary;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements  IALocationListener, OnMapReadyCallback {
+
+    private static final String TAG = "MainActivity";
+
+    IALocationManager mIALocationManager;
+
+    private IALocationListener mIALocationListener = new IALocationListener() {
+        @Override
+        public void onLocationChanged(IALocation iaLocation) {
+            Log.d(TAG, "Latitude: " + iaLocation.getLatitude());
+            Log.d(TAG, "Longitude: " + iaLocation.getLongitude());
+        }
+
+        @Override
+        public void onStatusChanged(String s, int i, Bundle bundle) {
+
+        }
+    };
+
+    private GoogleMap mMap;
+    private Marker mMarker;
+
+
+/*
+
     private PositionLibrary positionLibrary = null;
     private final BroadcastReceiver outputReceiver = new BroadcastReceiver() {
         @Override
@@ -27,10 +66,15 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     };
+
+*/
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+//        setContentView(R.layout.activity_maps);
+
+        /*
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -42,10 +86,38 @@ public class MainActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+*/
+/*
         //Initialize library here.. do so by calling new PositionLibrary();
         positionLibrary = new PositionLibrary();
         positionLibrary.wifiPosition.registerBroadcast(this);
         registerReceiver(outputReceiver,new IntentFilter("no.hesa.positionlibrary.Output"));
+*/
+        // Initialize IndoorAtlas here
+        mIALocationManager = IALocationManager.create(this);
+
+        // get map fragment reference
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
+    }
+
+    @Override
+    protected void onStart()
+    {
+        super.onStart();
+    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (mMap == null) {
+            mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
+                    .getMap();
+        }
+        mIALocationManager.requestLocationUpdates(IALocationRequest.create(), this);
     }
 
     @Override
@@ -69,12 +141,58 @@ public class MainActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (mIALocationManager != null) {
+            mIALocationManager.removeLocationUpdates(this);
+        }
+    }
+
     @Override
     protected void onStop() {
         super.onStop();
-        if (positionLibrary != null) {
+/*        if (positionLibrary != null) {
             positionLibrary.wifiPosition.unRegisterBroadcast(this);
         }
         unregisterReceiver(outputReceiver);
+        */
+    }
+
+    @Override
+    protected void onDestroy() {
+        mIALocationManager.destroy();
+        super.onDestroy();
+    }
+
+    @Override
+    public void onLocationChanged(IALocation iaLocation) {
+        LatLng latLng = new LatLng(iaLocation.getLatitude(), iaLocation.getLongitude());
+        if (mMarker == null) {
+            if (mMap != null) {
+                mMarker = mMap.addMarker(new MarkerOptions().position(latLng)
+                        .icon(BitmapDescriptorFactory.defaultMarker(R.color.blue)));
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17.0f));
+            }
+        } else {
+            mMarker.setPosition(latLng);
+        }
+    }
+
+    @Override
+    public void onStatusChanged(String s, int i, Bundle bundle) {
+
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+
+        // Add a marker in Sydney and move the camera
+        LatLng hin = new LatLng(68.436135, 17.434950);
+        mMap.addMarker(new MarkerOptions().position(hin).title("UiT Narvik"));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(hin, 17));
     }
 }
