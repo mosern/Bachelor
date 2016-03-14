@@ -12,4 +12,11 @@
     tools:context="no.hesa.veiviserenuitnarvik.MeasurementActivity"
     tools:showIn="@layout/activity_measurement">
 
+    <TextView
+        android:id="@+id/tv_returned_position"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+
+
 </RelativeLayout>

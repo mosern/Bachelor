@@ -15,16 +15,19 @@ import android.widget.TextView;
 import no.hesa.positionlibrary.PositionLibrary;
 
 public class MeasurementActivity extends AppCompatActivity {
+
     private PositionLibrary positionLibrary = null;
+
     private final BroadcastReceiver outputReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals("no.hesa.positionlibrary.Output")) {
-                TextView textView = (TextView) findViewById(R.id.text);
+                TextView textView = (TextView) findViewById(R.id.tv_returned_position);
                 textView.setText(intent.getStringExtra("DistanceOutput"));
             }
         }
     };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,6 +43,7 @@ public class MeasurementActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         positionLibrary = new PositionLibrary();
         positionLibrary.wifiPosition.registerBroadcast(this);
