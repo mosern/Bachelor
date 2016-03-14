@@ -3,7 +3,9 @@ using IdentityServer3.Core.Services;
 using IdSrv.Config;
 using IdSrv.Services;
 using Microsoft.Owin;
+using Microsoft.Owin.Security.Facebook;
 using Microsoft.Owin.Security.Google;
+using Microsoft.Owin.Security.MicrosoftAccount;
 using Owin;
 using Serilog;
 using System;
@@ -64,6 +66,26 @@ namespace IdSrv
 
                 ClientId = "112937482750-ql6c3ueds1f5h85bm1clqvlk9vqvcer0.apps.googleusercontent.com",
                 ClientSecret = "k56_hupJKDoLWk58wqd0_eHF"
+            });
+
+            app.UseFacebookAuthentication(new FacebookAuthenticationOptions
+            {
+                AuthenticationType = "Facebook",
+                Caption = "Sign-in with Facebook",
+                SignInAsAuthenticationType = signInAsType,
+                
+                AppId = "1776415305922386",
+                AppSecret = "3853d13cd3cb1a946eafe8773812a5db"
+            });
+
+            app.UseMicrosoftAccountAuthentication(new MicrosoftAccountAuthenticationOptions
+            {
+                AuthenticationType = "Microsoft",
+                Caption = "Sign-in with Microsoft",
+                SignInAsAuthenticationType = signInAsType,
+                
+                ClientId = "000000004818CC2B",
+                ClientSecret = "piRovC-cZ4mPkdBLcXqJBC7QrTjMZFV8"
             });
         }
 
