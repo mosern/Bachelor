@@ -7,8 +7,16 @@ using UserDB;
 
 namespace IdSrv.Helpers
 {
+    /// <summary>
+    /// Helper metodes to convert my db models to system classes
+    /// </summary>
     public class MakeObject
     {
+        /// <summary>
+        /// Converts a list of my db model claims to IEnumerable of System.Security.Claims.Claim
+        /// </summary>
+        /// <param name="claims"></param>
+        /// <returns> IEnumerable<Claim> </returns>
         public static IEnumerable<Claim> IEClaimFromListClaims(List<Claims> claims)
         {
             List<Claim> enClaims = new List<Claim>();

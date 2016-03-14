@@ -5,6 +5,7 @@ namespace UserDB
 {
     /// <summary>
     /// Entity Framework model for users, intentionally with minimal information
+    /// 
     /// Written by: Andreas Mosvoll
     /// </summary>
     public class User : BaseDbModel

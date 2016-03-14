@@ -8,25 +8,32 @@ using System.Web;
 
 namespace IdSrv.Config
 {
-
+    /// <summary>
+    /// Updates configuration in the database from local config, runs at application startup.
+    /// 
+    /// Written by: Andreas Mosvoll
+    /// </summary>
     public class Database
     {
         /// <summary>
+        /// Updating client and scope config returns a IdentityServerServiceFactory
+        /// 
         /// Inspired by sample from IdentityServer3 developers
         /// https://github.com/IdentityServer/IdentityServer3.Samples/blob/master/source/EntityFramework/SelfHost/Config/Factory.cs
         /// 
         /// writen by: Andreas Mosvoll
         /// </summary>
         /// <param name="connectStr"></param>
-        /// <returns></returns>
+        /// <returns> IdentityServerServiceFactory </returns>
         public static IdentityServerServiceFactory Configure(string connectStr)
         {
             var efConfig = new EntityFrameworkServiceOptions
             {
                 ConnectionString = connectStr,
+                
             };
 
-            ConfigureClients( Clients.Get(), efConfig);
+            ConfigureClients(Clients.Get(), efConfig);
             ConfigureScopes(Scopes.Get(), efConfig);
 
             var factory = new IdentityServerServiceFactory();
@@ -34,7 +41,9 @@ namespace IdSrv.Config
             factory.RegisterConfigurationServices(efConfig);
             factory.RegisterOperationalServices(efConfig);
 
-            factory.UseInMemoryUsers(Users.Get());
+            //TODO Remove or add to DB?
+            //For early debug purposes
+            //factory.UseInMemoryUsers(Users.Get());
 
             return factory;
 
@@ -42,6 +51,8 @@ namespace IdSrv.Config
         }
 
         /// <summary>
+        /// Updating client config
+        /// 
         /// Inspired by sample from IdentityServer3 developers
         /// https://github.com/IdentityServer/IdentityServer3.Samples/blob/master/source/EntityFramework/SelfHost/Config/Factory.cs
         /// 
@@ -51,7 +62,7 @@ namespace IdSrv.Config
         /// <param name="options"></param>
         public static void ConfigureClients(IEnumerable<Client> clients, EntityFrameworkServiceOptions options)
         {
-            //TODO Update allowed scopes ol.
+            //TODO [Not possible/Already done] Update allowed scopes ol.
             using (var db = new ClientConfigurationDbContext(options.ConnectionString, options.Schema))
             {
                 foreach (var c in clients)
@@ -73,6 +84,8 @@ namespace IdSrv.Config
         }
 
         /// <summary>
+        /// Updating scope config
+        /// 
         /// Inspired by sample from IdentityServer3 developers
         /// https://github.com/IdentityServer/IdentityServer3.Samples/blob/master/source/EntityFramework/SelfHost/Config/Factory.cs
         /// 
@@ -82,7 +95,7 @@ namespace IdSrv.Config
         /// <param name="options"></param>
         public static void ConfigureScopes(IEnumerable<Scope> scopes, EntityFrameworkServiceOptions options)
         {
-            //TODO Update Claims ol.
+            //TODO [Not possible/Already done] Update Claims ol.
             using (var db = new ScopeConfigurationDbContext(options.ConnectionString, options.Schema))
             {
                 foreach (var s in scopes)

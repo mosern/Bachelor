@@ -15,8 +15,16 @@ using System.Security.Cryptography.X509Certificates;
 
 namespace IdSrv
 {
+    /// <summary>
+    /// Written by: Andreas Mosvoll
+    /// </summary>
     public class Startup
     {
+        /// <summary>
+        /// Startup config, configures identity server.
+        /// 
+        /// </summary>
+        /// <param name="app"></param>
         public void Configuration(IAppBuilder app)
         {
             app.Map("/identity", idsrvApp =>
@@ -39,14 +47,7 @@ namespace IdSrv
 
                     Factory = factory,
 
-                    
-
-                //Factory = new IdentityServerServiceFactory()
-                //    .UseInMemoryUsers(Users.Get())
-                //   .UseInMemoryClients(Clients.Get())
-                //    .UseInMemoryScopes(Scopes.Get()),
-
-            });
+                });
             });
 
             Log.Logger = new LoggerConfiguration()
@@ -56,6 +57,11 @@ namespace IdSrv
 
         }
 
+        /// <summary>
+        /// Configures additional identity providers
+        /// </summary>
+        /// <param name="app"></param>
+        /// <param name="signInAsType"></param>
         private void ConfigureIdentityProviders(IAppBuilder app, string signInAsType)
         {
             app.UseGoogleAuthentication(new GoogleOAuth2AuthenticationOptions
@@ -90,7 +96,10 @@ namespace IdSrv
         }
 
 
-
+        /// <summary>
+        /// Get certificate from azure to sign tokens
+        /// </summary>
+        /// <returns>X509Certificate2</returns>
         X509Certificate2 LoadCertificate()
         {
             try
@@ -113,6 +122,10 @@ namespace IdSrv
             }
         }
 
+        /// <summary>
+        /// Get certificate from local folder to sign tokens, used for debuging 
+        /// </summary>
+        /// <returns>X509Certificate2</returns>
         X509Certificate2 LoadCertificate2()
         {
             return new X509Certificate2(

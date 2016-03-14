@@ -5,6 +5,12 @@ using System.Web;
 
 namespace UserDB
 {
+    /// <summary>
+    /// Repository interface
+    /// 
+    /// Written by: Andreas Mosvoll
+    /// </summary>
+    /// <typeparam name="X"></typeparam>
     public interface IRepository<X>
     {
         X Create(X entity);

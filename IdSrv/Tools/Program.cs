@@ -7,6 +7,11 @@ using System.Threading.Tasks;
 
 namespace Tools
 {
+    /// <summary>
+    /// Console program that generates password hash, user for testing.
+    /// 
+    /// Wiritten by: Andreas Mosvoll
+    /// </summary>
     class Program
     {
         static void Main(string[] args)

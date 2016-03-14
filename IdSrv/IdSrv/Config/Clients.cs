@@ -6,6 +6,11 @@ using System.Web;
 
 namespace IdSrv.Config
 {
+    /// <summary>
+    /// Client config
+    /// 
+    /// Written by: Andreas Mosvoll
+    /// </summary>
     public static class Clients
     {
         public static IEnumerable<Client> Get()

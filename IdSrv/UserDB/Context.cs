@@ -8,7 +8,9 @@ using System.Threading.Tasks;
 namespace UserDB
 {
     /// <summary>
-    /// Entity Framework DbContext for user tables by Andreas Mosvoll
+    /// Entity Framework DbContext for user tables 
+    /// 
+    /// Written by: Andreas Mosvoll
     /// </summary>
     public class Context : DbContext
     {

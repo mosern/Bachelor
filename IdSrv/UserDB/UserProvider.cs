@@ -9,6 +9,7 @@ namespace UserDB
 {
     /// <summary>
     /// Entity Framework Model that contains information on which providers the users is registered with and the provider identifier
+    /// 
     /// Written by: Andreas Mosvoll
     /// </summary>
     public class UserProvider : BaseDbModel

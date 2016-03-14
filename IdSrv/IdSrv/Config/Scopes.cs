@@ -6,6 +6,11 @@ using System.Web;
 
 namespace IdSrv.Config
 {
+    /// <summary>
+    /// Scope configuration
+    /// 
+    /// writen by: Andreas Mosvoll
+    /// </summary>
     public static class Scopes
     {
         public static IEnumerable<Scope> Get()

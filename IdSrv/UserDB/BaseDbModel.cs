@@ -7,6 +7,7 @@ namespace UserDB
 {
     /// <summary>
     /// Entity Framework Model, this is the base for all my EF models
+    /// 
     /// Written by: Andreas Mosvoll
     /// </summary>
     public class BaseDbModel

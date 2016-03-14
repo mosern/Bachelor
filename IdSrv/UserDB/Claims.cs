@@ -7,6 +7,11 @@ using System.Threading.Tasks;
 
 namespace UserDB
 {
+    /// <summary>
+    /// Entity Framework model for claims, eks. username
+    /// 
+    /// Written by: Andreas Mosvoll
+    /// </summary>
     public class Claims : BaseDbModel
     {
         [Required]

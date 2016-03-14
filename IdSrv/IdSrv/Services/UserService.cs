@@ -12,6 +12,12 @@ using UserDB;
 
 namespace IdSrv.Services
 {
+    /// <summary>
+    /// User authentication logic.
+    /// UserService used by IdentityServer3
+    /// 
+    /// Written by: Andreas Mosvoll
+    /// </summary>
     public class UserService : UserServiceBase
     {
         public static Repository<User> Users = new Repository<User>();
@@ -19,8 +25,14 @@ namespace IdSrv.Services
         public static Repository<Claims> Claims = new Repository<Claims>();
         public static List<User> UsersL = Users.List();
 
+        /// <summary>
+        /// Autentication local user
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         public override Task AuthenticateLocalAsync(LocalAuthenticationContext context)
         {
+            //TODO Password salt
             var user = UsersL.SingleOrDefault(x => x.Username == context.UserName && x.Password == context.Password.Sha512());
             if (user != null)
             {
@@ -31,8 +43,14 @@ namespace IdSrv.Services
             return Task.FromResult(0);
         }
 
+        /// <summary>
+        /// Autenticates local user connected to the verrified external identity. If no user is connectet to the external identity, a new user i created and autenticated.
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         public override Task AuthenticateExternalAsync(ExternalAuthenticationContext context)
         {
+            //TODO Make user registration (and hash Providerid and local userid?)
             var userProvider = UserProviders.List().FirstOrDefault(u => u.Identifier == context.ExternalIdentity.ProviderId);
             User user = null;
 
@@ -68,9 +86,14 @@ namespace IdSrv.Services
             return Task.FromResult(0);
         }
 
+        /// <summary>
+        /// Gets users IssuedClaims and assigns it to context
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         public override Task GetProfileDataAsync(ProfileDataRequestContext context)
         {
-            // issue the claims for the user
+
             var user = UsersL.SingleOrDefault(u => u.Username.Equals(context.Subject.Identity.Name));
 
             if (user != null)
@@ -82,9 +105,12 @@ namespace IdSrv.Services
             return Task.FromResult(0);
         }
 
-        //http://stackoverflow.com/questions/1344221/how-can-i-generate-random-alphanumeric-strings-in-c
-        //
-        //written by dtd
+        /// <summary>
+        /// Copied from stackowerflow
+        /// http://stackoverflow.com/questions/1344221/how-can-i-generate-random-alphanumeric-strings-in-c
+        /// </summary>
+        /// <param name="length"></param>
+        /// <returns></returns>
         public string RandomString(int length)
         {
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";

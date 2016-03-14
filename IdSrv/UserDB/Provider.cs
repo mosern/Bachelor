@@ -9,6 +9,7 @@ namespace UserDB
 {
     /// <summary>
     /// Entity Framework model for Providers, eks. google and facebook
+    /// 
     /// Written by: Andreas Mosvoll
     /// </summary>
     public class Provider : BaseDbModel

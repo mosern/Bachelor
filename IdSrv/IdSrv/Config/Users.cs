@@ -8,6 +8,11 @@ using System.Web;
 
 namespace IdSrv.Config
 {
+    /// <summary>
+    /// InMemmoryUsers, to be removed!
+    /// 
+    /// written by: Amdreas Mosvoll
+    /// </summary>
     public static class Users
     {
         public static List<InMemoryUser> Get()
