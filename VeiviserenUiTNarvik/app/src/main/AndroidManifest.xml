@@ -34,7 +34,6 @@
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="AIzaSyBU3czWMQCQZwjWP_Yq-HoZ0ENZjz-OAr8" />
-
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
@@ -49,7 +48,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
+        <activity
+            android:name=".MeasurementActivity"
+            android:label="@string/title_activity_measurement"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="no.hesa.veiviserenuitnarvik.MainActivity" />
+        </activity>
     </application>
 
 </manifest>

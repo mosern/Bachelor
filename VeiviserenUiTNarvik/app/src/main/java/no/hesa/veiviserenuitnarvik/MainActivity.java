@@ -29,8 +29,6 @@ import com.indooratlas.android.sdk.IALocationListener;
 import com.indooratlas.android.sdk.IALocationManager;
 import com.indooratlas.android.sdk.IALocationRequest;
 
-import no.hesa.positionlibrary.PositionLibrary;
-
 public class MainActivity extends AppCompatActivity implements  IALocationListener, OnMapReadyCallback {
 
     private static final String TAG = "MainActivity";
@@ -54,20 +52,6 @@ public class MainActivity extends AppCompatActivity implements  IALocationListen
     private Marker mMarker;
 
 
-/*
-
-    private PositionLibrary positionLibrary = null;
-    private final BroadcastReceiver outputReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals("no.hesa.positionlibrary.Output")) {
-                TextView textView = (TextView) findViewById(R.id.text);
-                textView.setText(intent.getStringExtra("DistanceOutput"));
-            }
-        }
-    };
-
-*/
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -87,12 +71,7 @@ public class MainActivity extends AppCompatActivity implements  IALocationListen
             }
         });
 */
-/*
         //Initialize library here.. do so by calling new PositionLibrary();
-        positionLibrary = new PositionLibrary();
-        positionLibrary.wifiPosition.registerBroadcast(this);
-        registerReceiver(outputReceiver,new IntentFilter("no.hesa.positionlibrary.Output"));
-*/
         // Initialize IndoorAtlas here
         mIALocationManager = IALocationManager.create(this);
 
@@ -154,11 +133,6 @@ public class MainActivity extends AppCompatActivity implements  IALocationListen
     @Override
     protected void onStop() {
         super.onStop();
-/*        if (positionLibrary != null) {
-            positionLibrary.wifiPosition.unRegisterBroadcast(this);
-        }
-        unregisterReceiver(outputReceiver);
-        */
     }
 
     @Override
