@@ -56,9 +56,8 @@ public class MainActivity extends AppCompatActivity implements  IALocationListen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-//        setContentView(R.layout.activity_maps);
 
-        /*
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -70,7 +69,7 @@ public class MainActivity extends AppCompatActivity implements  IALocationListen
                         .setAction("Action", null).show();
             }
         });
-*/
+
         //Initialize library here.. do so by calling new PositionLibrary();
         // Initialize IndoorAtlas here
         mIALocationManager = IALocationManager.create(this);
@@ -115,6 +114,12 @@ public class MainActivity extends AppCompatActivity implements  IALocationListen
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            return true;
+        }
+
+        if (id == R.id.action_measurement)
+        {
+            startActivity(new Intent(getApplicationContext(),MeasurementActivity.class));
             return true;
         }
 
