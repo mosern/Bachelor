@@ -18,6 +18,7 @@ import java.util.TimerTask;
 
 public class WifiPosition {
     private List<ScanResult> scanResults = null;
+    private static final double radius = 6371*1000;
     private final BroadcastReceiver wifiReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context c, Intent intent) {
@@ -74,6 +75,25 @@ public class WifiPosition {
     private double distanceToAccessPoint(double levelInDb, double freqInMHz)    {
         double exp = (27.55 - (20 * Math.log10(freqInMHz)) + Math.abs(levelInDb)) / 20.0;
         return Math.pow(10.0, exp);
+    }
+
+    /**
+     * Calculate from geo coordinates too cartesian coordinates
+     */
+    private double[] convertFromGeo(double[] coordinates) {
+        double x_cartesian = radius * Math.cos(coordinates[0]*Math.PI/180) * Math.cos(coordinates[1]*Math.PI/180);
+        double y_cartesian = radius * Math.cos(coordinates[0]*Math.PI/180) * Math.sin(coordinates[1] * Math.PI / 180);
+        double z_cartesian = radius * Math.sin(coordinates[0]*Math.PI/180);
+        return new double[] {x_cartesian,y_cartesian,z_cartesian};
+    }
+
+    /**
+     * Calculate from cartesian coordinates to geo coordinates
+     */
+    private double[] convertToGeo(double[] coordinates) {
+        double x_deg = (180/Math.PI)*Math.asin(coordinates[2] / radius);
+        double y_deg = (180/Math.PI)*Math.atan2(coordinates[1],coordinates[0]);
+        return new double[] {x_deg,y_deg};
     }
 
 }
