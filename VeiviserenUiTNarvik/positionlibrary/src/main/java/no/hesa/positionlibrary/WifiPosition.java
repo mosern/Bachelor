@@ -80,7 +80,7 @@ public class WifiPosition {
     /**
      * Calculate from geo coordinates too cartesian coordinates
      */
-    private double[] convertFromGeo(double[] coordinates) {
+    public static double[] convertFromGeo(double[] coordinates) {
         double x_cartesian = radius * Math.cos(coordinates[0]*Math.PI/180) * Math.cos(coordinates[1]*Math.PI/180);
         double y_cartesian = radius * Math.cos(coordinates[0]*Math.PI/180) * Math.sin(coordinates[1] * Math.PI / 180);
         double z_cartesian = radius * Math.sin(coordinates[0]*Math.PI/180);
@@ -90,7 +90,7 @@ public class WifiPosition {
     /**
      * Calculate from cartesian coordinates to geo coordinates
      */
-    private double[] convertToGeo(double[] coordinates) {
+    public static double[] convertToGeo(double[] coordinates) {
         double x_deg = (180/Math.PI)*Math.asin(coordinates[2] / radius);
         double y_deg = (180/Math.PI)*Math.atan2(coordinates[1],coordinates[0]);
         return new double[] {x_deg,y_deg};
