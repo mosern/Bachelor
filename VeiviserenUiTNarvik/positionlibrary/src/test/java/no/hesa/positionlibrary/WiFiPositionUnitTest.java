@@ -16,18 +16,18 @@ import static org.junit.Assert.*;
  */
 @RunWith(JUnit4.class)
 public class WiFiPositionUnitTest {
-    private double[][] degrees = new double[][]{{68.43605,17.43437},{68.43606,17.43439},{68.43618,17.43468}};
+ /*   private double[][] degrees = new double[][]{{68.43605,17.43437},{68.43606,17.43439},{68.43618,17.43468}};
     private double[][] degrees_test = new double[][]{{68.43617,17.43358},{68.43623,17.43363},{68.43629,17.43363}};
     private double[][] cartesian = null;
 
     private double x_expected_degree = 68.43622; //x-coordinate for expected position
     private double y_expected_degree = 17.4338; //y-coordinate for expected position
 
-    private double radius = 6371 * 1000; //earth raduis (meters)
+    private double radius = 6371 * 1000; //earth raduis (meters)*/
 
     @Test
     public void testPosition() {
-        double[] expectedPosition = new double[] {x_expected_degree, y_expected_degree};
+        /*double[] expectedPosition = new double[] {x_expected_degree, y_expected_degree};
         cartesian = new double[degrees.length][3];
         for (int i = 0; i < degrees.length; i++) {
             cartesian[i] = WifiPosition.convertFromGeo(degrees[i]);
@@ -40,7 +40,9 @@ public class WiFiPositionUnitTest {
         RealVector x = lSolver.solve();
         LeastSquaresOptimizer.Optimum optimum = nlSolver.solve();
 
-        testResults(expectedPosition,0.0001,optimum,x);
+        testResults(expectedPosition,0.0001,optimum,x);*/
+        double[] arr = WifiPosition.calculateCoordinates(new double[]{68.43605083,17.4343663},(4.692)/1000,69.416);
+        System.out.println("lat: "+arr[0]+" lon: "+arr[1]);
     }
 
     private void testResults(double[] expectedPosition, final double delta, LeastSquaresOptimizer.Optimum optimum, RealVector x) {

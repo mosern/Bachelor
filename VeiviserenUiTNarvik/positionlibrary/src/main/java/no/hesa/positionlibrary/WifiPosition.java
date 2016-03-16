@@ -77,6 +77,25 @@ public class WifiPosition {
         return Math.pow(10.0, exp);
     }
 
+    private static double radiansFromDeg(double degrees) {
+        return degrees * (Math.PI / 180);
+    }
+
+    private static double degFromRadians(double radians) {
+        return radians * (180 / Math.PI);
+    }
+
+    public static  double[] calculateCoordinates(double[] from, double distanceKm, double bearingDegrees) {
+        double distanceRadians = (double) distanceKm/6371;
+        double bearingRadians = radiansFromDeg(bearingDegrees);
+        double fromLatRadians = radiansFromDeg(from[0]);
+        double fromLonRadians = radiansFromDeg(from[1]);
+        double toLatRadians = Math.asin(Math.sin(fromLatRadians) * Math.cos(distanceRadians) + Math.cos(fromLatRadians) * Math.sin(distanceRadians) * Math.cos(bearingRadians));
+        double toLonRadians = fromLonRadians + Math.atan2(Math.sin(bearingRadians) * Math.sin(distanceRadians) * Math.cos(fromLatRadians),Math.cos(distanceRadians)-Math.sin(fromLatRadians) * Math.sin(toLatRadians));
+
+        toLonRadians = ((toLonRadians + 3*Math.PI) % (2*Math.PI)) - Math.PI;
+        return new double[]{degFromRadians(toLatRadians),degFromRadians(toLonRadians)};
+    }
     /**
      * Calculate from geo coordinates too cartesian coordinates
      */
