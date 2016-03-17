@@ -28,7 +28,10 @@ repositories {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
+    compile project(':positionlibrary')
+
     // Google Play Services Client Library
+
     // IndoorAtlas
     // Google Play Services Maps (Viktig! Kun last maps. Ved å laste play-services overskrider man heap size i java. Alle servies lastes da.)
     compile 'com.android.support:appcompat-v7:22.2.1'
@@ -36,7 +39,6 @@ dependencies {
     compile 'com.indooratlas.android:indooratlas-android-sdk:2.0.2-beta@aar'
     compile 'com.google.android.gms:play-services-maps:7.8.0'
     compile 'com.android.support:support-v4:22.2.1'
-    compile project(':positionlibrary')
 }
 
 

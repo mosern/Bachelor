@@ -57,6 +57,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="no.hesa.veiviserenuitnarvik.MainActivity" />
         </activity>
+        <activity android:name=".ResourceManagerActivity"></activity>
     </application>
 
 </manifest>
