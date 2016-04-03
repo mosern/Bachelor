@@ -58,5 +58,4 @@ public class MeasurementActivity extends AppCompatActivity {
         }
         unregisterReceiver(outputReceiver);
     }
-
 }
