@@ -26,14 +26,14 @@
         <!-- IndoorAtlas keys -->
         <meta-data
             android:name="com.indooratlas.android.sdk.API_KEY"
-            android:value="93381562-909e-46b7-8f44-a7bbe54aefb3" />
+            android:value="@string/indooratlas_api_key" />
         <meta-data
             android:name="com.indooratlas.android.sdk.API_SECRET"
-            android:value="Q4sO5%Jwkc0Wj(nNtM3d6oaLmCSrXHF1s2LD7rBoF!ks6HZq5Yesrj9chSfBzVcspz6hUkg8PK7MMT)hqttOyJYbbix!Je67lF77ndU9JcpB0(eGOr24GZn6oEhLFt10" />
+            android:value="@string/indooratlas_api_secret" />
         <!-- Google API keys -->
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
-            android:value="AIzaSyBU3czWMQCQZwjWP_Yq-HoZ0ENZjz-OAr8" />
+            android:value="@string/google_maps_api_key" />
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
@@ -57,6 +57,10 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="no.hesa.veiviserenuitnarvik.MainActivity" />
         </activity>
+        <activity
+            android:name=".ResourceManagerActivity"
+            android:label="@string/title_activity_resource_manager"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>
