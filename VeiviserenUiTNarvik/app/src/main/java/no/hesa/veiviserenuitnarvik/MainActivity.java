@@ -1,6 +1,7 @@
 package no.hesa.veiviserenuitnarvik;
 
 import android.app.DownloadManager;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -14,6 +15,7 @@ import android.os.Environment;
 import android.os.Looper;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -56,6 +58,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private GoogleMap mMap;
     private Marker mMarker;
 
+    private SupportMapFragment mapFragment;
+
     private IALocationManager mIALocationManager;
     private IAResourceManager mFloorPlanManager;
     private IATask<IAFloorPlan> mPendingAsyncResult;
@@ -69,7 +73,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mImageView = (BlueDotView) findViewById(R.id.blue_dot_view);
+//        mapFragment = (SupportMapFragment)getSupportFragmentManager().findFragmentById(R.id.map);
+//        mImageView = (BlueDotView) findViewById(R.id.blue_dot_view);
 
         mDownloadManager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
         mIALocationManager = IALocationManager.create(this);
@@ -89,7 +94,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         String floorplanid = getResources().getString(R.string.indooratlas_floor_1_floorplanid);
         String floorid = getResources().getString(R.string.indooratlas_floor_1_floorid);
-        fetchFloorPlan(floorid);
+        fetchFloorPlan(floorplanid);
 
         // get map fragment reference
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -170,12 +175,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             mImageView.setDotCenter(point);
             mImageView.postInvalidate();
         }
-/*
+
         // Add a marker in Narvik and move the camera
         LatLng hin = new LatLng(68.436135, 17.434950);
         mMap.addMarker(new MarkerOptions().position(hin).title("UiT Narvik"));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(hin, 17));
-*/
+
     }
 
     /*  Broadcast receiver for floor plan image download */
@@ -208,8 +213,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private void showFloorPlanImage(String filePath) {
         Log.w(TAG, "showFloorPlanImage: " + filePath);
-        mImageView.setRadius(mFloorPlan.getMetersToPixels() * dotRadius);
-        mImageView.setImage(ImageSource.uri(filePath));
+
+//        float f = mFloorPlan.getMetersToPixels() * dotRadius;
+//        mapFragment.setRadius(mFloorPlan.getMetersToPixels() * dotRadius);
+//        mImageView.setRadius(mFloorPlan.getMetersToPixels() * dotRadius);
+//        mapFragment.setImage(ImageSource.uri(filePath));
+//        mImageView.setImage(ImageSource.uri(filePath));
     }
 
     /**
@@ -235,6 +244,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         File file = new File(filePath);
                         if (!file.exists())
                         {
+                            // Toast.makeText(MainActivity.this, "entered IF", Toast.LENGTH_LONG).show();
+
                             DownloadManager.Request request = new DownloadManager.Request(Uri.parse(mFloorPlan.getUrl()));
                             request.setDescription("IndoorAtlas floor plan");
                             request.setTitle("Floor plan");
@@ -249,7 +260,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                     DIRECTORY_DOWNLOADS, fileName);
 
                             mDownloadId = mDownloadManager.enqueue(request);
-                        } else
+
+                        }
+                        else
                         {
                             showFloorPlanImage(filePath);
                         }
