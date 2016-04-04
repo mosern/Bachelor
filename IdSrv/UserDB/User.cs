@@ -12,7 +12,11 @@ namespace UserDB
     {
         [Required, MinLength(5),MaxLength(40)]
         public string Username { get; set; }
+
         [Required, MinLength(10), MaxLength(100)]
         public string Password { get; set; }
+
+        [Required, MinLength(10), MaxLength(100)]
+        public string Salt { get; set; }
     }
 }
