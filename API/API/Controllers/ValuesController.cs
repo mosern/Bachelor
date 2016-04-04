@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Http;
 using System.Security.Claims;
 using System.Web.Http;
+using UserDB;
 
 namespace Api.Controllers
 {
@@ -14,7 +15,11 @@ namespace Api.Controllers
         // GET api/values
         public IEnumerable<string> Get()
         {
-            return new string[] { "value1", "value2" };
+            var repo = new Repository<User>();
+
+            User user = repo.Read(1);
+
+            return new string[] { "value1", "value2",  user.Username };
         }
 
         // GET api/values/5
