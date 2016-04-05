@@ -49,7 +49,7 @@ import com.indooratlas.android.sdk.resources.IATask;
 
 import java.io.File;
 
-public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class MainActivity extends AppCompatActivity /*implements OnMapReadyCallback*/ {
 
     private static final String TAG = "MainActivity";
     // blue dot radius in meters
@@ -73,9 +73,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Intent myIntent = new Intent(MainActivity.this, MapActivity.class);
+//        myIntent.putExtra("key", value); //Optional parameters
+        MainActivity.this.startActivity(myIntent);
+
 //        mapFragment = (SupportMapFragment)getSupportFragmentManager().findFragmentById(R.id.map);
 //        mImageView = (BlueDotView) findViewById(R.id.blue_dot_view);
-
+        /*
         mDownloadManager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
         mIALocationManager = IALocationManager.create(this);
         mFloorPlanManager = IAResourceManager.create(this);
@@ -93,7 +97,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
 
         String floorplanid = getResources().getString(R.string.indooratlas_floor_1_floorplanid);
-        String floorid = getResources().getString(R.string.indooratlas_floor_1_floorid);
         fetchFloorPlan(floorplanid);
 
         // get map fragment reference
@@ -101,7 +104,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-
+*/
     }
 
     @Override
@@ -113,11 +116,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     protected void onResume() {
         super.onResume();
+        /*
         if (mMap == null) {
             mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
                     .getMap();
         }
         registerReceiver(onComplete, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+        */
     }
 
     @Override
@@ -151,7 +156,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     protected void onPause() {
         super.onPause();
-        unregisterReceiver(onComplete);
+//        unregisterReceiver(onComplete);
     }
 
     @Override
@@ -163,7 +168,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     protected void onDestroy() {
         super.onDestroy();
     }
-
+/*
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -182,9 +187,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(hin, 17));
 
     }
-
+*/
     /*  Broadcast receiver for floor plan image download */
-    private BroadcastReceiver onComplete = new BroadcastReceiver() {
+/*    private BroadcastReceiver onComplete = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             long id = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, 0L);
@@ -220,11 +225,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 //        mapFragment.setImage(ImageSource.uri(filePath));
 //        mImageView.setImage(ImageSource.uri(filePath));
     }
-
+*/
     /**
      * Fetches floor plan data from IndoorAtlas server. Some room for cleaning up!!
      */
-    private void fetchFloorPlan(String id) {
+/*    private void fetchFloorPlan(String id) {
         cancelPendingNetworkCalls();
         final IATask<IAFloorPlan> asyncResult = mFloorPlanManager.fetchFloorPlanWithId(id);
         mPendingAsyncResult = asyncResult;
@@ -289,4 +294,5 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             mPendingAsyncResult.cancel();
         }
     }
+    */
 }

@@ -18,6 +18,6 @@
     <string name="indooratlas_floor_1_floorplanid">888b8b37-e3ca-48a8-a39d-f70987db3a03</string>
     <string name="indooratlas_floor_1_floorid">8d983ec0-8333-442f-8098-18c00021c6fe</string>
 
-    <string name="title_activity_resource_manager">ResourceManagerActivity</string>
+    <string name="title_activity_map">MapActivity</string>
 
 </resources>
