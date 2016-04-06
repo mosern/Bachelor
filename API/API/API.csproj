@@ -110,6 +110,10 @@
       <HintPath>..\packages\System.IdentityModel.Tokens.Jwt.4.0.2.206221351\lib\net45\System.IdentityModel.Tokens.Jwt.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.Linq.Dynamic, Version=1.0.5840.25917, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Linq.Dynamic.1.0.6\lib\net40\System.Linq.Dynamic.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
@@ -237,11 +241,33 @@
     <Compile Include="Areas\HelpPage\SampleGeneration\SampleDirection.cs" />
     <Compile Include="Areas\HelpPage\SampleGeneration\TextSample.cs" />
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
+    <Compile Include="Classes\Context.cs" />
+    <Compile Include="Classes\ILocationRepository.cs" />
+    <Compile Include="Classes\IQueryableExtensions.cs" />
+    <Compile Include="Classes\LocationRepository.cs" />
+    <Compile Include="Controllers\AccesspointController.cs" />
+    <Compile Include="Controllers\CoordinateController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\LocationController.cs" />
+    <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Controllers\ValuesController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\LocationConfiguration\201604051006521_InitialCreate.cs" />
+    <Compile Include="Migrations\LocationConfiguration\201604051006521_InitialCreate.Designer.cs">
+      <DependentUpon>201604051006521_InitialCreate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\LocationConfiguration\Configuration.cs" />
+    <Compile Include="Models\Api\LocationInfo.cs" />
+    <Compile Include="Models\Api\UserInfo.cs" />
+    <Compile Include="Models\Api\UserLocationInfo.cs" />
+    <Compile Include="Models\EF\Accesspoint.cs" />
+    <Compile Include="Models\EF\BaseModel.cs" />
+    <Compile Include="Models\EF\Coordinate.cs" />
+    <Compile Include="Models\EF\Location.cs" />
+    <Compile Include="Models\EF\Type.cs" />
+    <Compile Include="Models\EF\UserLocation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
@@ -303,7 +329,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Models\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
@@ -312,6 +337,11 @@
     <Content Include="packages.config" />
     <None Include="Project_Readme.html" />
     <Content Include="Scripts\jquery-1.10.2.min.map" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\LocationConfiguration\201604051006521_InitialCreate.resx">
+      <DependentUpon>201604051006521_InitialCreate.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

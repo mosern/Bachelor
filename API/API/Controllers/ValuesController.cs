@@ -15,18 +15,11 @@ namespace Api.Controllers
         // GET api/values
         public IEnumerable<string> Get()
         {
-            try
-            {
-                var repo = new Repository<User>();
+            var repo = new Repository<User>();
 
-                User user = repo.List()[0];
+            User user = repo.List()[0];
 
-                return new string[] { "value1", "value2", user.Username };
-            }
-            catch(Exception e)
-            {
-                return new string[] { e.Message, e.InnerException.ToString() };
-            }
+            return new string[] { "value1", "value2", user.Username };
 
         }
 
