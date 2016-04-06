@@ -17,6 +17,7 @@ namespace UserDB
         X Read(int id);
         void Update(X entity);
         void Delete(X entity);
+        IQueryable<X> List();
 
 
     }

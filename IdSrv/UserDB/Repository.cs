@@ -123,9 +123,9 @@ namespace UserDB
 
         #endregion
 
-        public List<X> List()
+        public IQueryable<X> List()
         {
-            return Entities.ToList();
+            return Entities;
         }
 
         private IDbSet<X> Entities

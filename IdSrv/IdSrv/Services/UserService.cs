@@ -23,7 +23,7 @@ namespace IdSrv.Services
         public static Repository<User> Users = new Repository<User>();
         public static Repository<UserProvider> UserProviders = new Repository<UserProvider>();
         public static Repository<Claims> Claims = new Repository<Claims>();
-        public static List<User> UsersL = Users.List();
+        public static List<User> UsersL = Users.List().ToList();
 
         /// <summary>
         /// Autentication local user
@@ -81,7 +81,7 @@ namespace IdSrv.Services
 
                 Claims.Create(new Claims() { Type = "username", Value = createdUser.Username, UserId = createdUser.Id });
 
-                UsersL = Users.List();
+                UsersL = Users.List().ToList();
                 context.AuthenticateResult = new AuthenticateResult(createdUser.Id.ToString(), createdUser.Username);
             }
             return Task.FromResult(0);
