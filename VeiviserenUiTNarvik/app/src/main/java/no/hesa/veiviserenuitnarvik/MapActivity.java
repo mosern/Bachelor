@@ -41,7 +41,7 @@ import com.squareup.picasso.Target;
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback{
 
-    private static final String TAG = "IndoorAtlasExample";
+    private static final String TAG = "MapActivity";
 
     private static final float HUE_IABLUE = 200.0f;
 
@@ -89,19 +89,38 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     @Override
     protected void onResume() {
         super.onResume();
-        if (mMap == null) {
+        if (mMap == null)
+        {
             // Try to obtain the map from the SupportMapFragment.
-            mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
-                    .getMap();
+            mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
         }
     }
+
+
+
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+/*
+        if (mMap != null) {
+            mMap.setMyLocationEnabled(true); // shows users positon via GPS
+        }
+*/
+        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng point) {
+                if (mMarker != null) {
+                    mMarker.remove();
+                }
+                mMarker = mMap.addMarker(new MarkerOptions().position(point).title("Lat: " + point.latitude + " Lng: " + point.latitude));
+                mMarker.showInfoWindow();
+            }
+        });
 
         // Add a marker in Narvik and move the camera
         LatLng hin = new LatLng(68.436135, 17.434950);
+
         mMap.addMarker(new MarkerOptions().position(hin).title("UiT Narvik"));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(hin, 17));
     }
@@ -111,11 +130,13 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
          */
     private void setupGroundOverlay(IAFloorPlan floorPlan, Bitmap bitmap) {
 
-        if (mGroundOverlay != null) {
+        if (mGroundOverlay != null)
+        {
             mGroundOverlay.remove();
         }
 
-        if (mMap != null) {
+        if (mMap != null)
+        {
             BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(bitmap);
             IALatLng iaLatLng = floorPlan.getCenter();
             LatLng center = new LatLng(iaLatLng.latitude, iaLatLng.longitude);
@@ -136,22 +157,26 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         final String url = floorPlan.getUrl();
 
         if (mLoadTarget == null) {
-            mLoadTarget = new Target() {
+            mLoadTarget = new Target()
+            {
 
                 @Override
-                public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from)
+                {
                     Log.d(TAG, "onBitmap loaded with dimensions: " + bitmap.getWidth() + "x"
                             + bitmap.getHeight());
                     setupGroundOverlay(floorPlan, bitmap);
                 }
 
                 @Override
-                public void onPrepareLoad(Drawable placeHolderDrawable) {
+                public void onPrepareLoad(Drawable placeHolderDrawable)
+                {
                     // N/A
                 }
 
                 @Override
-                public void onBitmapFailed(Drawable placeHolderDraweble) {
+                public void onBitmapFailed(Drawable placeHolderDraweble)
+                {
                     Toast.makeText(MapActivity.this, "Failed to load bitmap",
                             Toast.LENGTH_SHORT).show();
                 }
@@ -163,9 +188,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         final int bitmapWidth = floorPlan.getBitmapWidth();
         final int bitmapHeight = floorPlan.getBitmapHeight();
 
-        if (bitmapHeight > MAX_DIMENSION) {
+        if (bitmapHeight > MAX_DIMENSION)
+        {
             request.resize(0, MAX_DIMENSION);
-        } else if (bitmapWidth > MAX_DIMENSION) {
+        }
+        else if (bitmapWidth > MAX_DIMENSION)
+        {
             request.resize(MAX_DIMENSION, 0);
         }
 
@@ -183,23 +211,27 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         final IATask<IAFloorPlan> task = mResourceManager.fetchFloorPlanWithId(id);
 
-        task.setCallback(new IAResultCallback<IAFloorPlan>() {
-
+        task.setCallback(new IAResultCallback<IAFloorPlan>()
+        {
             @Override
-            public void onResult(IAResult<IAFloorPlan> result) {
-
+            public void onResult(IAResult<IAFloorPlan> result)
+            {
                 if (result.isSuccess() && result.getResult() != null) {
                     // retrieve bitmap for this floor plan metadata
                     fetchFloorPlanBitmap(result.getResult());
-                } else {
+                }
+                else
+                {
                     // ignore errors if this task was already canceled
-                    if (!task.isCancelled()) {
+                    if (!task.isCancelled())
+                    {
                         // do something with error
                         Toast.makeText(MapActivity.this,
                                 "loading floor plan failed: " + result.getError(), Toast.LENGTH_LONG)
                                 .show();
                         // remove current ground overlay
-                        if (mGroundOverlay != null) {
+                        if (mGroundOverlay != null)
+                        {
                             mGroundOverlay.remove();
                             mGroundOverlay = null;
                         }
