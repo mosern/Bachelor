@@ -82,8 +82,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        String floorplanid = getResources().getString(R.string.indooratlas_floor_1_floorplanid);
-        fetchFloorPlan(floorplanid);
+        fetchFloorPlan(getResources().getString(R.string.indooratlas_floor_1_floorplanid));
     }
 
     @Override
@@ -102,6 +101,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+//        mMap.setIndoorEnabled(false);
+//        mMap.setBuildingsEnabled(false);
 /*
         if (mMap != null) {
             mMap.setMyLocationEnabled(true); // shows users positon via GPS
@@ -114,6 +115,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     mMarker.remove();
                 }
                 mMarker = mMap.addMarker(new MarkerOptions().position(point).title("Lat: " + point.latitude + " Lng: " + point.longitude));
+                mMarker.setDraggable(true);
                 mMarker.showInfoWindow();
             }
         });
@@ -123,6 +125,13 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         mMap.addMarker(new MarkerOptions().position(hin).title("UiT Narvik"));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(hin, 17));
+
+/*
+        GroundOverlayOptions hinMap = new GroundOverlayOptions()
+                .image(BitmapDescriptorFactory.fromResource(R.drawable.hin_1_etasje_v2))
+                .position(hin, 6299f, 3150f);
+        mMap.addGroundOverlay(hinMap);
+*/
     }
 
         /**
