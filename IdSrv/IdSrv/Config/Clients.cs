@@ -43,6 +43,39 @@ namespace IdSrv.Config
                         "api",
                         "roles",
                     },                   
+                },
+
+                new Client
+                {
+                    Enabled = true,
+                    ClientName = "Android",
+                    ClientId = "and",
+                    Flow = Flows.ResourceOwner,
+                    RequireConsent = true,
+
+                    ClientSecrets = new List<Secret>
+                    {
+                        new Secret("801Hd9ZEq0")
+                    },
+
+                    RedirectUris = new List<string>
+                    {
+                        "https://localhost:44300",
+                        "https://bacheloradm2.azurewebsites.net/",
+                    },
+
+                    PostLogoutRedirectUris = new List<string>
+                    {
+                        "https://bacheloradm2.azurewebsites.net/",
+                    },
+
+                    AllowedScopes = new List<string>
+                    {
+                        StandardScopes.OpenId.Name,
+                        StandardScopes.Profile.Name,
+                        "api",
+                        "roles",
+                    },
                 }
             };
         }
