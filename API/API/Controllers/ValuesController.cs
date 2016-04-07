@@ -17,7 +17,7 @@ namespace Api.Controllers
         {
             var repo = new Repository<User>();
 
-            User user = repo.List()[0];
+            User user = repo.List().ToList()[0];
 
             return new string[] { "value1", "value2", user.Username };
 

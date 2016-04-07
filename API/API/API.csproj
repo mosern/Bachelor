@@ -259,6 +259,7 @@
       <DependentUpon>201604051006521_InitialCreate.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\LocationConfiguration\Configuration.cs" />
+    <Compile Include="Models\Api\CoordinateInfo.cs" />
     <Compile Include="Models\Api\LocationInfo.cs" />
     <Compile Include="Models\Api\UserInfo.cs" />
     <Compile Include="Models\Api\UserLocationInfo.cs" />

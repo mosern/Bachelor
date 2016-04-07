@@ -12,7 +12,15 @@ namespace Api.Models.Api
 {
     public class UserInfo
     {
-        LocationRepository<UserLocation> userLocRepo = new LocationRepository<UserLocation>();
+        static LocationRepository<UserLocation> userLocRepo = new LocationRepository<UserLocation>();
+
+        private UserInfo(int id, string username, IEnumerable<object> location)
+        {
+            Id = id;
+            Username = username;
+            Location = location;
+        }
+
         public UserInfo(User user)
         {
             Id = user.Id;
@@ -22,7 +30,26 @@ namespace Api.Models.Api
 
         public static object Shape(User user, List<string> fields)
         {
-            UserInfo usrInf = new UserInfo(user);
+            object usrInf = user;
+
+            if (fields.Any(f => 
+            f.Equals("location", StringComparison.OrdinalIgnoreCase)||
+            f.Equals("coordinate", StringComparison.OrdinalIgnoreCase)||
+            f.Equals("name", StringComparison.OrdinalIgnoreCase)||
+            f.Equals("locNr", StringComparison.OrdinalIgnoreCase)||
+            f.Equals("hits", StringComparison.OrdinalIgnoreCase)
+            ))
+            {
+                usrInf = new UserInfo(user);
+                usrInf = new UserInfo(((UserInfo)usrInf).Id, ((UserInfo)usrInf).Username, 
+                                        UserLocationInfo.ShapeList(userLocRepo.List().Where(u => u.UserId == user.Id).AsEnumerable(), fields));
+
+                if(!fields.Any(f => f.Equals("location", StringComparison.OrdinalIgnoreCase)))
+                {
+                    fields.Add("location");
+                }
+            }
+            
             ExpandoObject toReturn = new ExpandoObject();
 
             foreach(var field in fields)
@@ -33,7 +60,7 @@ namespace Api.Models.Api
                 }
                 catch (NullReferenceException)
                 {
-                    break;
+                    
                 }               
             }
 
@@ -66,6 +93,6 @@ namespace Api.Models.Api
 
         public int Id { get; }
         public string Username { get; }
-        public IEnumerable<UserLocationInfo> Location { get; }
+        public IEnumerable<object> Location { get; }
     }
 }

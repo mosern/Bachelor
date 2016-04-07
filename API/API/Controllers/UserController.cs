@@ -18,9 +18,9 @@ namespace Api.Controllers
         LocationRepository<UserLocation> userLocRepo = new LocationRepository<UserLocation>();
 
         [Route("users")]
-        public IHttpActionResult Get(string fields, string sort)
+        public IHttpActionResult Get(string fields = null, string sort = "id")
         {
-            var users = userRepo.List();
+            var users = userRepo.List().ApplySort(sort);
 
             if(fields != null)
             {      
@@ -34,11 +34,26 @@ namespace Api.Controllers
             
         }
 
-        [Route("users")]
-        public IHttpActionResult Get()
+        [Route("users/{id}")]
+        public IHttpActionResult Get(int id, string fields = null)
         {
-            var users = userRepo.List();
-            return Ok(UserInfo.List(users));
+            var user = userRepo.Read(id);
+            if (user != null)
+            {
+                if (fields != null)
+                {
+                    return Ok(UserInfo.Shape(user, fields.ToLower().Split(',').ToList()));
+                }
+                else
+                {
+
+                    return Ok(new UserInfo(user));
+                }
+            }
+            else
+            {
+                return BadRequest();
+            }
         }
     }
 }

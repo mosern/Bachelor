@@ -4,7 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Linq.Dynamic;
 
-namespace ExpenseTracker.API.Helpers
+namespace Api.Classes
 {
     /// <summary>
     /// Written by Kevin Dockx as a part of the course "Building and Securing a RESTful API for Multiple Clients in ASP.NET" on pluralsight.
@@ -34,14 +34,19 @@ namespace ExpenseTracker.API.Helpers
             {
                 // if the sort option starts with "-", we order
                 // descending, ortherwise ascending
-
-                if (sortOption.StartsWith("-"))
-                {
-                    source = source.OrderBy(sortOption.Remove(0, 1) + " descending");
+                try {
+                    if (sortOption.StartsWith("-"))
+                    {
+                        source = source.OrderBy(sortOption.Remove(0, 1) + " descending");
+                    }
+                    else
+                    {
+                        source = source.OrderBy(sortOption);
+                    }
                 }
-                else
+                catch (ParseException)
                 {
-                    source = source.OrderBy(sortOption);
+                    break;
                 }
 
             }
