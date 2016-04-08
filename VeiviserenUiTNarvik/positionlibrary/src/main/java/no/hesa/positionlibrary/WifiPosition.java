@@ -37,6 +37,7 @@ public class WifiPosition {
         c.unregisterReceiver(wifiReceiver);
     }
 
+
     public void calculateDistances(Context c) {
         if (scanResults != null) {
             double[] distances = new double[scanResults.size()];

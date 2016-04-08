@@ -16,14 +16,14 @@ import static org.junit.Assert.*;
  */
 @RunWith(JUnit4.class)
 public class WiFiPositionUnitTest {
- /*   private double[][] degrees = new double[][]{{68.43605,17.43437},{68.43606,17.43439},{68.43618,17.43468}};
+    private double[][] degrees = new double[][]{{68.43611,17.43421},{68.43613,17.43412},{68.43615,17.43404}};
     private double[][] degrees_test = new double[][]{{68.43617,17.43358},{68.43623,17.43363},{68.43629,17.43363}};
     private double[][] cartesian = null;
 
     private double x_expected_degree = 68.43622; //x-coordinate for expected position
     private double y_expected_degree = 17.4338; //y-coordinate for expected position
 
-    private double radius = 6371 * 1000; //earth raduis (meters)*/
+    private double radius = 6371 * 1000; //earth raduis (meters)
 
     @Test
     public void testPosition() {
@@ -32,7 +32,7 @@ public class WiFiPositionUnitTest {
         for (int i = 0; i < degrees.length; i++) {
             cartesian[i] = WifiPosition.convertFromGeo(degrees[i]);
         }
-        double[] distances = new double[] {4.7,4.5,18.2};
+        double[] distances = new double[] {3.01,5.46,9.52};
         double[] distances_test = new double[]{11.11,6.52,10.52};
         TrilaterationFunction trilaterationFunction = new TrilaterationFunction(cartesian,distances);
         LinearLeastSquaresSolver lSolver = new LinearLeastSquaresSolver(trilaterationFunction);
@@ -41,7 +41,16 @@ public class WiFiPositionUnitTest {
         LeastSquaresOptimizer.Optimum optimum = nlSolver.solve();
 
         testResults(expectedPosition,0.0001,optimum,x);*/
-        double[] arr = WifiPosition.calculateCoordinates(new double[]{68.43605083,17.4343663},(4.692)/1000,69.416);
+
+        double a = 3.995; //length from start to north
+        double b = 12.025; //length from start to target
+        double c = 8.053; //length from north to target
+        double ang = 0; //aproximated bearing
+
+        ang = Math.acos((a * a + b * b - c * c) / (2 * a * b));
+        ang = ang * 180 / Math.PI;
+
+        double[] arr = WifiPosition.calculateCoordinates(new double[]{68.43604,17.43365},(b)/1000,25);
         System.out.println("lat: "+arr[0]+" lon: "+arr[1]);
     }
 
