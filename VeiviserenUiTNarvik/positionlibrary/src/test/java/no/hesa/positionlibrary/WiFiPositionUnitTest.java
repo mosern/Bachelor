@@ -41,7 +41,7 @@ public class WiFiPositionUnitTest {
         LeastSquaresOptimizer.Optimum optimum = nlSolver.solve();
 
         testResults(expectedPosition,0.0001,optimum,x);*/
-        double[] arr = WifiPosition.calculateCoordinates(new double[]{68.43605083,17.4343663},(4.692)/1000,69.416);
+        double[] arr = WifiPosition.calculateCoordinates(new double[]{68.43605303,17.43436657},(4.508)/1000,326.05);
         System.out.println("lat: "+arr[0]+" lon: "+arr[1]);
     }
 
