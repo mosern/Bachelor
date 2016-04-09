@@ -290,4 +290,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         return super.onOptionsItemSelected(item);
     }
+
+    public void showAuthentication(MenuItem item) {
+        Intent intent = new Intent(this,AuthenticationActivity.class);
+        startActivity(intent);
+    }
 }

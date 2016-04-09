@@ -8,7 +8,8 @@
         android:orderInCategory="90"
         android:title="@string/action_log_in"
         android:icon="@android:drawable/ic_input_get"
-        app:showAsAction="always"/>
+        app:showAsAction="always"
+        android:onClick="showAuthentication"/>
 
     <item
         android:id="@+id/action_settings"
