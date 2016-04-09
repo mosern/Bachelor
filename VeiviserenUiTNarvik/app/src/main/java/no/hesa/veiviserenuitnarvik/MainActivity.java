@@ -295,4 +295,9 @@ public class MainActivity extends AppCompatActivity /*implements OnMapReadyCallb
         }
     }
     */
+
+    public void showAuthentication(MenuItem item) {
+        Intent intent = new Intent(this,MainActivity.class);
+        startActivity(intent);
+    }
 }
