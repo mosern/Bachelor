@@ -50,8 +50,12 @@ namespace IdSrv.Config
                     Enabled = true,
                     ClientName = "Android",
                     ClientId = "and",
-                    Flow = Flows.ResourceOwner,
-                    RequireConsent = true,
+                    Flow = Flows.AuthorizationCode,
+
+                    RedirectUris = new List<string>
+                    {
+                        "http://localhost:123",
+                    },              
 
                     ClientSecrets = new List<Secret>
                     {
