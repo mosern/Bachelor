@@ -17,6 +17,7 @@ public class MainActivity extends AppCompatActivity {
         Intent myIntent = new Intent(MainActivity.this, MapActivity.class);
 //        myIntent.putExtra("key", value); //Optional parameters
         MainActivity.this.startActivity(myIntent);
+        // no content comment to force git update
     }
 
     @Override
