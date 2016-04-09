@@ -57,9 +57,9 @@ namespace Api.Controllers
         }
 
         [Route("users/{id}/locations/")]
-        public IHttpActionResult get(int id, string fields = null)
+        public IHttpActionResult get(int id, string fields = null, string sort = "id")
         {
-            var locations = userLocRepo.List().Where(u => u.UserId == id).AsEnumerable();
+            var locations = userLocRepo.List().Where(u => u.UserId == id).ApplySort(sort);
 
             if (locations != null)
             {
@@ -72,24 +72,13 @@ namespace Api.Controllers
         }
 
         [Route("users/{id}/locations/{locid}")]
-        public IHttpActionResult get(int id, int locId)
+        public IHttpActionResult get(int id, int locId, string fields = null)
         {
-            var user = userRepo.Read(id);
+            var userLocation = userLocRepo.List().Where(u => u.UserId == id && u.Id == locId).FirstOrDefault();
 
-            if (user != null)
+            if (userLocation != null)
             {
-                var locations = ((IEnumerable<UserLocationInfo>)new UserInfo(user).Location).Where(l => l.Id == locId);
-
-                if(locations != null)
-                {
-                    return Ok(locations);
-                }
-                else
-                {
-                    return BadRequest();
-                }
-                
-
+                    return Ok(UserLocationInfo.Shape(userLocation, fields.ToLower().Split(',').ToList()));
             }
             else
             {
