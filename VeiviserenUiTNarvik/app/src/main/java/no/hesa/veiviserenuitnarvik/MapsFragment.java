@@ -13,6 +13,7 @@ import android.view.ViewGroup;
  */
 public class MapsFragment extends Fragment {
 
+    private BlueDotView mImageView;
 
     public MapsFragment() {
         // Required empty public constructor
@@ -20,10 +21,22 @@ public class MapsFragment extends Fragment {
 
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.activity_main, container, false);
+        mImageView = (BlueDotView) view.findViewById(R.id.blue_dot_view);
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_maps, container, false);
+    }
+
+
+    public void setRadius(float f)
+    {
+        mImageView.setRadius(f);
+    }
+
+    public void setImage(com.davemorrissey.labs.subscaleview.ImageSource image)
+    {
+        mImageView.setImage(image);
     }
 
 }

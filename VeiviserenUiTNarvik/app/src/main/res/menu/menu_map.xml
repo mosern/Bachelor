@@ -1,15 +1,14 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="no.hesa.veiviserenuitnarvik.MainActivity">
-<!--
+    tools:context="no.hesa.veiviserenuitnarvik.MapActivity">
+
     <item
         android:id="@+id/action_login"
         android:orderInCategory="90"
         android:title="@string/action_log_in"
         android:icon="@android:drawable/ic_input_get"
-        app:showAsAction="always"
-        android:onClick="showAuthentication"/>
+        app:showAsAction="always"/>
 
     <item
         android:id="@+id/action_settings"
@@ -24,5 +23,4 @@
         android:title="@string/action_log_in"
         android:icon="@android:drawable/ic_menu_agenda"
         app:showAsAction="always"/>
-        -->
 </menu>

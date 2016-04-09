@@ -174,9 +174,4 @@ public class MainActivity extends AppCompatActivity implements  IALocationListen
         mMap.addMarker(new MarkerOptions().position(hin).title("UiT Narvik"));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(hin, 17));
     }
-
-    public void showAuthentication(MenuItem item) {
-        Intent intent = new Intent(this,AuthenticationActivity.class);
-        startActivity(intent);
-    }
 }

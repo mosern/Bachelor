@@ -9,12 +9,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="no.hesa.veiviserenuitnarvik.MeasurementActivity"
-    tools:showIn="@layout/activity_measurement">
-
-    <TextView
-        android:id="@+id/tv_returned_position"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+    tools:context="no.hesa.veiviserenuitnarvik.MapActivity"
+    tools:showIn="@layout/activity_map">
 
 </RelativeLayout>
