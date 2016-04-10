@@ -244,6 +244,7 @@
     <Compile Include="Classes\Context.cs" />
     <Compile Include="Classes\ILocationRepository.cs" />
     <Compile Include="Classes\IQueryableExtensions.cs" />
+    <Compile Include="Classes\JsonHelper.cs" />
     <Compile Include="Classes\LocationRepository.cs" />
     <Compile Include="Controllers\AccesspointController.cs" />
     <Compile Include="Controllers\CoordinateController.cs" />
@@ -261,6 +262,7 @@
     <Compile Include="Migrations\LocationConfiguration\Configuration.cs" />
     <Compile Include="Models\Api\AccesspointInfo.cs" />
     <Compile Include="Models\Api\CoordinateInfo.cs" />
+    <Compile Include="Classes\PaginationHeader.cs" />
     <Compile Include="Models\Api\LocationInfo.cs" />
     <Compile Include="Models\Api\UserInfo.cs" />
     <Compile Include="Models\Api\UserLocationInfo.cs" />
