@@ -45,14 +45,15 @@ public class ApiAsyncTask extends AsyncTask<List<Pair<String,String>>,Void,JSONO
             conn.setRequestMethod(dataType);
             conn.setDoInput(true);
             conn.setDoOutput(false);
-            conn.setRequestProperty("Content-Type","application/x-www-form-urlencoded");
-            String query = getQueryString(params[0]);
-            OutputStream os = conn.getOutputStream();
-            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os,"UTF-8"));
-            writer.write(query);
-            writer.flush();
-            writer.close();
-            os.close();
+            if (dataType.equals("POST")) {
+                String query = getQueryString(params[0]);
+                OutputStream os = conn.getOutputStream();
+                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os,"UTF-8"));
+                writer.write(query);
+                writer.flush();
+                writer.close();
+                os.close();
+            }
             int responseCode = conn.getResponseCode();
             if (responseCode == HttpsURLConnection.HTTP_OK) {
                 String line;
@@ -79,10 +80,13 @@ public class ApiAsyncTask extends AsyncTask<List<Pair<String,String>>,Void,JSONO
     }
 
     private String getQueryString(List<Pair<String,String>> list) {
-        Uri.Builder builder = new Uri.Builder();
-        for (Pair<String,String> pair : list) {
-            builder.appendQueryParameter(pair.first,pair.second);
+        if (list.size() > 0) {
+            Uri.Builder builder = new Uri.Builder();
+            for (Pair<String,String> pair : list) {
+                builder.appendQueryParameter(pair.first,pair.second);
+            }
+            return builder.build().getEncodedQuery();
         }
-        return builder.build().getEncodedQuery();
+        return "";
     }
 }

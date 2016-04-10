@@ -39,7 +39,12 @@ import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
 import com.squareup.picasso.Target;
 
-public class MapActivity extends AppCompatActivity implements OnMapReadyCallback{
+import org.json.JSONObject;
+
+import no.hesa.veiviserenuitnarvik.api.ActionInterface;
+import no.hesa.veiviserenuitnarvik.api.Api;
+
+public class MapActivity extends AppCompatActivity implements OnMapReadyCallback,ActionInterface{
 
     private static final String TAG = "MapActivity";
 
@@ -83,6 +88,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
 
         fetchFloorPlan(getResources().getString(R.string.indooratlas_floor_1_floorplanid));
+        Api api = new Api(this,getApplicationContext().getResources());
+        api.allUsers("LOAD_ALL_USERS");
     }
 
     @Override
@@ -294,5 +301,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     public void showAuthentication(MenuItem item) {
         Intent intent = new Intent(this,AuthenticationActivity.class);
         startActivity(intent);
+    }
+
+    @Override
+    public void onCompletedAction(JSONObject jsonObject, String actionString) {
+        if (actionString.equals("LOAD_ALL_USERS")) {
+            JSONObject dummyObject = jsonObject;
+        }
     }
 }
