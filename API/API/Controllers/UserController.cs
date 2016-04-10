@@ -22,7 +22,7 @@ namespace Api.Controllers
 
 
         [Route("users", Name = "users")]
-        public IHttpActionResult Get(string fields = null, string sort = "id", int page = 1, int pageSize = stdPageSize, bool asObject = false, string objPropName = "users")
+        public IHttpActionResult Get(string fields = null, string sort = "id", int page = 1, int pageSize = stdPageSize, bool asObject = true, string objPropName = "users")
         {
             var users = userRepo.List().ApplySort(sort).Skip(pageSize * (page - 1)).Take(pageSize);
 
@@ -89,7 +89,7 @@ namespace Api.Controllers
         }
 
         [Route("users/{id}/locations/", Name="userlocations")]
-        public IHttpActionResult Get(int id, string fields = null, string sort = "id", int page = 1, int pageSize = stdPageSize, bool asObject = false, string objPropName = "userLocations")
+        public IHttpActionResult Get(int id, string fields = null, string sort = "id", int page = 1, int pageSize = stdPageSize, bool asObject = true, string objPropName = "userLocations")
         {
             var locations = userLocRepo.List().Where(u => u.UserId == id).ApplySort(sort).Skip(pageSize * (page - 1)).Take(pageSize);
 

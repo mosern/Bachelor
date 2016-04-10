@@ -246,6 +246,7 @@
     <Compile Include="Classes\IQueryableExtensions.cs" />
     <Compile Include="Classes\JsonHelper.cs" />
     <Compile Include="Classes\LocationRepository.cs" />
+    <Compile Include="Classes\Search.cs" />
     <Compile Include="Controllers\AccesspointController.cs" />
     <Compile Include="Controllers\CoordinateController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
