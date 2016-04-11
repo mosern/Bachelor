@@ -1,5 +1,7 @@
 package no.hesa.veiviserenuitnarvik;
 
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.PointF;
@@ -10,6 +12,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -89,7 +92,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         fetchFloorPlan(getResources().getString(R.string.indooratlas_floor_1_floorplanid));
         Api api = new Api(this,getApplicationContext().getResources());
-        api.allUsers("LOAD_ALL_USERS");
+        api.allUsers();
     }
 
     @Override
@@ -274,6 +277,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_map, menu);
+
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         return true;
     }
 
@@ -305,7 +312,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     @Override
     public void onCompletedAction(JSONObject jsonObject, String actionString) {
-        if (actionString.equals("LOAD_ALL_USERS")) {
+        if (actionString.equals(Api.ALL_USERS)) {
             JSONObject dummyObject = jsonObject;
         }
     }

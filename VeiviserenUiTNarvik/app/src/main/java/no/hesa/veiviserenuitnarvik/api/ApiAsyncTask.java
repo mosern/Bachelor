@@ -17,17 +17,31 @@ import java.util.List;
 import javax.net.ssl.HttpsURLConnection;
 
 /**
- * Created by ThaSimon on 09.04.2016.
+ * A simple asynctask that communicates with the API
  */
 public class ApiAsyncTask extends AsyncTask<List<Pair<String,String>>,Void,JSONObject>{
     private ActionInterface actionInterface;
     private String actionString;
     private String url;
     private String dataType;
+
+    /**
+     * An overloaded constructor that defaults the data method to get
+     * @param actionInterface The interface that is used to callback to the activity
+     * @param actionString An actionstring that identifies the action so the activity can handle multiple callbacks
+     * @param url The URL which points to the API
+     */
     public ApiAsyncTask(ActionInterface actionInterface,String actionString, String url) {
         this(actionInterface,actionString,url,"GET");
     }
 
+    /**
+     * Main constructor
+     * @param actionInterface The interface that is used to callback to the activity
+     * @param actionString An actionstring that identifies the action so the activity can handle multiple callbacks
+     * @param url The URL which points to the API
+     * @param dataType POST or GET data
+     */
     public ApiAsyncTask(ActionInterface actionInterface, String actionString,String url,String dataType) {
         this.actionInterface = actionInterface;
         this.actionString = actionString;
@@ -39,13 +53,16 @@ public class ApiAsyncTask extends AsyncTask<List<Pair<String,String>>,Void,JSONO
         JSONObject jObj = null;
         try {
             URL urlObject = new URL(url);
+            if (dataType.equals("GET")) {
+                urlObject = new URL(buildGetUrl(params[0]));
+            }
             HttpsURLConnection conn = (HttpsURLConnection) urlObject.openConnection();
             conn.setReadTimeout(10000);
             conn.setConnectTimeout(15000);
             conn.setRequestMethod(dataType);
             conn.setDoInput(true);
             conn.setDoOutput(false);
-            if (dataType.equals("POST")) {
+            if (dataType.equals("POST") && params[0].size() > 0) {
                 String query = getQueryString(params[0]);
                 OutputStream os = conn.getOutputStream();
                 BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os,"UTF-8"));
@@ -79,6 +96,11 @@ public class ApiAsyncTask extends AsyncTask<List<Pair<String,String>>,Void,JSONO
         actionInterface.onCompletedAction(jsonObject,actionString);
     }
 
+    /**
+     * Build an encoded query which is used to send POST-data
+     * @param list The list of params to be included in the request
+     * @return The encoded query if any params exist, blank if not
+     */
     private String getQueryString(List<Pair<String,String>> list) {
         if (list.size() > 0) {
             Uri.Builder builder = new Uri.Builder();
@@ -88,5 +110,21 @@ public class ApiAsyncTask extends AsyncTask<List<Pair<String,String>>,Void,JSONO
             return builder.build().getEncodedQuery();
         }
         return "";
+    }
+
+    /**
+     * Build an URL for a GET-request
+     * @param list The list of params to be included in the request
+     * @return URL with all params included if any exist, the original URL if not
+     */
+    private String buildGetUrl(List<Pair<String,String>> list) {
+        if (list.size() > 0) {
+            Uri.Builder builder = Uri.parse(url).buildUpon();
+            for (Pair<String,String> pair : list) {
+                builder.appendQueryParameter(pair.first,pair.second);
+            }
+            return  builder.build().toString();
+        }
+        return url;
     }
 }
