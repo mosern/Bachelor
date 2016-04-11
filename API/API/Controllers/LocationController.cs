@@ -1,5 +1,6 @@
 ﻿using Api.Classes;
 using Api.Models.Api;
+using Api.Models.EF;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -14,17 +15,22 @@ namespace Api.Controllers
     [RoutePrefix("api")]
     public class LocationController : ApiController
     {
+        static LocationRepository<Location> LocRepo = new LocationRepository<Location>();
         const int stdPageSize = 5;
 
         [Route("locations", Name = "locations")]
         public IHttpActionResult Get(string fields = null, string sort = "id", int page = 1, int pageSize = stdPageSize, bool asObject = true, string objPropName = "locations", string search = null)
         {
-            if(search == null)
-            {
-                return BadRequest();
-            }
+            IEnumerable<Location> locations;
 
-            var locations = Search.Location(search);
+            if (search != null)
+            {
+                locations = Search.Location(search);
+            }
+            else
+            {
+                locations = LocRepo.List();
+            }
 
             if (locations != null)
             {
@@ -61,7 +67,7 @@ namespace Api.Controllers
             }
             else
             {
-                return Ok("No locations found");
+                return Ok(JsonHelper.variableToObject("No locations found", objPropName));
             }
         }
     }

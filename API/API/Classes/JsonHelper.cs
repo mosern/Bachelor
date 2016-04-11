@@ -14,5 +14,12 @@ namespace Api.Classes
             ((IDictionary<string, object>)obj).Add(type, objects);
             return obj;
         }
+
+        public static object variableToObject(object value, string type)
+        {
+            ExpandoObject obj = new ExpandoObject();
+            ((IDictionary<string, object>)obj).Add(type, value);
+            return obj;
+        }
     }
 }
