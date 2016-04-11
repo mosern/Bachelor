@@ -23,7 +23,9 @@ public class MeasurementActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals("no.hesa.positionlibrary.Output")) {
                 TextView textView = (TextView) findViewById(R.id.tv_returned_position);
-                textView.setText(intent.getStringExtra("DistanceOutput"));
+                //textView.setText(intent.getStringExtra("DistanceOutput"));
+                double[] position = intent.getDoubleArrayExtra("position");
+                //textView.setText(intent.getDoubleArrayExtra("position").toString());
             }
         }
     };
