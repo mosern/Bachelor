@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE resources[
+    <!ENTITY apiroot "https://bachelorapi2.azurewebsites.net/api">
+    ]>
+<resources>
+    <string name="api_users">&apiroot;/users</string>
+    <string name="api_locations">&apiroot;/locations</string>
+    <string name="indooratlas_api_key">93381562-909e-46b7-8f44-a7bbe54aefb3</string>
+    <string name="indooratlas_api_secret">Q4sO5%Jwkc0Wj(nNtM3d6oaLmCSrXHF1s2LD7rBoF!ks6HZq5Yesrj9chSfBzVcspz6hUkg8PK7MMT)hqttOyJYbbix!Je67lF77ndU9JcpB0(eGOr24GZn6oEhLFt10</string>
+    <string name="google_maps_api_key">AIzaSyBU3czWMQCQZwjWP_Yq-HoZ0ENZjz-OAr8</string>
+    <string name="indooratlas_floor_1_floorplanid">945be6c3-5b3d-4d7e-8d28-757f0716ddcb</string>
+    <string name="indooratlas_floor_1_floorid">2b17d556-a186-49b3-939c-e8c0595b532d</string>
+</resources>

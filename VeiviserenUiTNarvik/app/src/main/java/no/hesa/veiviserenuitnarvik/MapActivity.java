@@ -1,5 +1,7 @@
 package no.hesa.veiviserenuitnarvik;
 
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.PointF;
@@ -10,6 +12,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -39,7 +42,12 @@ import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
 import com.squareup.picasso.Target;
 
-public class MapActivity extends AppCompatActivity implements OnMapReadyCallback{
+import org.json.JSONObject;
+
+import no.hesa.veiviserenuitnarvik.api.ActionInterface;
+import no.hesa.veiviserenuitnarvik.api.Api;
+
+public class MapActivity extends AppCompatActivity implements OnMapReadyCallback,ActionInterface{
 
     private static final String TAG = "MapActivity";
 
@@ -83,6 +91,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
 
         fetchFloorPlan(getResources().getString(R.string.indooratlas_floor_1_floorplanid));
+        Api api = new Api(this,getApplicationContext().getResources());
+        api.allUsers();
     }
 
     @Override
@@ -267,6 +277,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_map, menu);
+
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         return true;
     }
 
@@ -289,5 +303,17 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void showAuthentication(MenuItem item) {
+        Intent intent = new Intent(this,AuthenticationActivity.class);
+        startActivity(intent);
+    }
+
+    @Override
+    public void onCompletedAction(JSONObject jsonObject, String actionString) {
+        if (actionString.equals(Api.ALL_USERS)) {
+            JSONObject dummyObject = jsonObject;
+        }
     }
 }
