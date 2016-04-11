@@ -70,7 +70,7 @@ public class NonLinearLeastSquaresSolver {
 		}
 
 		double[] target = new double[numberOfPositions];
-		double[] distances = function.getDistances();
+		Double[] distances = function.getDistances();
 		double[] weights = new double[target.length];
 		// Weights are inversely proportional to the the square of the distances I think
 		for (int i = 0; i < target.length; i++) {

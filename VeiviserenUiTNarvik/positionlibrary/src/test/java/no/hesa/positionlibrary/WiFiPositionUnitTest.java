@@ -27,12 +27,12 @@ public class WiFiPositionUnitTest {
 
     @Test
     public void testPosition() {
-        /*double[] expectedPosition = new double[] {x_expected_degree, y_expected_degree};
+        double[] expectedPosition = new double[] {x_expected_degree, y_expected_degree};
         cartesian = new double[degrees.length][3];
         for (int i = 0; i < degrees.length; i++) {
             cartesian[i] = WifiPosition.convertFromGeo(degrees[i]);
         }
-        double[] distances = new double[] {3.01,5.46,9.52};
+        Double[] distances = new Double[] {3.01,5.46,9.52};
         double[] distances_test = new double[]{11.11,6.52,10.52};
         TrilaterationFunction trilaterationFunction = new TrilaterationFunction(cartesian,distances);
         LinearLeastSquaresSolver lSolver = new LinearLeastSquaresSolver(trilaterationFunction);
@@ -40,9 +40,9 @@ public class WiFiPositionUnitTest {
         RealVector x = lSolver.solve();
         LeastSquaresOptimizer.Optimum optimum = nlSolver.solve();
 
-        testResults(expectedPosition,0.0001,optimum,x);*/
+        testResults(expectedPosition,0.0001,optimum,x);
 
-        double a = 3.995; //length from start to north
+        /*double a = 3.995; //length from start to north
         double b = 12.025; //length from start to target
         double c = 8.053; //length from north to target
         double ang = 0; //aproximated bearing
@@ -51,7 +51,7 @@ public class WiFiPositionUnitTest {
         ang = ang * 180 / Math.PI;
 
         double[] arr = WifiPosition.calculateCoordinates(new double[]{68.43604,17.43365},(b)/1000,25);
-        System.out.println("lat: "+arr[0]+" lon: "+arr[1]);
+        System.out.println("lat: "+arr[0]+" lon: "+arr[1]);*/
     }
 
     private void testResults(double[] expectedPosition, final double delta, LeastSquaresOptimizer.Optimum optimum, RealVector x) {
