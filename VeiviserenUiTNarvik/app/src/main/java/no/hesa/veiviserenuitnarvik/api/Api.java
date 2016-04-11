@@ -19,10 +19,12 @@ public class Api {
 
     private ActionInterface actionInterface;
     private Resources res;
+
     public Api(ActionInterface actionInterface,Resources res) {
         this.actionInterface = actionInterface;
         this.res = res;
     }
+
     public void allUsers() {
         String url = res.getString(R.string.api_users);
         List<Pair<String,String>> params = new ArrayList<>();

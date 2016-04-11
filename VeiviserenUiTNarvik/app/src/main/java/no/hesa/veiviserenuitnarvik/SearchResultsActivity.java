@@ -8,6 +8,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -20,12 +22,16 @@ import no.hesa.veiviserenuitnarvik.api.ActionInterface;
 import no.hesa.veiviserenuitnarvik.api.Api;
 
 public class SearchResultsActivity extends ListActivity implements ActionInterface{
+
     private JSONArray jsonArray = null;
+    TextView txtView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_results);
         handleIntent(getIntent());
+        txtView = (TextView) findViewById(R.id.tv_arraylistout);
 
     }
 
@@ -64,18 +70,30 @@ public class SearchResultsActivity extends ListActivity implements ActionInterfa
 
     @Override
     public void onCompletedAction(JSONObject jsonObject, String actionString) {
-        try {
-            ArrayList<String> arrayList = new ArrayList<>();
-            jsonArray = jsonObject.getJSONArray("locations");
-            for (int i = 0; i < jsonArray.length(); i++) {
-                JSONObject jObject = jsonArray.getJSONObject(i);
-                arrayList.add(jObject.getString("name"));
-            }
-            ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,arrayList);
-            setListAdapter(arrayAdapter);
+
+        switch (actionString) {
+            case Api.DO_SEARCH:
+                try {
+                    ArrayList<String> arrayList = new ArrayList<>();
+                    jsonArray = jsonObject.getJSONArray("locations");
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject jObject = jsonArray.getJSONObject(i);
+                        arrayList.add(jObject.getString("name"));
+                    }
+                    txtView.setText(jsonObject.toString()); // text printout av array for testing
+                    ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,arrayList);
+                    setListAdapter(arrayAdapter);
+                }
+                catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+                break;
+
+
+            default:
+                break;
         }
-        catch (Exception ex) {
-            ex.printStackTrace();
-        }
+
+
     }
 }
