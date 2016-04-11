@@ -1,6 +1,7 @@
 package no.hesa.veiviserenuitnarvik;
 
 import android.app.SearchManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -280,7 +281,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        ComponentName cn = new ComponentName("no.hesa.veiviserenuitnarvik","no.hesa.veiviserenuitnarvik.SearchResultsActivity");
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(cn));
         return true;
     }
 
