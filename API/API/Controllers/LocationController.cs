@@ -9,6 +9,7 @@ using System.Net;
 using System.Net.Http;
 using System.Web;
 using System.Web.Http;
+using System.Web.Http.Description;
 
 namespace Api.Controllers
 {
@@ -95,6 +96,16 @@ namespace Api.Controllers
                 return BadRequest("No location found");
             }
             
+        }
+
+        [Route("locations")]
+        public IHttpActionResult Post(LocationInfo location)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest();
+
+            LocRepo.Create(LocationInfo.toLocation(location));
+            return Ok();
         }
     }
 }

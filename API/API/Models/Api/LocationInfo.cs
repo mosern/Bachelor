@@ -2,6 +2,7 @@
 using Api.Models.EF;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Dynamic;
 using System.Linq;
 using System.Web;
@@ -19,7 +20,11 @@ namespace Api.Models.Api
             Name = location.Name;
             LocNr = location.LocNr;
             Hits = location.Hits;
+        }
 
+        public static Location toLocation(LocationInfo locInf)
+        {
+            return new Location() { CoordinateId = locInf.Coordinate.Id, Name = locInf.Name, LocNr = locInf.LocNr, Hits = locInf.Hits };
         }
 
         public static object Shape(Location location, List<string> fields)
@@ -104,9 +109,13 @@ namespace Api.Models.Api
 
 
         public int Id { get; }
+        [Required]
         public Coordinate Coordinate { get; }
+        [Required]
         public string Name { get; }
+        [Required]
         public string LocNr { get; }
+        [Required]
         public int Hits { get; }
 
     }
