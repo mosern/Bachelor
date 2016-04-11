@@ -33,7 +33,7 @@ namespace Api.Controllers
                 routeValues.Add("fields", fields);
                 routeValues.Add("sort", fields);
 
-                HttpContext.Current.Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(PaginationHeader.Get(page, pageSize, users.Count(), "users", routeValues)));
+                HttpContext.Current.Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(PaginationHeader.Get(page, pageSize, users.Count(), "users", routeValues, Request)));
 
                 if (fields != null)
                 {
@@ -115,21 +115,20 @@ namespace Api.Controllers
                 }
                 else
                 {
+                    routeValues.Add("sort", sort);
+                    HttpContext.Current.Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(PaginationHeader.Get(page, pageSize, locations.Count(), "userlocations", routeValues, Request)));
+
                     if (asObject)
                     {
-                        routeValues.Add("sort", sort);
-
                         return Ok(JsonHelper.listToObject(UserLocationInfo.List(locations), objPropName));
                     }
                     else
                     {
-                        routeValues.Add("sort", sort);
-
                         return Ok(UserLocationInfo.List(locations));
                     }
                 }
 
-                HttpContext.Current.Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(PaginationHeader.Get(page, pageSize, locations.Count(), "userlocations", routeValues)));
+                
             }
             else
             {

@@ -12,7 +12,7 @@ namespace Api.Classes
     {
         static LocationRepository<Location> LocRepo = new LocationRepository<Location>();
 
-        public static IEnumerable<Location> Location(string searchString)
+        public static IQueryable<Location> Location(string searchString)
         {
             if (isLocId(searchString))
             {
@@ -27,7 +27,7 @@ namespace Api.Classes
             }
             else
             {
-                return null;
+                return new List<Location>() as IQueryable<Location>;
             } 
         }
 
@@ -90,7 +90,7 @@ namespace Api.Classes
 
         }
 
-        private static IEnumerable<Location> locationByLocNr(string locNr)
+        private static IQueryable<Location> locationByLocNr(string locNr)
         {
             var loc = LocRepo.List().Where(l => l.LocNr.Contains(locNr));
             if (loc != null)
@@ -99,11 +99,11 @@ namespace Api.Classes
             }
             else
             {
-                return null;
+                return new List<Location>() as IQueryable<Location>;
             }
         }
 
-        private static IEnumerable<Location> locationByName(string name)
+        private static IQueryable<Location> locationByName(string name)
         {
             var loc = LocRepo.List().Where(l => l.Name.Contains(name));
             if (loc != null)
@@ -112,20 +112,23 @@ namespace Api.Classes
             }
             else
             {
-                return null;
+                return new List<Location>() as IQueryable<Location>;
             }
         }
 
-        private static IEnumerable<Location> locationById(int id)
+        private static IQueryable<Location> locationById(int id)
         {
             var loc = LocRepo.Read(id);
             if(loc != null)
             {
-                return new[] { loc };
+                var list = new List<Location>();
+                list.Add(loc);
+                var test = list.AsQueryable();
+                return list.AsQueryable();
             }
             else
             {
-                return null;
+                return new List<Location>().AsQueryable();
             }
             
         }

@@ -21,25 +21,27 @@ namespace Api.Controllers
         [Route("locations", Name = "locations")]
         public IHttpActionResult Get(string fields = null, string sort = "id", int page = 1, int pageSize = stdPageSize, bool asObject = true, string objPropName = "locations", string search = null)
         {
-            IEnumerable<Location> locations;
+            IQueryable<Location> locations;
 
             if (search != null)
             {
-                locations = Search.Location(search);
+                locations = Search.Location(search).ApplySort(sort).Skip(pageSize * (page - 1)).Take(pageSize); ;
             }
             else
             {
-                locations = LocRepo.List();
+                locations = LocRepo.List().ApplySort(sort).Skip(pageSize * (page - 1)).Take(pageSize); ;
             }
 
-            if (locations != null)
+            if (locations.Any())
             {
                 IDictionary<string, object> routeValues = new Dictionary<string, object>();
 
+                if(fields != null)
                 routeValues.Add("fields", fields);
-                routeValues.Add("sort", fields);
 
-                HttpContext.Current.Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(PaginationHeader.Get(page, pageSize, locations.Count(), "locations", routeValues)));
+                routeValues.Add("sort", sort);
+
+                HttpContext.Current.Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(PaginationHeader.Get(page, pageSize, locations.Count(), "locations", routeValues, Request)));
 
                 if (fields != null)
                 {
@@ -67,8 +69,32 @@ namespace Api.Controllers
             }
             else
             {
-                return Ok(JsonHelper.variableToObject("No locations found", objPropName));
+                return BadRequest("No locations found");
             }
+        }
+
+        [Route("locations/{id}")]
+        public IHttpActionResult Get(int id, string fields = null)
+        {
+            var location = LocRepo.Read(id);
+
+            if (location != null)
+            {
+                if(fields != null)
+                {
+                    return Ok(LocationInfo.Shape(location, fields.ToLower().Split(',').ToList()));
+                }
+                else
+                {
+                    return Ok(new LocationInfo(location));
+                }
+                
+            }
+            else
+            {
+                return BadRequest("No location found");
+            }
+            
         }
     }
 }
