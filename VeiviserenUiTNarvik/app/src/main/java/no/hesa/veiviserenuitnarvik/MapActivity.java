@@ -1,24 +1,26 @@
 package no.hesa.veiviserenuitnarvik;
 
 import android.app.SearchManager;
-import android.app.SearchManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
+import android.graphics.PointF;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Looper;
-
-import android.support.v4.view.MenuItemCompat;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -63,6 +65,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private IATask<IAFloorPlan> mFetchFloorPlanTask;
     private Target mLoadTarget;
     private boolean mCameraPositionNeedsUpdating;
+    private Intent intent;
     private BroadcastReceiver intentReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -87,6 +90,15 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            }
+        });
+
         // get map fragment reference
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -94,8 +106,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         fetchFloorPlan(getResources().getString(R.string.indooratlas_floor_1_floorplanid));
         Api api = new Api(this,getApplicationContext().getResources());
         api.allUsers();
-        IntentFilter intentFilter = new IntentFilter("LAT_LNG_RETURN");
-        registerReceiver(intentReceiver,intentFilter);
+        intent = getIntent();
     }
 
     @Override
@@ -139,6 +150,15 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         mMap.addMarker(new MarkerOptions().position(hin).title("UiT Narvik"));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(hin, 17));
 
+        if (intent != null) {
+            if (intent.getAction() != null) {
+                if (intent.getAction().equals("LAT_LNG_RETURN")) {
+                    LatLng latLng = new LatLng(intent.getDoubleExtra("lng",0),intent.getDoubleExtra("lat",0));
+                    mMap.addMarker(new MarkerOptions().position(latLng).title("UiT Narvik"));
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
+                }
+            }
+        }
 /*
         GroundOverlayOptions hinMap = new GroundOverlayOptions()
                 .image(BitmapDescriptorFactory.fromResource(R.drawable.hin_1_etasje_v2))
@@ -339,11 +359,5 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         if (actionString.equals(Api.ALL_USERS)) {
             JSONObject dummyObject = jsonObject;
         }
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        unregisterReceiver(intentReceiver);
     }
 }
