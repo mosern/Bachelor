@@ -4,6 +4,8 @@
     <string name="action_log_in">Log in</string>
     <string name="search_title">Søk</string>
     <string name="app_label">UiT Narvik</string>
+    <string name="action_measure">Measure</string>
+
     <!-- TEMP -->
     <string name="content_text">Dette er content_main.xml, loads fra activity_main.xml</string>
     <string name="title_activity_maps">Map</string>
@@ -16,5 +18,7 @@
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_map">MapActivity</string>
     <string name="title_activity_search_results">SearchResultsActivity</string>
+
+    <string name="search_default_text">Search for person or room</string>
 
 </resources>
