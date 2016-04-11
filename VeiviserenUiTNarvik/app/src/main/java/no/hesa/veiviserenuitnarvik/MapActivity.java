@@ -1,20 +1,22 @@
 package no.hesa.veiviserenuitnarvik;
 
+import android.app.SearchManager;
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
-import android.graphics.PointF;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Looper;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.FragmentActivity;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -39,11 +41,15 @@ import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
 import com.squareup.picasso.Target;
 
-public class MapActivity extends AppCompatActivity implements OnMapReadyCallback{
+import org.json.JSONObject;
+
+import no.hesa.positionlibrary.PositionLibrary;
+import no.hesa.veiviserenuitnarvik.api.ActionInterface;
+import no.hesa.veiviserenuitnarvik.api.Api;
+
+public class MapActivity extends AppCompatActivity implements OnMapReadyCallback,ActionInterface{
 
     private static final String TAG = "MapActivity";
-
-    private static final float HUE_IABLUE = 200.0f;
 
     /* used to decide when bitmap should be downscaled */
     private static final int MAX_DIMENSION = 2048;
@@ -55,7 +61,41 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private IAResourceManager mResourceManager;
     private IATask<IAFloorPlan> mFetchFloorPlanTask;
     private Target mLoadTarget;
-    private boolean mCameraPositionNeedsUpdating;
+    private Intent intent; // rename den her globale intenten til noe fornuftig simon
+    private PositionLibrary positionLibrary = null;
+
+    // gjør denne noe i det hele tatt simon?
+    private BroadcastReceiver intentReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals("LAT_LNG_RETURN")) {
+                Toast.makeText(MapActivity.this, "intentReceiver onReceive method", Toast.LENGTH_LONG).show();
+                LatLng latLng = new LatLng(intent.getDoubleExtra("lat",0),intent.getDoubleExtra("lng",0));
+                mMap.addMarker(new MarkerOptions().position(latLng).title("TestLoc"));
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
+            }
+        }
+    };
+
+    private final BroadcastReceiver outputReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals("no.hesa.positionlibrary.Output")) {
+                double[] pos = intent.getDoubleArrayExtra("posision");
+                if (pos != null)
+                {
+                    Toast.makeText(MapActivity.this, "User location received from library = " + pos[0] + "," + pos[1], Toast.LENGTH_LONG).show();
+                    LatLng latLng = new LatLng(pos[0], pos[1]);
+                    mMap.addMarker(new MarkerOptions().position(latLng).title("UserLocAsDeterminedByLibrary\nLat:" + pos[0] + " Lng: " + pos[1]));
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
+                }
+                else
+                {
+                    Toast.makeText(MapActivity.this, "Returned doublearray was null.", Toast.LENGTH_LONG).show();
+                }
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,25 +109,21 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-
         // get map fragment reference
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
         fetchFloorPlan(getResources().getString(R.string.indooratlas_floor_1_floorplanid));
+
+        Api api = new Api(this,getApplicationContext().getResources());
+        api.allUsers();
+        intent = getIntent();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        // dette må antageligvis fjernes
         if (mMap == null)
         {
             // Try to obtain the map from the SupportMapFragment.
@@ -95,12 +131,25 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
     }
 
-
-
+    @Override
+    protected void onStop()
+    {
+        super.onStop();
+        /*
+        if (positionLibrary != null) {
+            positionLibrary.wifiPosition.unRegisterBroadcast(this);
+        }
+        unregisterReceiver(outputReceiver);
+        */
+    }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        //Disable Map Toolbar:
+        mMap.getUiSettings().setMapToolbarEnabled(false);
+
+
 //        mMap.setIndoorEnabled(false);
 //        mMap.setBuildingsEnabled(false);
 /*
@@ -108,6 +157,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             mMap.setMyLocationEnabled(true); // shows users positon via GPS
         }
 */
+        // adds a marker
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng point) {
@@ -122,9 +172,22 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         // Add a marker in Narvik and move the camera
         LatLng hin = new LatLng(68.436135, 17.434950);
-
-        mMap.addMarker(new MarkerOptions().position(hin).title("UiT Narvik"));
+//        mMap.addMarker(new MarkerOptions().position(hin).title("UiT Narvik"));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(hin, 17));
+
+        if (intent != null) {
+            if (intent.getAction() != null) {
+                if (intent.getAction().equals("LAT_LNG_RETURN")) {
+                    LatLng latLng = new LatLng(intent.getDoubleExtra("lng",0),intent.getDoubleExtra("lat",0));
+                    mMap.addMarker(new MarkerOptions().position(latLng).title("TestLoc2"));
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
+                }
+            }
+        }
+
+        positionLibrary = new PositionLibrary();
+        positionLibrary.wifiPosition.registerBroadcast(this);
+        registerReceiver(outputReceiver, new IntentFilter("no.hesa.positionlibrary.Output"));
 
 /*
         GroundOverlayOptions hinMap = new GroundOverlayOptions()
@@ -134,6 +197,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 */
     }
 
+//region INDOORATLAS METHODS
         /**
          * Sets bitmap of floor plan as ground overlay on Google Maps
          */
@@ -209,7 +273,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         request.into(mLoadTarget);
     }
 
-
     /**
      * Fetches floor plan data from IndoorAtlas server.
      */
@@ -263,11 +326,47 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
     }
 
+//endregion
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
+
+        getMenuInflater().inflate(R.menu.menu_map, menu);// Retrieve the SearchView and plug it into SearchManager
+        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
+        searchView.setIconifiedByDefault(false);
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName("no.hesa.veiviserenuitnarvik","no.hesa.veiviserenuitnarvik.SearchResultsActivity")));
+
+        // listener for toolbar search submit
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+
+            @Override
+            public boolean onQueryTextSubmit(String newText) {
+                Toast.makeText(MapActivity.this, "You searched for: " + newText, Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getApplicationContext(), SearchResultsActivity.class);
+                intent.setAction(Intent.ACTION_SEARCH);
+                intent.putExtra("query", newText);
+                startActivity(intent);
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+        /*
         getMenuInflater().inflate(R.menu.menu_map, menu);
+
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
+        searchView.setIconifiedByDefault(false); // makes text field always "open"/visible
+        ComponentName cn = new ComponentName("no.hesa.veiviserenuitnarvik","no.hesa.veiviserenuitnarvik.SearchResultsActivity");
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(cn));
+        */
         return true;
+
     }
 
     @Override
@@ -289,5 +388,24 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void showAuthentication(MenuItem item) {
+        Intent intent = new Intent(this,AuthenticationActivity.class);
+        startActivity(intent);
+    }
+
+    @Override
+    public void onCompletedAction(JSONObject jsonObject, String actionString) {
+
+        switch (actionString) {
+            case Api.ALL_USERS:
+                JSONObject dummyObject = jsonObject;
+                break;
+
+
+            default:
+                break;
+        }
     }
 }

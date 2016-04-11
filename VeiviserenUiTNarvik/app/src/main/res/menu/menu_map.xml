@@ -3,24 +3,41 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="no.hesa.veiviserenuitnarvik.MapActivity">
 
+
+    <item android:id="@+id/action_search"
+        android:title="@string/search_default_text"
+        android:icon="@drawable/abc_ic_search_api_mtrl_alpha"
+        app:showAsAction="always"
+        app:actionViewClass="android.support.v7.widget.SearchView" />
+
     <item
         android:id="@+id/action_login"
         android:orderInCategory="90"
         android:title="@string/action_log_in"
         android:icon="@android:drawable/ic_input_get"
-        app:showAsAction="always"/>
+        app:showAsAction="never"
+        android:onClick="showAuthentication"/>
 
     <item
         android:id="@+id/action_settings"
         android:orderInCategory="95"
         android:title="@string/action_settings"
         android:icon="@android:drawable/ic_menu_preferences"
-        app:showAsAction="always"/>
+        app:showAsAction="never"/>
 
     <item
         android:id="@+id/action_measurement"
         android:orderInCategory="100"
-        android:title="@string/action_log_in"
+        android:title="@string/action_measure"
         android:icon="@android:drawable/ic_menu_agenda"
-        app:showAsAction="always"/>
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/search"
+        android:orderInCategory="60"
+        android:title="@string/search_title"
+        android:icon="@android:drawable/ic_menu_search"
+        app:showAsAction="always"
+        app:actionViewClass="android.support.v7.widget.SearchView"
+        />
 </menu>

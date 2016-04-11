@@ -26,9 +26,9 @@ public class TrilaterationFunction implements MultivariateJacobianFunction {
 	/**
 	 * Euclidean distances from static nodes to mobile node
 	 */
-	protected final double distances[];
+	protected final Double distances[];
 
-	public TrilaterationFunction(double positions[][], double distances[]) {
+	public TrilaterationFunction(double positions[][], Double distances[]) {
 
 		if(positions.length < 2) {
 			throw new IllegalArgumentException("Need at least two positions.");
@@ -54,7 +54,7 @@ public class TrilaterationFunction implements MultivariateJacobianFunction {
 		this.distances = distances;
 	}
 
-	public final double[] getDistances() {
+	public final Double[] getDistances() {
 		return distances;
 	}
 

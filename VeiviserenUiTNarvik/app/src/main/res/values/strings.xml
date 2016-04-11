@@ -2,6 +2,9 @@
     <string name="app_name">Veiviseren UiT Narvik</string>
     <string name="action_settings">Settings</string>
     <string name="action_log_in">Log in</string>
+    <string name="search_title">Søk etter personer eller rom</string>
+    <string name="app_label">UiT Narvik</string>
+    <string name="action_measure">Measure</string>
 
     <!-- TEMP -->
     <string name="content_text">Dette er content_main.xml, loads fra activity_main.xml</string>
@@ -10,16 +13,12 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_measurement">MeasurementActivity</string>
+    <string name="title_activity_authentication">AuthenticationActivity</string>
 
-    <string name="indooratlas_api_key">93381562-909e-46b7-8f44-a7bbe54aefb3</string>
-    <string name="indooratlas_api_secret">Q4sO5%Jwkc0Wj(nNtM3d6oaLmCSrXHF1s2LD7rBoF!ks6HZq5Yesrj9chSfBzVcspz6hUkg8PK7MMT)hqttOyJYbbix!Je67lF77ndU9JcpB0(eGOr24GZn6oEhLFt10</string>
-    <string name="google_maps_api_key">AIzaSyBU3czWMQCQZwjWP_Yq-HoZ0ENZjz-OAr8</string>
-<!--
-    <string name="indooratlas_floor_1_floorplanid">945be6c3-5b3d-4d7e-8d28-757f0716ddcb</string>
-    <string name="indooratlas_floor_1_floorid">2b17d556-a186-49b3-939c-e8c0595b532d</string>
--->
-    <string name="indooratlas_floor_1_floorplanid">df6670cd-bc96-4784-8fbd-9756be5b7c79</string>
-
+    <string name="hello_world">Hello world!</string>
     <string name="title_activity_map">MapActivity</string>
+    <string name="title_activity_search_results">SearchResultsActivity</string>
+
+    <string name="search_default_text">Search for person or room</string>
 
 </resources>
