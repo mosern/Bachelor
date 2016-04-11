@@ -67,16 +67,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private IATask<IAFloorPlan> mFetchFloorPlanTask;
     private Target mLoadTarget;
     private boolean mCameraPositionNeedsUpdating;
-    private BroadcastReceiver intentReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals("LAT_LNG_RETURN")) {
-                LatLng latLng = new LatLng(intent.getDoubleExtra("lat",0),intent.getDoubleExtra("lng",0));
-                mMap.addMarker(new MarkerOptions().position(latLng).title("UiT Narvik"));
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
-            }
-        }
-    };
+    private Intent intent;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -105,8 +96,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         fetchFloorPlan(getResources().getString(R.string.indooratlas_floor_1_floorplanid));
         Api api = new Api(this,getApplicationContext().getResources());
         api.allUsers();
-        IntentFilter intentFilter = new IntentFilter("LAT_LNG_RETURN");
-        registerReceiver(intentReceiver,intentFilter);
+        intent = getIntent();
     }
 
     @Override
@@ -150,6 +140,15 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         mMap.addMarker(new MarkerOptions().position(hin).title("UiT Narvik"));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(hin, 17));
 
+        if (intent != null) {
+            if (intent.getAction() != null) {
+                if (intent.getAction().equals("LAT_LNG_RETURN")) {
+                    LatLng latLng = new LatLng(intent.getDoubleExtra("lng",0),intent.getDoubleExtra("lat",0));
+                    mMap.addMarker(new MarkerOptions().position(latLng).title("UiT Narvik"));
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
+                }
+            }
+        }
 /*
         GroundOverlayOptions hinMap = new GroundOverlayOptions()
                 .image(BitmapDescriptorFactory.fromResource(R.drawable.hin_1_etasje_v2))
@@ -330,11 +329,5 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         if (actionString.equals(Api.ALL_USERS)) {
             JSONObject dummyObject = jsonObject;
         }
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        unregisterReceiver(intentReceiver);
     }
 }
