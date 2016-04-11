@@ -9,6 +9,8 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -18,7 +20,7 @@ import no.hesa.veiviserenuitnarvik.api.ActionInterface;
 import no.hesa.veiviserenuitnarvik.api.Api;
 
 public class SearchResultsActivity extends ListActivity implements ActionInterface{
-
+    private JSONArray jsonArray = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,7 +37,21 @@ public class SearchResultsActivity extends ListActivity implements ActionInterfa
 
     @Override
     public void onListItemClick(ListView listView, View view, int position, long id) {
-        //Add some code here..
+        if (jsonArray != null) {
+            if (jsonArray.length() >= position) {
+                try {
+                    JSONObject jsonObject = jsonArray.getJSONObject(position);
+                    Intent intent = new Intent(this,MapActivity.class);
+                    intent.putExtra("lat",jsonObject.getJSONObject("coordinate").getDouble("lat"));
+                    intent.putExtra("lng",jsonObject.getJSONObject("coordinate").getDouble("lng"));
+                    intent.setAction("LAT_LNG_RETURN");
+                    startActivity(intent);
+                }
+                catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        }
     }
 
     private void handleIntent(Intent intent) {
@@ -50,14 +66,13 @@ public class SearchResultsActivity extends ListActivity implements ActionInterfa
     public void onCompletedAction(JSONObject jsonObject, String actionString) {
         try {
             ArrayList<String> arrayList = new ArrayList<>();
-            JSONArray jsonArray = jsonObject.getJSONArray("locations");
+            jsonArray = jsonObject.getJSONArray("locations");
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject jObject = jsonArray.getJSONObject(i);
                 arrayList.add(jObject.getString("name"));
             }
             ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,arrayList);
-            ListView listView = (ListView) findViewById(R.id.listview);
-            listView.setAdapter(arrayAdapter);
+            setListAdapter(arrayAdapter);
         }
         catch (Exception ex) {
             ex.printStackTrace();

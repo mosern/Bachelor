@@ -1,9 +1,11 @@
 package no.hesa.veiviserenuitnarvik;
 
 import android.app.SearchManager;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.PointF;
 import android.graphics.drawable.Drawable;
@@ -65,7 +67,16 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private IATask<IAFloorPlan> mFetchFloorPlanTask;
     private Target mLoadTarget;
     private boolean mCameraPositionNeedsUpdating;
-
+    private BroadcastReceiver intentReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals("LAT_LNG_RETURN")) {
+                LatLng latLng = new LatLng(intent.getDoubleExtra("lat",0),intent.getDoubleExtra("lng",0));
+                mMap.addMarker(new MarkerOptions().position(latLng).title("UiT Narvik"));
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
+            }
+        }
+    };
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,6 +105,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         fetchFloorPlan(getResources().getString(R.string.indooratlas_floor_1_floorplanid));
         Api api = new Api(this,getApplicationContext().getResources());
         api.allUsers();
+        IntentFilter intentFilter = new IntentFilter("LAT_LNG_RETURN");
+        registerReceiver(intentReceiver,intentFilter);
     }
 
     @Override
@@ -317,5 +330,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         if (actionString.equals(Api.ALL_USERS)) {
             JSONObject dummyObject = jsonObject;
         }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        unregisterReceiver(intentReceiver);
     }
 }
