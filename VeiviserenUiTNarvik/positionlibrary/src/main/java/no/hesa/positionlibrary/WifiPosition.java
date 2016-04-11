@@ -75,14 +75,24 @@ public class WifiPosition {
                 calculatedPosition = calculatePosition(sortedWifiPointsLocationInf);
             }
 
-            if(calculatedPosition != null)
-                outputBuilder.append("Your position: " + Double.toString(calculatedPosition[0]) + " " + Double.toString(calculatedPosition[1]) + "\n");
-            else
-                outputBuilder.append("Cant find your position :(" + "\n");
-
             Intent intent = new Intent();
             intent.setAction("no.hesa.positionlibrary.Output");
-            intent.putExtra("DistanceOutput", outputBuilder.toString());
+
+            if(calculatedPosition != null)
+                intent.putExtra("position", calculatedPosition);
+                //outputBuilder.append("Your position: " + Double.toString(calculatedPosition[0]) + " " + Double.toString(calculatedPosition[1]) + "\n");
+            else {
+                double[] noPosition = {0,0};
+                intent.putExtra("position", noPosition);
+                //outputBuilder.append("Cant find your position :(" + "\n");
+            }
+
+            //Intent intent = new Intent();
+            //intent.setAction("no.hesa.positionlibrary.Output");
+            //intent.putExtra("DistanceOutput", outputBuilder.toString());
+            //intent.putExtra("lat.", calculatedPosition[0]);
+            //intent.putExtra("lng.", calculatedPosition[1]);
+            //intent.putExtra("position", calculatedPosition);
             c.sendBroadcast(intent);
         }
     }
