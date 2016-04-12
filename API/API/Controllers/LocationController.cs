@@ -10,6 +10,7 @@ using System.Net.Http;
 using System.Web;
 using System.Web.Http;
 using System.Web.Http.Description;
+using Thinktecture.IdentityModel.Mvc;
 
 namespace Api.Controllers
 {
@@ -74,7 +75,7 @@ namespace Api.Controllers
             }
         }
 
-        [Route("locations/{id}")]
+        [Route("locations/{id}"), ResourceAuthorize("Read","location")]
         public IHttpActionResult Get(int id, string fields = null)
         {
             var location = LocRepo.Read(id);
