@@ -24,7 +24,7 @@ namespace Api.Classes
             switch (context.Action.First().Value)
             {
                 case "Read":
-                    return Eval(true);
+                    return Eval(context.Principal.Identity.IsAuthenticated);
                 case "Write":
                     return Eval(context.Principal.HasClaim("roles", "Administrator"));
                 default:

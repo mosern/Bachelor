@@ -253,13 +253,13 @@
     <Compile Include="Areas\HelpPage\SampleGeneration\SampleDirection.cs" />
     <Compile Include="Areas\HelpPage\SampleGeneration\TextSample.cs" />
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
-    <Compile Include="Classes\AuthorizationManager.cs" />
-    <Compile Include="Classes\Context.cs" />
-    <Compile Include="Classes\ILocationRepository.cs" />
-    <Compile Include="Classes\IQueryableExtensions.cs" />
-    <Compile Include="Classes\JsonHelper.cs" />
-    <Compile Include="Classes\LocationRepository.cs" />
-    <Compile Include="Classes\Search.cs" />
+    <Compile Include="Helper\AuthorizationManager.cs" />
+    <Compile Include="Helper\Context.cs" />
+    <Compile Include="Helper\ILocationRepository.cs" />
+    <Compile Include="Helper\IQueryableExtensions.cs" />
+    <Compile Include="Helper\JsonHelper.cs" />
+    <Compile Include="Helper\LocationRepository.cs" />
+    <Compile Include="Helper\Search.cs" />
     <Compile Include="Controllers\AccesspointController.cs" />
     <Compile Include="Controllers\CoordinateController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
@@ -276,7 +276,7 @@
     <Compile Include="Migrations\LocationConfiguration\Configuration.cs" />
     <Compile Include="Models\Api\AccesspointInfo.cs" />
     <Compile Include="Models\Api\CoordinateInfo.cs" />
-    <Compile Include="Classes\PaginationHeader.cs" />
+    <Compile Include="Helper\PaginationHeader.cs" />
     <Compile Include="Models\Api\LocationInfo.cs" />
     <Compile Include="Models\Api\UserInfo.cs" />
     <Compile Include="Models\Api\UserLocationInfo.cs" />
@@ -347,6 +347,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Factories\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />

@@ -75,7 +75,8 @@ namespace Api.Controllers
             }
         }
 
-        [Route("locations/{id}"), ResourceAuthorize("Read","location")]
+        [ResourceAuthorize("Read", "location")]
+        [Route("locations/{id}")]
         public IHttpActionResult Get(int id, string fields = null)
         {
             var location = LocRepo.Read(id);
