@@ -19,18 +19,18 @@ namespace Api.Models.Api
             //LocNr = "A1111";
         }
 
-        public LocationInfo(int coordinateId, string name, string locNr, int hits)
-        {
-            CoordinateId = coordinateId;
-            Name = name;
-            LocNr = locNr;
-            Hits = hits;
-        }
+        //public LocationInfo(int coordinateId, string name, string locNr, int hits)
+        //{
+        //    Coordinate = coordinateId;
+        //    Name = name;
+        //    LocNr = locNr;
+        //    Hits = hits;
+        //}
 
         public LocationInfo(Location location)
         {
             Id = location.Id;
-            CoordinateId = location.CoordinateId;
+            Coordinate = location.Coordinate;
             Name = location.Name;
             LocNr = location.LocNr;
             Hits = location.Hits;
@@ -38,7 +38,7 @@ namespace Api.Models.Api
 
         public static Location toLocation(LocationInfo locInf)
         {
-            return new Location() { CoordinateId = locInf.CoordinateId, Name = locInf.Name, LocNr = locInf.LocNr, Hits = locInf.Hits };
+            return new Location() { Coordinate = locInf.Coordinate, Name = locInf.Name, LocNr = locInf.LocNr, Hits = locInf.Hits };
         }
 
         public static object Shape(Location location, List<string> fields)
@@ -57,7 +57,7 @@ namespace Api.Models.Api
                 ExpandoObject temp = new ExpandoObject();
                 ((IDictionary<string, object>)temp).Add("id", tempLocInf.Id);
                 ((IDictionary<string, object>)temp).Add("name", tempLocInf.Name);
-                ((IDictionary<string, object>)temp).Add("coordinate", CoordinateInfo.Shape(CoorRepo.Read(tempLocInf.CoordinateId), fields));
+                ((IDictionary<string, object>)temp).Add("coordinate", CoordinateInfo.Shape(tempLocInf.Coordinate, fields));
                 ((IDictionary<string, object>)temp).Add("locnr", tempLocInf.LocNr);
                 ((IDictionary<string, object>)temp).Add("hits", tempLocInf.Hits);
 
@@ -124,7 +124,7 @@ namespace Api.Models.Api
 
         public int Id { get; }
         [Required]
-        public int CoordinateId { get; }
+        public Coordinate Coordinate { get; }
         [Required]
         public string Name { get; }
         [Required]
