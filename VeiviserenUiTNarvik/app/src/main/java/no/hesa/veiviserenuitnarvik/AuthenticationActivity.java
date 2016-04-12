@@ -11,6 +11,7 @@ import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -21,30 +22,32 @@ import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 
 public class AuthenticationActivity extends AppCompatActivity {
 
     private static String CLIENT_ID = "and";
     //Use your own client id
-    private static String CLIENT_SECRET ="801Hd9ZEq0";
+    private static String CLIENT_SECRET = "801Hd9ZEq0";
     //Use your own client secret
-    private static String REDIRECT_URI="http://localhost:123";
-    private static String GRANT_TYPE="authorization_code";
-    private static String TOKEN_URL ="https://bacheloridsrv3.azurewebsites.net/identity/connect/token";
-    private static String OAUTH_URL ="https://bacheloridsrv3.azurewebsites.net/identity/connect/authorize";
+    private static String REDIRECT_URI = "http://localhost:123";
+    private static String GRANT_TYPE = "implicit";
+    private static String TOKEN_URL = "https://bacheloridsrv3.azurewebsites.net/identity/connect/token";
+    private static String OAUTH_URL = "https://bacheloridsrv3.azurewebsites.net/identity/connect/authorize";
     /*private static String TOKEN_URL = "https://158.39.116.36:44305/identity/connect/token";
     private static String OAUTH_URL = "https://158.39.116.36:44305/identity/connect/authorize";*/
-    private static String OAUTH_SCOPE ="api roles openid";
+    private static String OAUTH_SCOPE = "api roles openid";
     private SharedPreferences pref;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_authentication);
         WebView web = (WebView) findViewById(R.id.webv);
         web.getSettings().setJavaScriptEnabled(true);
-        pref = getSharedPreferences("AppPref",MODE_PRIVATE);
-        web.loadUrl(OAUTH_URL + "?redirect_uri=" + REDIRECT_URI + "&response_type=code&client_id=" + CLIENT_ID + "&scope=" + OAUTH_SCOPE);
+        pref = getSharedPreferences("AppPref", MODE_PRIVATE);
+        web.loadUrl(OAUTH_URL + "?redirect_uri=" + REDIRECT_URI + "&response_type=id_token%20token&client_id=" + CLIENT_ID + "&scope=" + OAUTH_SCOPE + "&nonce=12343");
         web.setWebViewClient(new WebViewClient() {
 
             boolean authComplete = false;
@@ -61,9 +64,12 @@ public class AuthenticationActivity extends AppCompatActivity {
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
-                if (url.contains("?code=") && !authComplete) {
+                if (url.contains("access_token=") && !authComplete) {
                     Uri uri = Uri.parse(url);
-                    authCode = uri.getQueryParameter("code");
+                    int start = TextUtils.indexOf(url, "access_token=") + "access_token=".length();
+                    int end = TextUtils.indexOf(url, "&token_type=");
+                    authCode = url.substring(start, end);
+
                     Log.i("", "CODE : " + authCode);
                     authComplete = true;
                     resultIntent.putExtra("code", authCode);
@@ -74,9 +80,8 @@ public class AuthenticationActivity extends AppCompatActivity {
                     edit.putString("Code", authCode);
                     edit.commit();
                     //auth_dialog.dismiss();
-                    new TokenGet().execute();
                     Toast.makeText(getApplicationContext(), "Authorization Code is: " + authCode, Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(getApplicationContext(),MainActivity.class);
+                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                     startActivity(intent);
 
                 } else if (url.contains("error=access_denied")) {
@@ -117,50 +122,5 @@ public class AuthenticationActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-    private class TokenGet extends AsyncTask<String, String, JSONObject> {
-        private ProgressDialog pDialog;
-        String Code;
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            pDialog = new ProgressDialog(AuthenticationActivity.this);
-            pDialog.setMessage("Logger deg inn ...");
-            pDialog.setIndeterminate(false);
-            pDialog.setCancelable(true);
-            Code = pref.getString("Code", "");
-            pDialog.show();
-        }
-
-        @Override
-        protected JSONObject doInBackground(String... args) {
-            GetAccessToken jParser = new GetAccessToken();
-            return  jParser.gettoken(TOKEN_URL,Code,CLIENT_ID,CLIENT_SECRET,REDIRECT_URI,GRANT_TYPE);
-        }
-
-        @Override
-        protected void onPostExecute(JSONObject json) {
-            pDialog.dismiss();
-            if (json != null){
-
-                try {
-
-                    String tok = json.getString("access_token");
-                    String expire = json.getString("expires_in");
-                    String refresh = json.getString("refresh_token");
-
-                    Log.d("Token Access", tok);
-                    Log.d("Expire", expire);
-                    Log.d("Refresh", refresh);
-                } catch (JSONException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            }
-            else{
-                Toast.makeText(getApplicationContext(), "Network Error", Toast.LENGTH_SHORT).show();
-                pDialog.dismiss();
-            }
-        }
     }
 }
