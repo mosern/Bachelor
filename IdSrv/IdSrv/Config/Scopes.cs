@@ -30,7 +30,12 @@ namespace IdSrv.Config
                         Description = "Access to the api",
                         Type = ScopeType.Resource,
                         Emphasize = false,
-                        Enabled = true
+                        Enabled = true,
+
+                        Claims = new List<ScopeClaim>
+                        {
+                            new ScopeClaim("role")
+                        }
                     },
 
                     new Scope
