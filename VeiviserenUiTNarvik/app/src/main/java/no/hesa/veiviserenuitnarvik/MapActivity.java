@@ -61,29 +61,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private IAResourceManager mResourceManager;
     private IATask<IAFloorPlan> mFetchFloorPlanTask;
     private Target mLoadTarget;
-    private Intent intent; // rename den her globale intenten til noe fornuftig simon
+    private Intent returnedCoordsFromSearchIntent;
     private PositionLibrary positionLibrary = null;
 
+    private BroadcastReceiver positionLibOutputReceiver = null;
+    private BroadcastReceiver searchLocationReceiver = null;
 
-    private final BroadcastReceiver outputReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals("no.hesa.positionlibrary.Output")) {
-                double[] pos = intent.getDoubleArrayExtra("position");
-                if (pos[0] != 0 && pos[1] != 0)
-                {
-                    Toast.makeText(MapActivity.this, "User location received from library = " + pos[0] + "," + pos[1], Toast.LENGTH_LONG).show();
-                    LatLng latLng = new LatLng(pos[0], pos[1]);
-                    mMap.addMarker(new MarkerOptions().position(latLng).title("UserLocAsDeterminedByLibrary\nLat:" + pos[0] + " Lng: " + pos[1]));
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
-                }
-                else
-                {
-                    Toast.makeText(MapActivity.this, "Sorry, can´t determine your position.", Toast.LENGTH_LONG).show();
-                }
-            }
-        }
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,54 +80,62 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        // get map fragment reference
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
-
-        fetchFloorPlan(getResources().getString(R.string.indooratlas_floor_1_floorplanid));
-
         Api api = new Api(this,getApplicationContext().getResources());
         api.allUsers();
-        intent = getIntent();
+        returnedCoordsFromSearchIntent = getIntent();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        // dette må antageligvis fjernes
-        if (mMap == null)
-        {
-            // Try to obtain the map from the SupportMapFragment.
-            mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
-        }
+        // get map fragment reference
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
+
+        fetchFloorPlan(getResources().getString(R.string.indooratlas_floor_1_floorplanid));
     }
 
     @Override
     protected void onStop()
     {
         super.onStop();
-        /*
         if (positionLibrary != null) {
             positionLibrary.wifiPosition.unRegisterBroadcast(this);
         }
-        unregisterReceiver(outputReceiver);
-        */
+        unregisterReceiver(positionLibOutputReceiver);
+        //unregisterReceiver(searchLocationReceiver);
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        //Disable Map Toolbar:
-        mMap.getUiSettings().setMapToolbarEnabled(false);
 
+        mMap.getUiSettings().setMapToolbarEnabled(false); // disable map toolbar:
 
-//        mMap.setIndoorEnabled(false);
-//        mMap.setBuildingsEnabled(false);
-/*
-        if (mMap != null) {
-            mMap.setMyLocationEnabled(true); // shows users positon via GPS
+        // Add a marker in Narvik and move the camera
+        LatLng hin = new LatLng(68.436135, 17.434950);
+        mMap.addMarker(new MarkerOptions().position(hin).title("UiT Narvik"));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(hin, 17));
+
+        if (returnedCoordsFromSearchIntent != null) {
+            if (returnedCoordsFromSearchIntent.getAction() != null) {
+                if (returnedCoordsFromSearchIntent.getAction().equals("LAT_LNG_RETURN")) {
+                    LatLng latLng = new LatLng(returnedCoordsFromSearchIntent.getDoubleExtra("lng",0),returnedCoordsFromSearchIntent.getDoubleExtra("lat",0));
+                    mMap.addMarker(new MarkerOptions().position(latLng).title("TestLoc2"));
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
+                }
+            }
         }
-*/
+
+        registerOnMapClickReceiver();
+        registerPositionReceiver();
+//        registerSearchLocationReceiver();
+
+    }
+
+//region BROADCASTRECEIVERS
+    private void registerOnMapClickReceiver()
+    {
         // adds a marker
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
@@ -157,33 +148,51 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 mMarker.showInfoWindow();
             }
         });
+    }
 
-        // Add a marker in Narvik and move the camera
-        LatLng hin = new LatLng(68.436135, 17.434950);
-//        mMap.addMarker(new MarkerOptions().position(hin).title("UiT Narvik"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(hin, 17));
-
-        if (intent != null) {
-            if (intent.getAction() != null) {
-                if (intent.getAction().equals("LAT_LNG_RETURN")) {
-                    LatLng latLng = new LatLng(intent.getDoubleExtra("lng",0),intent.getDoubleExtra("lat",0));
-                    mMap.addMarker(new MarkerOptions().position(latLng).title("TestLoc2"));
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
+    private void registerPositionReceiver()
+    {
+        positionLibOutputReceiver= new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (intent.getAction().equals("no.hesa.positionlibrary.Output")) {
+                    double[] pos = intent.getDoubleArrayExtra("position");
+                    if (pos != null)
+                    {
+                        Toast.makeText(MapActivity.this, "User location received from library = " + pos[0] + "," + pos[1], Toast.LENGTH_LONG).show();
+                        LatLng latLng = new LatLng(pos[0], pos[1]);
+                        mMap.addMarker(new MarkerOptions().position(latLng).title("UserLocAsDeterminedByLibrary\nLat:" + pos[0] + " Lng: " + pos[1]));
+                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
+                    }
+                    else
+                    {
+                        Toast.makeText(MapActivity.this, "Returned doublearray was null.", Toast.LENGTH_LONG).show();
+                    }
                 }
             }
-        }
+        };
 
         positionLibrary = new PositionLibrary();
         positionLibrary.wifiPosition.registerBroadcast(this);
-        registerReceiver(outputReceiver, new IntentFilter("no.hesa.positionlibrary.Output"));
-
-/*
-        GroundOverlayOptions hinMap = new GroundOverlayOptions()
-                .image(BitmapDescriptorFactory.fromResource(R.drawable.hin_1_etasje_v2))
-                .position(hin, 6299f, 3150f);
-        mMap.addGroundOverlay(hinMap);
-*/
+        registerReceiver(positionLibOutputReceiver, new IntentFilter("no.hesa.positionlibrary.Output"));
     }
+
+    private void registerSearchLocationReceiver()
+    {
+        searchLocationReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals("LAT_LNG_RETURN")) {
+                Toast.makeText(MapActivity.this, "intentReceiver onReceive method", Toast.LENGTH_LONG).show();
+                LatLng latLng = new LatLng(intent.getDoubleExtra("lat",0),intent.getDoubleExtra("lng",0));
+                mMap.addMarker(new MarkerOptions().position(latLng).title("TestLocFromBR"));
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
+                }
+            }
+        };
+        registerReceiver(searchLocationReceiver, new IntentFilter("LAT_LNG_RETURN"));
+    }
+//endregion
 
 //region INDOORATLAS METHODS
         /**
@@ -335,6 +344,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 Intent intent = new Intent(getApplicationContext(), SearchResultsActivity.class);
                 intent.setAction(Intent.ACTION_SEARCH);
                 intent.putExtra("query", newText);
+
                 startActivity(intent);
                 return true;
             }
