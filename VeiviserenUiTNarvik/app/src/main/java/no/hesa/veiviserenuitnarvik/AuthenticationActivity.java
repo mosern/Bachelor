@@ -24,19 +24,15 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.w3c.dom.Text;
 
+import java.math.BigInteger;
+import java.security.SecureRandom;
+
 
 public class AuthenticationActivity extends AppCompatActivity {
 
     private static String CLIENT_ID = "and";
-    //Use your own client id
-    private static String CLIENT_SECRET = "801Hd9ZEq0";
-    //Use your own client secret
     private static String REDIRECT_URI = "http://localhost:123";
-    private static String GRANT_TYPE = "implicit";
-    private static String TOKEN_URL = "https://bacheloridsrv3.azurewebsites.net/identity/connect/token";
     private static String OAUTH_URL = "https://bacheloridsrv3.azurewebsites.net/identity/connect/authorize";
-    /*private static String TOKEN_URL = "https://158.39.116.36:44305/identity/connect/token";
-    private static String OAUTH_URL = "https://158.39.116.36:44305/identity/connect/authorize";*/
     private static String OAUTH_SCOPE = "api roles openid";
     private SharedPreferences pref;
 
@@ -46,8 +42,9 @@ public class AuthenticationActivity extends AppCompatActivity {
         setContentView(R.layout.activity_authentication);
         WebView web = (WebView) findViewById(R.id.webv);
         web.getSettings().setJavaScriptEnabled(true);
+        String nonceString = generateNonce();
         pref = getSharedPreferences("AppPref", MODE_PRIVATE);
-        web.loadUrl(OAUTH_URL + "?redirect_uri=" + REDIRECT_URI + "&response_type=id_token%20token&client_id=" + CLIENT_ID + "&scope=" + OAUTH_SCOPE + "&nonce=12343");
+        web.loadUrl(OAUTH_URL + "?redirect_uri=" + REDIRECT_URI + "&response_type=id_token%20token&client_id=" + CLIENT_ID + "&scope=" + OAUTH_SCOPE + "&nonce="+nonceString);
         web.setWebViewClient(new WebViewClient() {
 
             boolean authComplete = false;
@@ -65,7 +62,6 @@ public class AuthenticationActivity extends AppCompatActivity {
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
                 if (url.contains("access_token=") && !authComplete) {
-                    Uri uri = Uri.parse(url);
                     int start = TextUtils.indexOf(url, "access_token=") + "access_token=".length();
                     int end = TextUtils.indexOf(url, "&token_type=");
                     authCode = url.substring(start, end);
@@ -79,7 +75,6 @@ public class AuthenticationActivity extends AppCompatActivity {
                     SharedPreferences.Editor edit = pref.edit();
                     edit.putString("Code", authCode);
                     edit.commit();
-                    //auth_dialog.dismiss();
                     Toast.makeText(getApplicationContext(), "Authorization Code is: " + authCode, Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                     startActivity(intent);
@@ -90,8 +85,6 @@ public class AuthenticationActivity extends AppCompatActivity {
                     authComplete = true;
                     setResult(Activity.RESULT_CANCELED, resultIntent);
                     Toast.makeText(getApplicationContext(), "Error Occured", Toast.LENGTH_SHORT).show();
-
-                    //auth_dialog.dismiss();
                 }
             }
 
@@ -122,5 +115,10 @@ public class AuthenticationActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private static String generateNonce() {
+        SecureRandom random = new SecureRandom();
+        return new BigInteger(130,random).toString(32);
     }
 }
