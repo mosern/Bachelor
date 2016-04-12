@@ -122,15 +122,15 @@ namespace Api.Models.Api
         }
 
 
-        public int Id { get; }
+        public int Id { get; set; }
         [Required]
-        public int CoordinateId { get; }
+        public int CoordinateId { get; set; }
         [Required]
-        public string Name { get; }
+        public string Name { get; set; }
         [Required]
-        public string LocNr { get; }
+        public string LocNr { get; set; }
         [Required]
-        public int Hits { get; }
+        public int Hits { get; set; }
 
     }
 }
