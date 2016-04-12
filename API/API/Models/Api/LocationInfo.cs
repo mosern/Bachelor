@@ -30,7 +30,7 @@ namespace Api.Models.Api
         public LocationInfo(Location location)
         {
             Id = location.Id;
-            Coordinate = location.Coordinate;
+            Coordinate = CoorRepo.Read(location.CoordinateId);
             Name = location.Name;
             LocNr = location.LocNr;
             Hits = location.Hits;
