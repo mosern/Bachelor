@@ -69,8 +69,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals("no.hesa.positionlibrary.Output")) {
-                double[] pos = intent.getDoubleArrayExtra("posision");
-                if (pos != null)
+                double[] pos = intent.getDoubleArrayExtra("position");
+                if (pos[0] != 0 && pos[1] != 0)
                 {
                     Toast.makeText(MapActivity.this, "User location received from library = " + pos[0] + "," + pos[1], Toast.LENGTH_LONG).show();
                     LatLng latLng = new LatLng(pos[0], pos[1]);
@@ -79,7 +79,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 }
                 else
                 {
-                    Toast.makeText(MapActivity.this, "Returned doublearray was null.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(MapActivity.this, "Sorry, can´t determine your position.", Toast.LENGTH_LONG).show();
                 }
             }
         }
