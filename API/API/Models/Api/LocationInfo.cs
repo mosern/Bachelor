@@ -13,10 +13,24 @@ namespace Api.Models.Api
     {
         static LocationRepository<Coordinate> CoorRepo = new LocationRepository<Coordinate>();
 
+        public LocationInfo()
+        {
+            //Name = "Ola";
+            //LocNr = "A1111";
+        }
+
+        public LocationInfo(int coordinateId, string name, string locNr, int hits)
+        {
+            CoordinateId = coordinateId;
+            Name = name;
+            LocNr = locNr;
+            Hits = hits;
+        }
+
         public LocationInfo(Location location)
         {
             Id = location.Id;
-            Coordinate = CoorRepo.Read(location.CoordinateId);
+            CoordinateId = location.CoordinateId;
             Name = location.Name;
             LocNr = location.LocNr;
             Hits = location.Hits;
@@ -24,7 +38,7 @@ namespace Api.Models.Api
 
         public static Location toLocation(LocationInfo locInf)
         {
-            return new Location() { CoordinateId = locInf.Coordinate.Id, Name = locInf.Name, LocNr = locInf.LocNr, Hits = locInf.Hits };
+            return new Location() { CoordinateId = locInf.CoordinateId, Name = locInf.Name, LocNr = locInf.LocNr, Hits = locInf.Hits };
         }
 
         public static object Shape(Location location, List<string> fields)
@@ -43,7 +57,7 @@ namespace Api.Models.Api
                 ExpandoObject temp = new ExpandoObject();
                 ((IDictionary<string, object>)temp).Add("id", tempLocInf.Id);
                 ((IDictionary<string, object>)temp).Add("name", tempLocInf.Name);
-                ((IDictionary<string, object>)temp).Add("coordinate", CoordinateInfo.Shape(tempLocInf.Coordinate, fields));
+                ((IDictionary<string, object>)temp).Add("coordinate", CoordinateInfo.Shape(CoorRepo.Read(tempLocInf.CoordinateId), fields));
                 ((IDictionary<string, object>)temp).Add("locnr", tempLocInf.LocNr);
                 ((IDictionary<string, object>)temp).Add("hits", tempLocInf.Hits);
 
@@ -110,7 +124,7 @@ namespace Api.Models.Api
 
         public int Id { get; }
         [Required]
-        public Coordinate Coordinate { get; }
+        public int CoordinateId { get; }
         [Required]
         public string Name { get; }
         [Required]

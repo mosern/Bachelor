@@ -2,6 +2,8 @@
 // package to your project.
 ////#define Handle_PageResultOfT
 
+using Api.Models.Api;
+using Api.Models.EF;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -62,6 +64,7 @@ namespace Api.Areas.HelpPage
             //// Uncomment the following to use "[0]=foo&[1]=bar" directly as the sample for all actions that support form URL encoded format
             //// and have IEnumerable<string> as the body parameter or return type.
             //config.SetSampleForType("[0]=foo&[1]=bar", new MediaTypeHeaderValue("application/x-www-form-urlencoded"), typeof(IEnumerable<string>));
+            //config.SetSampleForType("id=0&coordinate=null&name=null&locNr=null&hits=0", new MediaTypeHeaderValue("application/x-www-form-urlencoded"), typeof(LocationInfo));
 
             //// Uncomment the following to use "1234" directly as the request sample for media type "text/plain" on the controller named "Values"
             //// and action named "Put".

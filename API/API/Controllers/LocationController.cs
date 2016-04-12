@@ -101,10 +101,20 @@ namespace Api.Controllers
         [Route("locations")]
         public IHttpActionResult Post(LocationInfo location)
         {
+            if(location.CoordinateId == 0)
+            {
+                return Ok(location);
+            }
             if (!ModelState.IsValid)
                 return BadRequest();
 
-            LocRepo.Create(LocationInfo.toLocation(location));
+            try {
+                LocRepo.Create(LocationInfo.toLocation(location));
+            }
+            catch
+            {
+                return BadRequest();
+            }
             return Ok();
         }
     }

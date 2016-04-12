@@ -39,29 +39,32 @@
         @Html.DisplayFor(m => m.SampleRequests, "Samples")
     }
 
-    <h2>Response Information</h2>
 
-    <h3>Resource Description</h3>
+    @if (Model.SampleResponses.Count > 0) {
+        <h2>Response Information</h2>
 
-    <p>@description.ResponseDescription.Documentation</p>
+        <h3>Resource Description</h3>
 
-    @if (Model.ResourceDescription != null)
-    {
-        @Html.DisplayFor(m => m.ResourceDescription.ModelType, "ModelDescriptionLink", new { modelDescription = Model.ResourceDescription })
-        if (Model.ResourceProperties != null)
+        if (Model.ResourceDescription != null)
         {
-            @Html.DisplayFor(m => m.ResourceProperties, "Parameters")
+        <p>@description.ResponseDescription.Documentation</p>
+
+
+            @Html.DisplayFor(m => m.ResourceDescription.ModelType, "ModelDescriptionLink", new { modelDescription = Model.ResourceDescription })
+            if (Model.ResourceProperties != null)
+            {
+                @Html.DisplayFor(m => m.ResourceProperties, "Parameters")
+            }
+        }
+        else
+        {
+            <p>None.</p>
+        }
+
+        if (Model.SampleResponses.Count > 0)
+        {
+            <h3>Response Formats</h3>
+            @Html.DisplayFor(m => m.SampleResponses, "Samples")
         }
     }
-    else
-    {
-        <p>None.</p>
-    }
-
-    @if (Model.SampleResponses.Count > 0)
-    {
-        <h3>Response Formats</h3>
-        @Html.DisplayFor(m => m.SampleResponses, "Samples")
-    }
-
 </div>
