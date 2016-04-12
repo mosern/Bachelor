@@ -45,13 +45,14 @@ public class SearchResultsActivity extends ListActivity implements ActionInterfa
     public void onListItemClick(ListView listView, View view, int position, long id) {
         if (jsonArray != null) {
             if (jsonArray.length() >= position) {
-                try {
+               try {
                     JSONObject jsonObject = jsonArray.getJSONObject(position);
                     Intent intent = new Intent(this,MapActivity.class);
+                    intent.setAction("LAT_LNG_RETURN");
                     intent.putExtra("lat",jsonObject.getJSONObject("coordinate").getDouble("lat"));
                     intent.putExtra("lng",jsonObject.getJSONObject("coordinate").getDouble("lng"));
-                    intent.setAction("LAT_LNG_RETURN");
                     startActivity(intent);
+
                 }
                 catch (Exception ex) {
                     ex.printStackTrace();
@@ -93,7 +94,5 @@ public class SearchResultsActivity extends ListActivity implements ActionInterfa
             default:
                 break;
         }
-
-
     }
 }

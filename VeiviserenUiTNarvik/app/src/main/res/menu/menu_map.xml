@@ -5,6 +5,7 @@
 
 
     <item android:id="@+id/action_search"
+        android:orderInCategory="60"
         android:title="@string/search_default_text"
         android:icon="@drawable/abc_ic_search_api_mtrl_alpha"
         app:showAsAction="always"
@@ -32,12 +33,4 @@
         android:icon="@android:drawable/ic_menu_agenda"
         app:showAsAction="never"/>
 
-    <item
-        android:id="@+id/search"
-        android:orderInCategory="60"
-        android:title="@string/search_title"
-        android:icon="@android:drawable/ic_menu_search"
-        app:showAsAction="always"
-        app:actionViewClass="android.support.v7.widget.SearchView"
-        />
 </menu>
