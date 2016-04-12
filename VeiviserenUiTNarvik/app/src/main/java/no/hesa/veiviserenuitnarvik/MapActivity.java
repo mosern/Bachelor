@@ -80,8 +80,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-
-
         Api api = new Api(this,getApplicationContext().getResources());
         api.allUsers();
         returnedCoordsFromSearchIntent = getIntent();
