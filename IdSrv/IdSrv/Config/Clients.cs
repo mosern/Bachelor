@@ -50,7 +50,7 @@ namespace IdSrv.Config
                     Enabled = true,
                     ClientName = "Android",
                     ClientId = "and",
-                    Flow = Flows.AuthorizationCode,
+                    Flow = Flows.Implicit,
 
                     RedirectUris = new List<string>
                     {
