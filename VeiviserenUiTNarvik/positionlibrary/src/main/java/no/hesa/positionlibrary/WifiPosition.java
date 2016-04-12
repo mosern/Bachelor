@@ -36,6 +36,7 @@ public class WifiPosition {
                 WifiManager wifiManager = (WifiManager) c.getSystemService(Context.WIFI_SERVICE);
                 scanResults = wifiManager.getScanResults();
                 calculateDistances(c);
+                wifiManager.startScan();
             }
         }
     };
