@@ -191,7 +191,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             }
         };
         registerReceiver(searchLocationReceiver, new IntentFilter("LAT_LNG_RETURN"));
-
     }
 //endregion
 
