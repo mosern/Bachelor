@@ -64,18 +64,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private Intent intent; // rename den her globale intenten til noe fornuftig simon
     private PositionLibrary positionLibrary = null;
 
-    // gjør denne noe i det hele tatt simon?
-    private BroadcastReceiver intentReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals("LAT_LNG_RETURN")) {
-                Toast.makeText(MapActivity.this, "intentReceiver onReceive method", Toast.LENGTH_LONG).show();
-                LatLng latLng = new LatLng(intent.getDoubleExtra("lat",0),intent.getDoubleExtra("lng",0));
-                mMap.addMarker(new MarkerOptions().position(latLng).title("TestLoc"));
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
-            }
-        }
-    };
 
     private final BroadcastReceiver outputReceiver = new BroadcastReceiver() {
         @Override
