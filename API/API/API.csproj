@@ -277,6 +277,10 @@
     <Compile Include="Migrations\LocationConfiguration\201604051006521_InitialCreate.Designer.cs">
       <DependentUpon>201604051006521_InitialCreate.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\LocationConfiguration\201604130816558_people.cs" />
+    <Compile Include="Migrations\LocationConfiguration\201604130816558_people.Designer.cs">
+      <DependentUpon>201604130816558_people.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\LocationConfiguration\Configuration.cs" />
     <Compile Include="Models\Api\AccesspointInfo.cs" />
     <Compile Include="Models\Api\CoordinateInfo.cs" />
@@ -288,6 +292,7 @@
     <Compile Include="Models\EF\BaseModel.cs" />
     <Compile Include="Models\EF\Coordinate.cs" />
     <Compile Include="Models\EF\Location.cs" />
+    <Compile Include="Models\EF\People.cs" />
     <Compile Include="Models\EF\Type.cs" />
     <Compile Include="Models\EF\UserLocation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -364,6 +369,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\LocationConfiguration\201604051006521_InitialCreate.resx">
       <DependentUpon>201604051006521_InitialCreate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\LocationConfiguration\201604130816558_people.resx">
+      <DependentUpon>201604130816558_people.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

@@ -19,5 +19,6 @@ namespace Api.Classes
         public virtual DbSet<Accesspoint> Accesspoint { get; set; }
         public virtual DbSet<Models.EF.Type> Type { get; set; }
         public virtual DbSet<UserLocation> UserLocation { get; set; }
+        public virtual DbSet<People> People { get; set; }
     }
 }
