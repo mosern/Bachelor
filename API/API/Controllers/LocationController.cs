@@ -1,4 +1,5 @@
 ﻿using Api.Classes;
+using Api.Factories;
 using Api.Models.Api;
 using Api.Models.EF;
 using Newtonsoft.Json;
@@ -11,7 +12,6 @@ using System.Web;
 using System.Web.Http;
 using System.Web.Http.Description;
 using Thinktecture.IdentityModel.WebApi;
-
 namespace Api.Controllers
 {
     [RoutePrefix("api")]
@@ -23,18 +23,20 @@ namespace Api.Controllers
         [Route("locations", Name = "locations")]
         public IHttpActionResult Get(string fields = null, string sort = "id", int page = 1, int pageSize = stdPageSize, bool asObject = true, string objPropName = "locations", string search = null)
         {
-            IQueryable<Location> locations;
+            SearchViewModel result = new SearchViewModel();
 
             if (search != null)
             {
-                locations = Search.Location(search).ApplySort(sort).Skip(pageSize * (page - 1)).Take(pageSize); ;
+                result = Search.Location(search);
+                result.LocationViewModel = result.LocationViewModel.ApplySort(sort).Skip(pageSize * (page - 1)).Take(pageSize);
+                result.PeopleViewModel = result.PeopleViewModel.ApplySort(sort).Skip(pageSize * (page - 1)).Take(pageSize);
             }
             else
             {
-                locations = LocRepo.List().ApplySort(sort).Skip(pageSize * (page - 1)).Take(pageSize); ;
+                result.LocationViewModel = ConversionFactory.queryLocationToViewModel(LocRepo.List().ApplySort(sort).Skip(pageSize * (page - 1)).Take(pageSize));
             }
 
-            if (locations.Any())
+            if (result.LocationViewModel.Any() || result.PeopleViewModel.Any())
             {
                 IDictionary<string, object> routeValues = new Dictionary<string, object>();
 

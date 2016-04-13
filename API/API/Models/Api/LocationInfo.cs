@@ -124,7 +124,7 @@ namespace Api.Models.Api
 
         public int Id { get; set; }
         [Required]
-        public Coordinate Coordinate { get; }
+        public Coordinate Coordinate { get; set; }
         [Required]
         public string Name { get; set; }
         [Required]
