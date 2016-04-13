@@ -6,12 +6,13 @@ using System.Web;
 
 namespace Api.Models.Api
 {
-    public class PeopleViewModel
+    public class PeopleViewModel : BaseViewModel
     {
+        public int Id { get; set; }
         public string Name { get; set; }
         public string TlfOffice { get; set; }
         public string TlfMobile { get; set; }
         public string Email { get; set; }
-        public LocationViewModel Location { get; set; }
+        public int LocationId { get; set; }
     }
 }

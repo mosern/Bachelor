@@ -23,10 +23,12 @@ namespace Api.Controllers
         [Route("locations", Name = "locations")]
         public IHttpActionResult Get(string fields = null, string sort = "id", int page = 1, int pageSize = stdPageSize, bool asObject = true, string objPropName = "locations", string search = null)
         {
+            string name = objPropName;
             SearchViewModel result = new SearchViewModel();
 
             if (search != null)
             {
+                name = "results";
                 result = Search.Location(search);
                 result.LocationViewModel = result.LocationViewModel.ApplySort(sort).Skip(pageSize * (page - 1)).Take(pageSize);
                 result.PeopleViewModel = result.PeopleViewModel.ApplySort(sort).Skip(pageSize * (page - 1)).Take(pageSize);
@@ -34,6 +36,7 @@ namespace Api.Controllers
             else
             {
                 result.LocationViewModel = ConversionFactory.queryLocationToViewModel(LocRepo.List().ApplySort(sort).Skip(pageSize * (page - 1)).Take(pageSize));
+                result.PeopleViewModel = new List<PeopleViewModel>().AsQueryable();
             }
 
             if (result.LocationViewModel.Any() || result.PeopleViewModel.Any())
@@ -45,29 +48,51 @@ namespace Api.Controllers
 
                 routeValues.Add("sort", sort);
 
-                HttpContext.Current.Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(PaginationHeader.Get(page, pageSize, locations.Count(), "locations", routeValues, Request)));
+                HttpContext.Current.Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(PaginationHeader.Get(page, pageSize, result.LocationViewModel.Count() + result.PeopleViewModel.Count(), "locations", routeValues, Request)));
 
                 if (fields != null)
                 {
+                    IEnumerable<object> loc = new List<object>();
+                    IEnumerable<object> peo = new List<object>();
+
                     if (asObject)
                     {
-                        var toReturn = LocationInfo.ShapeList(locations, fields.ToLower().Split(',').ToList());
+                        loc = ShapeFactory<LocationViewModel>.ShapeList(result.LocationViewModel, fields.ToLower().Split(',').ToList());
+                        peo = ShapeFactory<PeopleViewModel>.ShapeList(result.PeopleViewModel, fields.ToLower().Split(',').ToList());
+
+                        List<object> toReturn = new List<object>();
+
+                        if (peo.Any())
+                            toReturn.Add(peo);
+
+                        toReturn.Add(loc);
+
                         return Ok(JsonHelper.listToObject(toReturn, objPropName));
                     }
                     else
                     {
-                        return Ok(LocationInfo.ShapeList(locations, fields.ToLower().Split(',').ToList()));
+                        loc = ShapeFactory<LocationViewModel>.ShapeList(result.LocationViewModel, fields.ToLower().Split(',').ToList());
+                        peo = ShapeFactory<LocationViewModel>.ShapeList(result.LocationViewModel, fields.ToLower().Split(',').ToList());
+
+                        List<object> toReturn = new List<object>();
+
+                        if (peo.Any())
+                            toReturn.Add(peo);
+
+                        toReturn.Add(loc);
+
+                        return Ok(toReturn);
                     }
                 }
                 else
                 {
                     if (asObject)
                     {
-                        return Ok(JsonHelper.listToObject(LocationInfo.List(locations), objPropName));
+                        return Ok(JsonHelper.listToObject(ConversionFactory.searchToQuerry(result), objPropName));
                     }
                     else
                     {
-                        return Ok(LocationInfo.List(locations));
+                        return Ok(ConversionFactory.searchToQuerry(result));
                     }
                 }
             }

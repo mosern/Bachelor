@@ -259,6 +259,7 @@
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
     <Compile Include="Dto\People.cs" />
     <Compile Include="Factories\ConversionFactory.cs" />
+    <Compile Include="Factories\ShapeFactory.cs" />
     <Compile Include="Helpers\AuthorizationManager.cs" />
     <Compile Include="Database\Context.cs" />
     <Compile Include="Database\ILocationRepository.cs" />
@@ -285,12 +286,15 @@
     </Compile>
     <Compile Include="Migrations\LocationConfiguration\Configuration.cs" />
     <Compile Include="Models\Api\AccesspointInfo.cs" />
+    <Compile Include="Models\Api\BaseViewModel.cs" />
     <Compile Include="Models\Api\CoordinateInfo.cs" />
     <Compile Include="Helpers\PaginationHeader.cs" />
+    <Compile Include="Models\Api\CoordinateViewModel.cs" />
     <Compile Include="Models\Api\LocationViewModel.cs" />
     <Compile Include="Models\Api\LocationInfo.cs" />
     <Compile Include="Models\Api\PeopleViewModel.cs" />
     <Compile Include="Models\Api\SearchViewModel.cs" />
+    <Compile Include="Models\Api\TypeViewModel.cs" />
     <Compile Include="Models\Api\UserInfo.cs" />
     <Compile Include="Models\Api\UserLocationInfo.cs" />
     <Compile Include="Models\EF\Accesspoint.cs" />

@@ -13,6 +13,7 @@ namespace Api.Classes
     public class Search
     {
         static LocationRepository<Location> LocRepo = new LocationRepository<Location>();
+        static LocationRepository<People> peoRepo = new LocationRepository<People>();
 
         public static SearchViewModel Location(string searchString)
         {
@@ -22,16 +23,46 @@ namespace Api.Classes
 
             switch (getTypeLocation(searchString))
             {
-                case 1 : locations = locationById(Convert.ToInt32(searchString)); break;
-                case 2 : locations = locationByLocNr(searchString); break;
-                case 3 : locations = locationByName(searchString); break;
+                case 0 : locations = new List<LocationViewModel>().AsQueryable(); break;
+                case 1 : locations = locationByLocNr(searchString); break;
+                case 2 : locations = locationByName(searchString); break;
             }
 
             switch (getTypePeople(searchString))
             {
-                case 1: people = new List<PeopleViewModel>().AsQueryable(); break;
-                case 2: people = new List<PeopleViewModel>().AsQueryable(); break;
-                case 3: people = new List<PeopleViewModel>().AsQueryable(); break;
+                case 0: people = new List<PeopleViewModel>().AsQueryable(); break;
+                case 1: people = peopleByName(searchString); break;
+            }
+
+            List<int> locid = new List<int>();
+
+            foreach(PeopleViewModel peo in people)
+            {
+                var loc = ConversionFactory.LocationToViewModel(LocRepo.List().Where(l => l.Id == peo.LocationId).FirstOrDefault());
+                locid.Add(loc.Id);
+
+                if (!locations.Contains(loc))
+                {
+                    var temp = locations.ToList();
+                    temp.Add(loc);
+
+                    locations = temp.AsQueryable();
+                }
+            }
+
+            foreach (LocationViewModel loc in locations)
+            {
+                if (!locid.Contains(loc.Id))
+                {
+                    var peo = ConversionFactory.PeopleToViewModel(peoRepo.List().Where(p => p.LocationId == loc.Id).FirstOrDefault());
+                    if (!people.Contains(peo))
+                    {
+                        var temp = people.ToList();
+                        temp.Add(peo);
+
+                        people = temp.AsQueryable();
+                    }
+                }
             }
 
 
@@ -44,17 +75,13 @@ namespace Api.Classes
 
         private static int getTypeLocation(string searchString)
         {
-            if (isLocId(searchString))
+            if (isLocNr(searchString))
             {
                 return 1;
             }
-            else if (isLocNr(searchString))
-            {
-                return 2;
-            }
             else if (isLocName(searchString))
             {
-                return 3;
+                return 2;
             }
             else
             {
@@ -64,17 +91,10 @@ namespace Api.Classes
 
         private static int getTypePeople(string searchString)
         {
-            if (isLocId(searchString))
+
+            if (isPeoName(searchString))
             {
                 return 1;
-            }
-            else if (isLocNr(searchString))
-            {
-                return 2;
-            }
-            else if (isLocName(searchString))
-            {
-                return 3;
             }
             else
             {
@@ -87,6 +107,19 @@ namespace Api.Classes
             if(checkString.Length > 5)
             {
                 return false;
+            }
+
+            try
+            {
+                if(checkString.Length <= 4)
+                {
+                    Convert.ToInt32(checkString);
+                    return true;
+                }
+            }
+            catch
+            {
+
             }
 
             if(checkString.Length == 1)
@@ -127,18 +160,43 @@ namespace Api.Classes
             }
         }
 
-        private static bool isLocId(string checkString)
+        //private static bool isLocId(string checkString)
+        //{
+        //    try
+        //    {
+        //        Convert.ToInt32(checkString);
+        //        return true;
+        //    }
+        //    catch
+        //    {
+        //        return false;
+        //    }
+
+        //}
+
+        private static bool isPeoName(string checkString)
         {
-            try
+            if (checkString.Length <= 20)
             {
-                Convert.ToInt32(checkString);
                 return true;
             }
-            catch
+            else
             {
                 return false;
             }
+        }
 
+        private static IQueryable<PeopleViewModel> peopleByName(string name)
+        {
+            var peo = peoRepo.List().Where(p => p.Name.Contains(name));
+            if (peo != null)
+            {
+                return ConversionFactory.queryPeopleToViewModel(peo); ;
+            }
+            else
+            {
+                return new List<PeopleViewModel>().AsQueryable();
+            }
         }
 
         private static IQueryable<LocationViewModel> locationByLocNr(string locNr)

@@ -7,13 +7,13 @@ using System.Web;
 
 namespace Api.Models.Api
 {
-    public class LocationViewModel
+    public class LocationViewModel : BaseViewModel
     {
         public int Id { get; set; }
         [Required]
-        public Coordinate Coordinate { get; set; }
+        public CoordinateViewModel Coordinate { get; set; }
         [Required]
-        public EF.Type Type { get; set; }
+        public TypeViewModel Type { get; set; }
         [Required]
         public string Name { get; set; }
         [Required]
