@@ -8,6 +8,7 @@ using Microsoft.Owin.Security.ActiveDirectory;
 using Owin;
 using System.Web.Http;
 using IdentityServer3.AccessTokenValidation;
+using Api.Classes;
 
 namespace Api
 {
