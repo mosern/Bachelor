@@ -1,7 +1,9 @@
 package no.hesa.veiviserenuitnarvik.api;
 
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.util.Pair;
 
 import org.json.JSONObject;
@@ -24,6 +26,8 @@ public class ApiAsyncTask extends AsyncTask<List<Pair<String,String>>,Void,JSONO
     private String actionString;
     private String url;
     private String dataType;
+    private String token = null;
+    private boolean authenticationError = false;
 
     /**
      * An overloaded constructor that defaults the data method to get
@@ -48,6 +52,26 @@ public class ApiAsyncTask extends AsyncTask<List<Pair<String,String>>,Void,JSONO
         this.url = url;
         this.dataType = dataType;
     }
+
+    /**
+     * A construction that accepts a token for authentication
+     * @param actionInterface The interface that is used to callback to the activity
+     * @param actionString An actionstring that identifies the action so the activity can handle multiple callbacks
+     * @param url The URL which points to the API
+     * @param dataType POST or GET data
+     * @param token The bearer token for authentication
+     */
+    public ApiAsyncTask(ActionInterface actionInterface, String actionString, String url, String dataType, String token) {
+        this(actionInterface,actionString,url,dataType);
+        this.token = token;
+
+    }
+
+    /**
+     * Do the execution of the asynctask, get the jsonobject from the API, does authentication if set
+     * @param params List of parameters to include in the request
+     * @return JSON return from the API
+     */
     @Override
     protected JSONObject doInBackground(List<Pair<String,String>>... params) {
         JSONObject jObj = null;
@@ -62,6 +86,9 @@ public class ApiAsyncTask extends AsyncTask<List<Pair<String,String>>,Void,JSONO
             conn.setRequestMethod(dataType);
             conn.setDoInput(true);
             conn.setDoOutput(false);
+            if (token != null) {
+                conn.setRequestProperty("Authorization","Bearer "+token);
+            }
             if (dataType.equals("POST") && params[0].size() > 0) {
                 String query = getQueryString(params[0]);
                 OutputStream os = conn.getOutputStream();
@@ -82,6 +109,9 @@ public class ApiAsyncTask extends AsyncTask<List<Pair<String,String>>,Void,JSONO
                 String json = sb.toString();
                 jObj = new JSONObject(json);
             }
+            else if (responseCode == HttpsURLConnection.HTTP_UNAUTHORIZED) {
+                authenticationError = true;
+            }
 
         }
         catch (Exception ex) {
@@ -90,10 +120,19 @@ public class ApiAsyncTask extends AsyncTask<List<Pair<String,String>>,Void,JSONO
         return jObj;
     }
 
+    /**
+     * Is called when the execution is completed. Does a callback to the
+     * @param jsonObject
+     */
     @Override
     protected void onPostExecute(JSONObject jsonObject) {
         super.onPostExecute(jsonObject);
-        actionInterface.onCompletedAction(jsonObject,actionString);
+        if (!authenticationError) {
+            actionInterface.onCompletedAction(jsonObject,actionString);
+        }
+        else {
+            //Add call here..
+        }
     }
 
     /**

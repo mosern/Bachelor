@@ -6,6 +6,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -82,6 +83,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         Api api = new Api(this,getApplicationContext().getResources());
         api.allUsers();
+        SharedPreferences sharedPreferences = getSharedPreferences("AppPref",MODE_PRIVATE);
+        String token = sharedPreferences.getString("Code",null);
+        api.locationById(2,token);
         returnedCoordsFromSearchIntent = getIntent();
     }
 
@@ -405,5 +409,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             default:
                 break;
         }
+    }
+
+    @Override
+    public void onAuthorizationFailed() {
+        //Do something here..
     }
 }

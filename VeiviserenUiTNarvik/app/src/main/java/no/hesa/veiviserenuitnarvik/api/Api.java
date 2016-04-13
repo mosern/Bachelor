@@ -16,7 +16,7 @@ public class Api {
     //All actionstrings
     public static final String ALL_USERS = "LOAD_ALL_USERS";
     public static final String DO_SEARCH = "DO_SEARCH";
-
+    public static final String LOCATION_BY_ID = "LOCATION_BY_ID";
     private ActionInterface actionInterface;
     private Resources res;
 
@@ -51,6 +51,15 @@ public class Api {
     }
 
     /**
+     * Test authorized
+     */
+    public void locationById(int id,String token) {
+        String url = res.getString(R.string.api_locations)+"/"+id;
+        List<Pair<String,String>> params = new ArrayList<>();
+        callAsyncTaskAuthorized(url,params,LOCATION_BY_ID,"GET",token);
+    }
+
+    /**
      * Calls the async task to connect with the API
      * @param url The url in the API that is to be requested
      * @param params Parameters to include in the request, input a list with no entries if there is no parameters
@@ -59,6 +68,11 @@ public class Api {
      */
     private void callAsyncTask(String url, List<Pair<String,String>> params,String actionString,String dataType) {
         ApiAsyncTask asyncTask = new ApiAsyncTask(actionInterface,actionString,url,dataType);
+        asyncTask.execute(params);
+    }
+
+    private void callAsyncTaskAuthorized(String url, List<Pair<String,String>> params, String actionString, String dataType, String token) {
+        ApiAsyncTask asyncTask = new ApiAsyncTask(actionInterface,actionString,url,dataType,token);
         asyncTask.execute(params);
     }
 }
