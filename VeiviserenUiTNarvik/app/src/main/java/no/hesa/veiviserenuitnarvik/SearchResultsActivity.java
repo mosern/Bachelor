@@ -95,4 +95,9 @@ public class SearchResultsActivity extends ListActivity implements ActionInterfa
                 break;
         }
     }
+
+    @Override
+    public void onAuthorizationFailed() {
+        //Do something here..
+    }
 }
