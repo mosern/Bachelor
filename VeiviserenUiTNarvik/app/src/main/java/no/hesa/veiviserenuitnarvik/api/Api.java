@@ -17,6 +17,8 @@ public class Api {
     public static final String ALL_USERS = "LOAD_ALL_USERS";
     public static final String DO_SEARCH = "DO_SEARCH";
     public static final String LOCATION_BY_ID = "LOCATION_BY_ID";
+    public static final String NO_TOKEN = "NO_TOKEN";
+    //Fields
     private ActionInterface actionInterface;
     private Resources res;
 
@@ -71,6 +73,14 @@ public class Api {
         asyncTask.execute(params);
     }
 
+    /**
+     * Calls the async task to connect with the API with authorization
+     * @param url The url in the API that is to be requested
+     * @param params Parameters to include in the request, input a list with no entries if there is no parameters
+     * @param actionString The string that is used in the callback to identify the action
+     * @param dataType Method of parameters (GET or POST)
+     * @param token Bearer token for authorization
+     */
     private void callAsyncTaskAuthorized(String url, List<Pair<String,String>> params, String actionString, String dataType, String token) {
         ApiAsyncTask asyncTask = new ApiAsyncTask(actionInterface,actionString,url,dataType,token);
         asyncTask.execute(params);

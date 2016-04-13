@@ -121,17 +121,17 @@ public class ApiAsyncTask extends AsyncTask<List<Pair<String,String>>,Void,JSONO
     }
 
     /**
-     * Is called when the execution is completed. Does a callback to the
-     * @param jsonObject
+     * Is called when the execution is completed. Does a callback to the activity
+     * @param jsonObject JSONObject to parse
      */
     @Override
     protected void onPostExecute(JSONObject jsonObject) {
         super.onPostExecute(jsonObject);
         if (!authenticationError) {
-            actionInterface.onCompletedAction(jsonObject,actionString);
+            actionInterface.onCompletedAction(jsonObject,actionString); //Everything is okay, return to activity
         }
         else {
-            //Add call here..
+            actionInterface.onAuthorizationFailed(); //Authorization failed
         }
     }
 
