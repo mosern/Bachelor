@@ -16,34 +16,34 @@
         android:orderInCategory="90"
         android:title="@string/action_log_in"
         android:icon="@android:drawable/ic_menu_upload"
-        app:showAsAction="always"/>
+        app:showAsAction="ifRoom"/>
 
     <item
         android:id="@+id/action_logout"
         android:orderInCategory="91"
         android:title="@string/action_log_out"
         android:icon="@android:drawable/ic_menu_revert"
-        app:showAsAction="always"/>
+        app:showAsAction="ifRoom"/>
 
     <item
         android:id="@+id/action_settings"
         android:orderInCategory="95"
         android:title="@string/action_settings"
         android:icon="@android:drawable/ic_menu_preferences"
-        app:showAsAction="never"/>
+        app:showAsAction="ifRoom"/>
 
     <item
         android:id="@+id/action_measurement"
         android:orderInCategory="100"
         android:title="@string/action_measure"
         android:icon="@android:drawable/ic_menu_agenda"
-        app:showAsAction="never"/>
+        app:showAsAction="ifRoom"/>
 
     <item
         android:id="@+id/action_register_location_receiver"
         android:orderInCategory="100"
         android:title="@string/action_register_location_receiver"
         android:icon="@android:drawable/ic_menu_add"
-        app:showAsAction="never"/>
+        app:showAsAction="ifRoom"/>
 
 </menu>

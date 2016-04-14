@@ -102,8 +102,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
 
         fetchFloorPlan(getResources().getString(R.string.indooratlas_floor_1_floorplanid));
-
-
     }
 
     @Override
