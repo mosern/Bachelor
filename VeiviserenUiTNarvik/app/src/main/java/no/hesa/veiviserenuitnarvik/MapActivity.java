@@ -27,6 +27,8 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.GroundOverlay;
 import com.google.android.gms.maps.model.GroundOverlayOptions;
 import com.google.android.gms.maps.model.LatLng;
@@ -86,11 +88,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         Api api = new Api(this,getApplicationContext().getResources());
         api.allUsers();
-        /*
+/*
         SharedPreferences sharedPreferences = getSharedPreferences("AppPref",MODE_PRIVATE);
         String token = sharedPreferences.getString("Code",Api.NO_TOKEN);
         api.locationById(2,token);
-        */
+*/
         returnedCoordsFromSearchIntent = getIntent();
     }
 
@@ -153,6 +155,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 if (mMarker != null) {
                     mMarker.remove();
                 }
+                // new CircleOptions().center(point).radius(3.0).fillColor(R.color.radiusfillcolor).strokeColor(R.color.radiusstrokecolor).strokeWidth(2)
                 mMarker = mMap.addMarker(new MarkerOptions().position(point).title("Lat: " + point.latitude + " Lng: " + point.longitude));
                 mMarker.setDraggable(true);
                 mMarker.showInfoWindow();
@@ -198,6 +201,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 LatLng latLng = new LatLng(intent.getDoubleExtra("lat",0),intent.getDoubleExtra("lng",0));
                 mMap.addMarker(new MarkerOptions().position(latLng).title("TestLocFromBR"));
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
+                mMap.addCircle(new CircleOptions().center(latLng).radius(3.0).fillColor(R.color.radiusfillcolor).strokeColor(R.color.radiusstrokecolor).strokeWidth(2));
                 }
             }
         };

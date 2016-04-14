@@ -4,4 +4,6 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
     <color name="blue">#79adde</color>
+    <color name="radiusfillcolor">#84b166</color>
+    <color name="radiusstrokecolor">#413333</color>
 </resources>
