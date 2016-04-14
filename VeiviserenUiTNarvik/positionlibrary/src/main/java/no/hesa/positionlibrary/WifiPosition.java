@@ -4,9 +4,13 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.location.Location;
+import android.location.LocationManager;
+import android.location.LocationProvider;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.os.Handler;
 
 import org.apache.commons.math3.fitting.leastsquares.LeastSquaresOptimizer;
 import org.apache.commons.math3.fitting.leastsquares.LevenbergMarquardtOptimizer;
@@ -36,10 +40,31 @@ public class WifiPosition {
                 WifiManager wifiManager = (WifiManager) c.getSystemService(Context.WIFI_SERVICE);
                 scanResults = wifiManager.getScanResults();
                 calculateDistances(c);
-                //wifiManager.startScan();
+                //If this was first time that code was run, set up TimerTask to make WI-Fi scans every 15 s.
+                if(timer == null){
+                    timer = new Timer();
+                    initializeTimerTask(wifiManager);
+                    timer.schedule(timerTask, 15000, 15000);
+                }
             }
         }
     };
+    private Timer timer;
+    private TimerTask timerTask;
+    final Handler handler = new Handler();
+
+    public void initializeTimerTask(final WifiManager wifiManager) {
+        timerTask = new TimerTask() {
+            public void run() {
+                handler.post(new Runnable() {
+                    public void run() {
+                        wifiManager.startScan();
+                    }
+                });
+            }
+        };
+    }
+
 
     public void registerBroadcast(Context c) {
         c.registerReceiver(wifiReceiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
@@ -105,8 +130,25 @@ public class WifiPosition {
      * @return The distance to the access-point in meters
      */
     private double distanceToAccessPoint(double levelInDb, double freqInMHz)    {
-        double exp = (27.55 - (20 * Math.log10(freqInMHz)) + Math.abs(levelInDb)) / 20.0;
-        return Math.pow(10.0, exp);
+        double Tx_PWR = 17; //transmitter output power in dB
+        double Gain_TX = 4; //transmit-side antenna gain in dBi
+        double Gain_RX = 0; //transmit-side antenna gain in dBi
+        double PL_1meter = 23; //reference path loss
+        double s = 4; //standard deviation of shadow fading
+        double n = 3.7; //path loss exponent
+
+        double a = 3; //distance from phone to ceiling (rouge estimation)
+
+        double FSPL = Tx_PWR + Gain_TX + Gain_RX - levelInDb - PL_1meter;
+        double exp = (FSPL + 27.55 - (20 * Math.log10(freqInMHz))) / 21.66;
+        double tmp = (Tx_PWR - levelInDb + Gain_TX - PL_1meter + s)/(10 * n);
+        //double exp = (27.55 - (20 * Math.log10(freqInMHz)) + Math.abs(levelInDb)) / 20.0;
+        //double exp = (Tx_PWR - levelInDb + Gain_TX - PL_1meter + s)/(10 * n);
+        double b = Math.pow(10.0, exp);
+
+        double d = Math.sqrt(b * b - a * a);
+        //return Math.pow(10.0, exp);
+        return d;
     }
 
     private static double radiansFromDeg(double degrees) {
@@ -168,7 +210,7 @@ public class WifiPosition {
         wifiPointsMacGeo.put("5c:83:8f:34:f9:59", new Point(68.43618089979086, 17.434068247675896));*/
 
         //frequency: 5.0
-        wifiPointsMacGeo.put("ec:bd:1d:8b:8d:bf", new Point(68.43611583610615, 17.43369428932667));
+        wifiPointsMacGeo.put("ec:bd:1d:88:8d:bf", new Point(68.43611583610615, 17.43369428932667));
         wifiPointsMacGeo.put("ec:bd:1d:6b:8d:4f", new Point(68.43606297172468, 17.433767840266228));
         wifiPointsMacGeo.put("ec:bd:1d:6b:8e:7f", new Point(68.43617239716085, 17.433753423392773));
         wifiPointsMacGeo.put("ec:bd:1d:88:85:7f", new Point(68.43623622842107, 17.43380941450596));
