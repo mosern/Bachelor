@@ -38,7 +38,18 @@ namespace Api.Classes
 
             foreach(PeopleViewModel peo in people)
             {
-                var loc = ConversionFactory.LocationToViewModel(LocRepo.List().Where(l => l.Id == peo.LocationId).FirstOrDefault());
+                var tempLoc = LocRepo.List().Where(l => l.Id == peo.LocationId).FirstOrDefault();
+                LocationViewModel loc = null;
+
+                if(tempLoc != null)
+                {
+                    loc = ConversionFactory.LocationToViewModel(tempLoc);
+                }
+                else
+                {
+                    break;
+                }
+
                 locid.Add(loc.Id);
 
                 if (!locations.Contains(loc))
@@ -54,7 +65,18 @@ namespace Api.Classes
             {
                 if (!locid.Contains(loc.Id))
                 {
-                    var peo = ConversionFactory.PeopleToViewModel(peoRepo.List().Where(p => p.LocationId == loc.Id).FirstOrDefault());
+                    var tempPeo = peoRepo.List().Where(p => p.LocationId == loc.Id).FirstOrDefault();
+                    PeopleViewModel peo = null;
+
+                    if (tempPeo != null)
+                    {
+                        peo = ConversionFactory.PeopleToViewModel(tempPeo);
+                    }
+                    else
+                    {
+                        break;
+                    }
+
                     if (!people.Contains(peo))
                     {
                         var temp = people.ToList();

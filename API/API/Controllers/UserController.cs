@@ -39,7 +39,9 @@ namespace Api.Controllers
             {
                 IDictionary<string, object> routeValues = new Dictionary<string, object>();
 
-                routeValues.Add("fields", fields);
+                if (fields != null)
+                    routeValues.Add("fields", fields);
+
                 routeValues.Add("sort", fields);
 
                 if(page != null)
