@@ -191,7 +191,7 @@ namespace Api.Classes
             var peo = peoRepo.List().Where(p => p.Name.Contains(name));
             if (peo != null)
             {
-                return ConversionFactory.queryPeopleToViewModel(peo); ;
+                return ConversionFactory.QueryPeopleToViewModel(peo); ;
             }
             else
             {
@@ -204,7 +204,7 @@ namespace Api.Classes
             var loc = LocRepo.List().Where(l => l.LocNr.Contains(locNr));
             if (loc != null)
             {
-                return ConversionFactory.queryLocationToViewModel(loc);
+                return ConversionFactory.QueryLocationToViewModel(loc);
             }
             else
             {
@@ -217,7 +217,7 @@ namespace Api.Classes
             var loc = LocRepo.List().Where(l => l.Name.Contains(name));
             if (loc != null)
             {
-                return ConversionFactory.queryLocationToViewModel(loc); ;
+                return ConversionFactory.QueryLocationToViewModel(loc); ;
             }
             else
             {
@@ -233,7 +233,7 @@ namespace Api.Classes
                 var list = new List<Location>();
                 list.Add(loc);
 
-                return ConversionFactory.queryLocationToViewModel(list.AsQueryable());
+                return ConversionFactory.QueryLocationToViewModel(list.AsQueryable());
             }
             else
             {

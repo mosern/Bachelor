@@ -292,12 +292,10 @@
     <Compile Include="Helpers\PaginationHeader.cs" />
     <Compile Include="Models\Api\CoordinateViewModel.cs" />
     <Compile Include="Models\Api\LocationViewModel.cs" />
-    <Compile Include="Models\Api\LocationInfo.cs" />
     <Compile Include="Models\Api\PeopleViewModel.cs" />
     <Compile Include="Models\Api\SearchViewModel.cs" />
     <Compile Include="Models\Api\TypeViewModel.cs" />
-    <Compile Include="Models\Api\UserInfo.cs" />
-    <Compile Include="Models\Api\UserLocationInfo.cs" />
+    <Compile Include="Models\Api\UserViewModel.cs" />
     <Compile Include="Models\EF\Accesspoint.cs" />
     <Compile Include="Models\EF\BaseModel.cs" />
     <Compile Include="Models\EF\Coordinate.cs" />
