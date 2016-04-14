@@ -1,4 +1,5 @@
 ﻿using Api.Classes;
+using Api.Dto;
 using Api.Models.Api;
 using Api.Models.EF;
 using System;
@@ -10,12 +11,12 @@ namespace Api.Factories
 {
     public class ConversionFactory
     {
-        static LocationRepository<Location>locRepo = new LocationRepository<Location>();
-        static LocationRepository<Coordinate> coorRepo = new LocationRepository<Coordinate>();
-        static LocationRepository<Models.EF.Type> typeRepo = new LocationRepository<Models.EF.Type>();
 
         public static LocationViewModel LocationToViewModel(Location Location)
         {
+            LocationRepository<Models.EF.Type> typeRepo = new LocationRepository<Models.EF.Type>();
+            LocationRepository<Coordinate> coorRepo = new LocationRepository<Coordinate>();
+
             return new LocationViewModel()
                     {
                         Id = Location.Id,
@@ -25,6 +26,22 @@ namespace Api.Factories
                         Type = TypeToViewModel(typeRepo.Read(Location.TypeId)),
                         Coordinate = CoordinateToViewModel(coorRepo.Read(Location.CoordinateId))
                     };
+        }
+
+        public static Location DTOLocationToDatabase(DTOLocation dtoLocation)
+        {
+            LocationRepository<Models.EF.Type> typeRepo = new LocationRepository<Models.EF.Type>();
+            LocationRepository<Coordinate> coorRepo = new LocationRepository<Coordinate>();
+
+            return new Location()
+            {
+                Id = dtoLocation.Id,
+                Name = dtoLocation.Name,
+                Hits = dtoLocation.Hits,
+                LocNr = dtoLocation.LocNr,
+                Coordinate = coorRepo.Read(dtoLocation.CoordinateId),
+                Type = typeRepo.Read(dtoLocation.TypeId)
+            };
         }
 
         public static CoordinateViewModel CoordinateToViewModel(Coordinate coordinate)

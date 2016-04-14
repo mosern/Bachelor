@@ -257,7 +257,8 @@
     <Compile Include="Areas\HelpPage\SampleGeneration\SampleDirection.cs" />
     <Compile Include="Areas\HelpPage\SampleGeneration\TextSample.cs" />
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
-    <Compile Include="Dto\People.cs" />
+    <Compile Include="Dto\DTOLocation.cs" />
+    <Compile Include="Dto\DTOPeople.cs" />
     <Compile Include="Factories\ConversionFactory.cs" />
     <Compile Include="Factories\ShapeFactory.cs" />
     <Compile Include="Helpers\AuthorizationManager.cs" />

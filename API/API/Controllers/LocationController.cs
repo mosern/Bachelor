@@ -1,4 +1,5 @@
 ﻿using Api.Classes;
+using Api.Dto;
 using Api.Factories;
 using Api.Models.Api;
 using Api.Models.EF;
@@ -113,11 +114,11 @@ namespace Api.Controllers
             {
                 if(fields != null)
                 {
-                    return Ok(LocationInfo.Shape(location, fields.ToLower().Split(',').ToList()));
+                    return Ok(ShapeFactory<LocationViewModel>.Shape(ConversionFactory.LocationToViewModel(location), fields.ToLower().Split(',').ToList()));
                 }
                 else
                 {
-                    return Ok(new LocationInfo(location));
+                    return Ok(ConversionFactory.LocationToViewModel(location));
                 }
                 
             }
@@ -129,17 +130,14 @@ namespace Api.Controllers
         }
 
         [Route("locations")]
-        public IHttpActionResult Post(LocationInfo location)
+        public IHttpActionResult Post(DTOLocation location)
         {
-            //if(location.CoordinateId == 0)
-            //{
-            //    return Ok(location);
-            //}
             if (!ModelState.IsValid)
                 return BadRequest();
 
-            try {
-                LocRepo.Create(LocationInfo.toLocation(location));
+            try
+            {
+                LocRepo.Create(ConversionFactory.DTOLocationToDatabase(location));
             }
             catch
             {

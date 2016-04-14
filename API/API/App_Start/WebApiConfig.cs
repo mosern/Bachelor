@@ -12,6 +12,13 @@ namespace Api
         {
             var config = new HttpConfiguration();
 
+            Register(config);
+
+            return config;
+        }
+
+        public static void Register(HttpConfiguration config)
+        {
             // Web API configuration and services
 
             // Web API routes
@@ -27,8 +34,6 @@ namespace Api
 
             config.Formatters.JsonFormatter.SerializerSettings.Formatting = Newtonsoft.Json.Formatting.Indented;
             config.Formatters.JsonFormatter.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
-
-            return config;
         }
     }
 }

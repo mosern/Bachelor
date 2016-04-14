@@ -5,7 +5,7 @@ using System.Web;
 
 namespace Api.Dto
 {
-    public class People
+    public class DTOPeople
     {
         public string Name { get; set; }
         public string TlfOffice { get; set; }
