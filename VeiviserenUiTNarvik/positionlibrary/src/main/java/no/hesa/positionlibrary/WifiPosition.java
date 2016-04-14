@@ -10,6 +10,7 @@ import android.location.LocationProvider;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.os.Handler;
 
 import org.apache.commons.math3.fitting.leastsquares.LeastSquaresOptimizer;
 import org.apache.commons.math3.fitting.leastsquares.LevenbergMarquardtOptimizer;
@@ -39,11 +40,31 @@ public class WifiPosition {
                 WifiManager wifiManager = (WifiManager) c.getSystemService(Context.WIFI_SERVICE);
                 scanResults = wifiManager.getScanResults();
                 calculateDistances(c);
-                //Begin scanning again
-                //wifiManager.startScan();
+                //If this was first time that code was run, set up TimerTask to make WI-Fi scans every 15 s.
+                if(timer == null){
+                    timer = new Timer();
+                    initializeTimerTask(wifiManager);
+                    timer.schedule(timerTask, 15000, 15000);
+                }
             }
         }
     };
+    private Timer timer;
+    private TimerTask timerTask;
+    final Handler handler = new Handler();
+
+    public void initializeTimerTask(final WifiManager wifiManager) {
+        timerTask = new TimerTask() {
+            public void run() {
+                handler.post(new Runnable() {
+                    public void run() {
+                        wifiManager.startScan();
+                    }
+                });
+            }
+        };
+    }
+
 
     public void registerBroadcast(Context c) {
         c.registerReceiver(wifiReceiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
@@ -120,6 +141,7 @@ public class WifiPosition {
 
         double FSPL = Tx_PWR + Gain_TX + Gain_RX - levelInDb - PL_1meter;
         double exp = (FSPL + 27.55 - (20 * Math.log10(freqInMHz))) / 21.66;
+        double tmp = (Tx_PWR - levelInDb + Gain_TX - PL_1meter + s)/(10 * n);
         //double exp = (27.55 - (20 * Math.log10(freqInMHz)) + Math.abs(levelInDb)) / 20.0;
         //double exp = (Tx_PWR - levelInDb + Gain_TX - PL_1meter + s)/(10 * n);
         double b = Math.pow(10.0, exp);
