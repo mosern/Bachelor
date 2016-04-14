@@ -74,6 +74,7 @@ public class AuthenticationActivity extends AppCompatActivity {
 
                     SharedPreferences.Editor edit = pref.edit();
                     edit.putString("Code", authCode);
+                    edit.putBoolean("LoggedInThisSession", true);
                     edit.commit();
                     Toast.makeText(getApplicationContext(), "Authorization Code is: " + authCode, Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(getApplicationContext(), MainActivity.class);

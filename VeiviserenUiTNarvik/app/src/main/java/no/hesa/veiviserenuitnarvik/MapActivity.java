@@ -11,6 +11,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Looper;
+import android.preference.PreferenceManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
@@ -68,6 +69,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private BroadcastReceiver positionLibOutputReceiver = null;
     private BroadcastReceiver searchLocationReceiver = null;
 
+    Menu menuRef = null;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,9 +86,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         Api api = new Api(this,getApplicationContext().getResources());
         api.allUsers();
+        /*
         SharedPreferences sharedPreferences = getSharedPreferences("AppPref",MODE_PRIVATE);
         String token = sharedPreferences.getString("Code",Api.NO_TOKEN);
         api.locationById(2,token);
+        */
         returnedCoordsFromSearchIntent = getIntent();
     }
 
@@ -97,6 +102,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
 
         fetchFloorPlan(getResources().getString(R.string.indooratlas_floor_1_floorplanid));
+
+
     }
 
     @Override
@@ -106,7 +113,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         if (positionLibrary != null) {
             positionLibrary.wifiPosition.unRegisterBroadcast(this);
         }
-        unregisterReceiver(positionLibOutputReceiver);
+        if (positionLibOutputReceiver != null)
+            unregisterReceiver(positionLibOutputReceiver);
         //unregisterReceiver(searchLocationReceiver);
     }
 
@@ -132,7 +140,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
 
         registerOnMapClickReceiver();
-        registerPositionReceiver();
+//        registerPositionReceiver();
 //        registerSearchLocationReceiver();
 
     }
@@ -332,9 +340,21 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        menuRef = menu;
         // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_map, menu);
 
-        getMenuInflater().inflate(R.menu.menu_map, menu);// Retrieve the SearchView and plug it into SearchManager
+        SharedPreferences sharedPreferences = getSharedPreferences("AppPref",MODE_PRIVATE);
+        String token = sharedPreferences.getString("Code",Api.NO_TOKEN);
+        if (token.length() > 0) {
+            menu.findItem(R.id.action_login).setVisible(false); // logIN menu item
+            menu.findItem(R.id.action_logout).setVisible(true); // logOUT menu item
+        } else {
+            menu.findItem(R.id.action_login).setVisible(true); // logIN menu item
+            menu.findItem(R.id.action_logout).setVisible(false); // logOUT menu item
+        }
+
+        // Retrieve the SearchView and plug it into SearchManager
         final SearchView searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
         searchView.setIconifiedByDefault(false);
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
@@ -377,25 +397,38 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
+        switch (item.getItemId()) {
+            case R.id.action_login:
+                Intent intent = new Intent(this,AuthenticationActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.action_logout:
+                /*
+        SharedPreferences sharedPreferences = getSharedPreferences("AppPref",MODE_PRIVATE);
+        String token = sharedPreferences.getString("Code",Api.NO_TOKEN);
+        api.locationById(2,token);
+        */
+                SharedPreferences sharedPreferences = getSharedPreferences("AppPref",MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.remove("Code");
+                editor.apply();
+                menuRef.findItem(R.id.action_login).setVisible(true); // logIN menu item
+                menuRef.findItem(R.id.action_logout).setVisible(false); // logOUT menu item
+                break;
+            case R.id.action_settings:
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+                break;
+            case R.id.action_measurement:
+                startActivity(new Intent(getApplicationContext(), MeasurementActivity.class));
+                break;
+            case R.id.action_register_location_receiver:
+                Toast.makeText(getApplicationContext(), "Listening for updates from positioning library", Toast.LENGTH_LONG).show();
+                registerPositionReceiver();
+                break;
+            default:
+                break;
         }
-
-        if (id == R.id.action_measurement)
-        {
-            startActivity(new Intent(getApplicationContext(), MeasurementActivity.class));
-            return true;
-        }
-
         return super.onOptionsItemSelected(item);
-    }
-
-    public void showAuthentication(MenuItem item) {
-        Intent intent = new Intent(this,AuthenticationActivity.class);
-        startActivity(intent);
     }
 
     @Override
@@ -414,7 +447,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     @Override
     public void onAuthorizationFailed() {
         //TODO: possible intent loop?
-        Intent startAuthorization = new Intent(this,AuthenticationActivity.class);
-        startActivity(startAuthorization);
+        SharedPreferences sharedPreferences = getSharedPreferences("AppPref",MODE_PRIVATE);
+
+        if (sharedPreferences.getBoolean("LoggedInThisSession", true)) {
+            Intent startAuthorization = new Intent(this, AuthenticationActivity.class);
+            startActivity(startAuthorization);
+        }
     }
 }
