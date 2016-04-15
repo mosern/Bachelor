@@ -57,7 +57,7 @@ namespace Api.Factories
                 objs.Add(Shape(o, fields));
             }
 
-            return objs as IEnumerable<object>;
+            return objs.AsEnumerable();
         }
     }
 }

@@ -11,6 +11,7 @@ using System.Web;
 using System.Web.Http;
 using UserDB;
 using Api.Factories;
+using Api.Helpers;
 
 namespace Api.Controllers
 {
@@ -25,51 +26,56 @@ namespace Api.Controllers
         [Route("users", Name = "users")]
         public IHttpActionResult Get(string fields = null, string sort = "id", int? page = null, int pageSize = stdPageSize, bool asObject = true, string objPropName = "users")
         {
-            IQueryable<User> users;
-            if (page != null)
+            IQueryable<User> users = userRepo.List();
+            object toReturn = ControllerHelper<UserViewModel>.get(users, HttpContext.Current, Request, "userLocations", asObject, objPropName, fields, sort, page, pageSize);
+
+            if(toReturn != null)
             {
-                users = userRepo.List().ApplySort(sort).Skip(pageSize * (page.Value - 1)).Take(pageSize);
-            }
-            else
-            {
-                users = userRepo.List().ApplySort(sort);
-            }
+                return Ok(toReturn);
+            //if (page != null)
+            //{
+            //    users = userRepo.List().ApplySort(sort).Skip(pageSize * (page.Value - 1)).Take(pageSize);
+            //}
+            //else
+            //{
+            //    users = userRepo.List().ApplySort(sort);
+            //}
 
-            if (users != null)
-            {
-                IDictionary<string, object> routeValues = new Dictionary<string, object>();
+            //if (users != null)
+            //{
+            //    IDictionary<string, object> routeValues = new Dictionary<string, object>();
 
-                if (fields != null)
-                    routeValues.Add("fields", fields);
+            //    if (fields != null)
+            //        routeValues.Add("fields", fields);
 
-                routeValues.Add("sort", fields);
+            //    routeValues.Add("sort", fields);
 
-                if(page != null)
-                HttpContext.Current.Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(PaginationHeader.Get(page.Value, pageSize, users.Count(), "users", routeValues, Request)));
+            //    if(page != null)
+            //    HttpContext.Current.Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(PaginationHeader.Get(page.Value, pageSize, users.Count(), "users", routeValues, Request)));
 
-                if (fields != null)
-                {
-                    if (asObject)
-                    {
-                        var toReturn = ShapeFactory<UserViewModel>.ShapeList(ConversionFactory.QueryUserToViewModel(users), fields.ToLower().Split(',').ToList());
-                        return Ok(JsonHelper.listToObject(toReturn, objPropName));
-                    }
-                    else
-                    {
-                        return Ok(ShapeFactory<UserViewModel>.ShapeList(ConversionFactory.QueryUserToViewModel(users), fields.ToLower().Split(',').ToList()));
-                    }
-                }
-                else
-                {
-                    if (asObject)
-                    {
-                        return Ok(JsonHelper.listToObject(ConversionFactory.QueryUserToViewModel(users), objPropName));
-                    }
-                    else
-                    {
-                        return Ok(ConversionFactory.QueryUserToViewModel(users));
-                    }
-                }
+            //    if (fields != null)
+            //    {
+            //        if (asObject)
+            //        {
+            //            var toReturn = ShapeFactory<UserViewModel>.ShapeList(ConversionFactory.QueryUserToViewModel(users), fields.ToLower().Split(',').ToList());
+            //            return Ok(JsonHelper.listToObject(toReturn, objPropName));
+            //        }
+            //        else
+            //        {
+            //            return Ok(ShapeFactory<UserViewModel>.ShapeList(ConversionFactory.QueryUserToViewModel(users), fields.ToLower().Split(',').ToList()));
+            //        }
+            //    }
+            //    else
+            //    {
+            //        if (asObject)
+            //        {
+            //            return Ok(JsonHelper.listToObject(ConversionFactory.QueryUserToViewModel(users), objPropName));
+            //        }
+            //        else
+            //        {
+            //            return Ok(ConversionFactory.QueryUserToViewModel(users));
+            //        }
+            //    }
             }
             else
             {
@@ -84,15 +90,18 @@ namespace Api.Controllers
             var user = userRepo.Read(id);
             if (user != null)
             {
-                if (fields != null)
-                {
-                    return Ok(ShapeFactory<UserViewModel>.Shape(ConversionFactory.UserToViewModel(user), fields.ToLower().Split(',').ToList()));
-                }
-                else
-                {
+                //if (fields != null)
+                //{
+                //    return Ok(ShapeFactory<UserViewModel>.Shape(AutoMapConfig.configureMaping().Map<User, UserViewModel>(user), fields.ToLower().Split(',').ToList()));
+                //}
+                //else
+                //{
 
-                    return Ok(ConversionFactory.UserToViewModel(user));
-                }
+                //    return Ok(ConversionFactory.UserToViewModel(user));
+                //}
+
+                return Ok(ControllerHelper<UserViewModel>.get(user, fields));
+
             }
             else
             {
@@ -103,54 +112,65 @@ namespace Api.Controllers
         [Route("users/{id}/locations/", Name="userlocations")]
         public IHttpActionResult Get(int id, string fields = null, string sort = "id", int? page = null, int pageSize = stdPageSize, bool asObject = true, string objPropName = "userLocations")
         {
-            IQueryable<UserLocation> locations;
-            if (page != null)
+
+            IQueryable<UserLocation> locations = userLocRepo.List().Where(u => u.UserId == id);
+            object toReturn = ControllerHelper<LocationViewModel>.get(locations, HttpContext.Current, Request, "userLocations", asObject, objPropName, fields, sort, page, pageSize );
+
+            if(toReturn != null)
             {
-                locations = userLocRepo.List().Where(u => u.UserId == id).ApplySort(sort).Skip(pageSize * (page.Value - 1)).Take(pageSize);
-            }
-            else
-            {
-                locations = userLocRepo.List().Where(u => u.UserId == id).ApplySort(sort);
-            }
+                return Ok(toReturn);
+            
+            //IQueryable<UserLocation> locations;
+            //if (page != null)
+            //{
+            //    locations = userLocRepo.List().Where(u => u.UserId == id).ApplySort(sort).Skip(pageSize * (page.Value - 1)).Take(pageSize);
+            //}
+            //else
+            //{
+            //    locations = userLocRepo.List().Where(u => u.UserId == id).ApplySort(sort);
+            //}
 
-            if (locations != null)
-            {
-                IDictionary<string, object> routeValues = new Dictionary<string, object>();
+            //if (locations != null)
+            //{
+            //    IDictionary<string, object> routeValues = new Dictionary<string, object>();
 
-                if (fields != null)
-                {
-                    routeValues.Add("fields", fields);
-                    routeValues.Add("sort", sort);
+            //    if (fields != null)
+            //    {
+            //        routeValues.Add("fields", fields);
+            //        routeValues.Add("sort", sort);
 
-                    if (asObject)
-                    {
-                        var toReturn = ShapeFactory<LocationViewModel>.ShapeList(ConversionFactory.QueryUserLocationToViewModel(locations), fields.ToLower().Split(',').ToList());
-                        return Ok(JsonHelper.listToObject(toReturn, objPropName));
-                    }
-                    else
-                    {
-                        return Ok(ShapeFactory<LocationViewModel>.ShapeList(ConversionFactory.QueryUserLocationToViewModel(locations), fields.ToLower().Split(',').ToList()));
-                    }
+            //        if (page != null)
+            //            HttpContext.Current.Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(PaginationHeader.Get(page.Value, pageSize, locations.Count(), "userlocations", routeValues, Request)));
 
-                }
-                else
-                {
-                    routeValues.Add("sort", sort);
+            //        if (asObject)
+            //        {
+            //            var toReturn = ShapeFactory<LocationViewModel>.ShapeList(ConversionFactory.QueryUserLocationToViewModel(locations), fields.ToLower().Split(',').ToList());
+            //            return Ok(JsonHelper.listToObject(toReturn, objPropName));
+            //        }
+            //        else
+            //        {
+            //            return Ok(ShapeFactory<LocationViewModel>.ShapeList(ConversionFactory.QueryUserLocationToViewModel(locations), fields.ToLower().Split(',').ToList()));
+            //        }
 
-                    if(page != null)
-                    HttpContext.Current.Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(PaginationHeader.Get(page.Value, pageSize, locations.Count(), "userlocations", routeValues, Request)));
+            //    }
+            //    else
+            //    {
+            //        routeValues.Add("sort", sort);
 
-                    if (asObject)
-                    {
-                        return Ok(JsonHelper.listToObject(ConversionFactory.QueryUserLocationToViewModel(locations), objPropName));
-                    }
-                    else
-                    {
-                        return Ok(ConversionFactory.QueryUserLocationToViewModel(locations));
-                    }
-                }
+            //        if(page != null)
+            //        HttpContext.Current.Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(PaginationHeader.Get(page.Value, pageSize, locations.Count(), "userlocations", routeValues, Request)));
 
-                
+            //        if (asObject)
+            //        {
+            //            return Ok(JsonHelper.listToObject(ConversionFactory.QueryUserLocationToViewModel(locations), objPropName));
+            //        }
+            //        else
+            //        {
+            //            return Ok(ConversionFactory.QueryUserLocationToViewModel(locations));
+            //        }
+            //    }
+
+
             }
             else
             {
@@ -165,14 +185,7 @@ namespace Api.Controllers
 
             if (userLocation != null)
             {
-                if (fields != null)
-                {
-                    return Ok(ShapeFactory<LocationViewModel>.Shape(ConversionFactory.UserLocationToViewModel(userLocation), fields.ToLower().Split(',').ToList()));
-                }
-                else
-                {
-                    return Ok(ConversionFactory.UserLocationToViewModel(userLocation));
-                }
+                return Ok(ControllerHelper<LocationViewModel>.get(userLocation, fields));
             }
             else
             {
