@@ -21,7 +21,7 @@ namespace Api.Controllers
         public IHttpActionResult Get(string fields = null, string sort = "id", int? page = null, int pageSize = stdPageSize, bool asObject = true, string objPropName = "types")
         {
             IQueryable<Models.EF.Type> types = typeRepo.List();
-            object toReturn = ControllerHelper<TypeViewModel>.get(types, HttpContext.Current, Request, "types", asObject, objPropName, fields, sort, page, pageSize);
+            object toReturn = ControllerHelper.get<TypeViewModel>(types, HttpContext.Current, Request, "types", asObject, objPropName, fields, sort, page, pageSize);
 
             if (toReturn != null)
             {
@@ -40,12 +40,28 @@ namespace Api.Controllers
             var type = typeRepo.Read(id);
             if (type != null)
             {
-                return Ok(ControllerHelper<TypeViewModel>.get(type, fields));
+                return Ok(ControllerHelper.get<TypeViewModel>(type, fields));
 
             }
             else
             {
                 return BadRequest("No type found");
+            }
+        }
+
+        [Route("types")]
+        public IHttpActionResult Post(Models.EF.Type type)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest();
+
+            try
+            {
+                return Created("api/types", (Models.EF.Type)ControllerHelper.post<Models.EF.Type>(type));
+            }
+            catch
+            {
+                return BadRequest();
             }
         }
     }

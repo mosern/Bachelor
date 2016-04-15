@@ -8,12 +8,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Web;
+using UserDB;
 
 namespace Api.Helpers
 {
-    public class ControllerHelper<X> where X : BaseViewModel
+    public class ControllerHelper
     {
-        public static object get(object obj, string fields = null)
+        public static object get<X>(object obj, string fields = null) where X : BaseViewModel
         {
             if (fields != null)
             {
@@ -25,7 +26,7 @@ namespace Api.Helpers
             }
         }
 
-        public static object get(IQueryable<object> obj, HttpContext context, HttpRequestMessage request, string routeName, bool asObject, string objPropName, string fields = null, string sort = "id", int? page = null, int? pageSize = null)
+        public static object get<X>(IQueryable<object> obj, HttpContext context, HttpRequestMessage request, string routeName, bool asObject, string objPropName, string fields = null, string sort = "id", int? page = null, int? pageSize = null) where X : BaseViewModel
         {
 
 
@@ -88,6 +89,30 @@ namespace Api.Helpers
             else
             {
                 return null;
+            }
+        }
+
+        public static BaseModel post<X>(BaseModel model) where X : BaseModel
+        {
+            try
+            {
+                return new LocationRepository<X>().Create(AutoMapConfig.configureMaping().Map<BaseModel, X>(model));
+            }
+            catch
+            {
+                throw new Exception();
+            }
+        }
+
+        public static BaseDbModel post<X>(BaseDbModel model) where X : BaseDbModel
+        {
+            try
+            {
+                return new Repository<X>().Create(AutoMapConfig.configureMaping().Map<BaseDbModel, X>(model));
+            }
+            catch
+            {
+                throw new Exception();
             }
         }
     }

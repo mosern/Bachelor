@@ -19,15 +19,18 @@ namespace Api
             var config = new MapperConfiguration(c =>
             {
                 c.CreateMap<User, UserViewModel>().ConvertUsing<UserTypeConverter>();
+                c.CreateMap<User, User>();
                 c.CreateMap<UserLocation, LocationViewModel>().ConvertUsing<UserLocationTypeConverter>();
-                //c.CreateMap<IQueryable<UserLocation>, IQueryable<LocationViewModel>>().ConvertUsing<IQUserLocationTypeConverter>();
                 c.CreateMap<Models.EF.Type, TypeViewModel>();
+                c.CreateMap<Models.EF.Type, Models.EF.Type>();
                 c.CreateMap<People, PeopleViewModel>();
+                c.CreateMap<People, People>().ConvertUsing<PeopleTypeFiller>();
                 c.CreateMap<Location, LocationViewModel>();
-                c.CreateMap<IQueryable<Location>, IQueryable<LocationViewModel>>();
+                c.CreateMap<Location, Location>().ConvertUsing<LocationTypeFiller>();
                 c.CreateMap<Coordinate, CoordinateViewModel>();
-                c.CreateMap<Location, DTOLocation>();
-                c.CreateMap<People, DTOPeople>();
+                c.CreateMap<Coordinate, Coordinate>();
+                c.CreateMap<Accesspoint, AccesspointViewModel>();
+                c.CreateMap<Accesspoint, Accesspoint>().ConvertUsing<AccesspointTypeFiller>();
             });
 
             return config.CreateMapper();
@@ -55,6 +58,61 @@ namespace Api
         public IQueryable<LocationViewModel> Convert(ResolutionContext context)
         {
             return ConversionFactory.QueryUserLocationToViewModel((IQueryable<UserLocation>)context.SourceValue);
+        }
+    }
+
+    public class LocationTypeFiller : ITypeConverter<Location, Location>
+    {
+        public Location Convert(ResolutionContext context)
+        {
+
+            Location source = (Location)context.SourceValue;
+            Location dest = new Location()
+            {
+                Name = source.Name,
+                Hits = source.Hits,
+                LocNr = source.LocNr,
+                CoordinateId = source.Coordinate.Id,
+                TypeId = source.Type.Id,
+                //Coordinate = new LocationRepository<Coordinate>().Read(source.Coordinate.Id),
+                //Type = new LocationRepository<Models.EF.Type>().Read(source.Type.Id)
+            };
+
+            return dest;
+        }
+    }
+
+    public class PeopleTypeFiller : ITypeConverter<People, People>
+    {
+        public People Convert(ResolutionContext context)
+        {
+            People source = (People)context.SourceValue;
+            People dest = new People()
+            {
+                Name = source.Name,
+                Email = source.Email,
+                TlfMobile = source.TlfMobile,
+                TlfOffice = source.TlfOffice,
+                LocationId = source.Location.Id
+            };
+
+            return dest;
+        }
+    }
+
+    public class AccesspointTypeFiller : ITypeConverter<Accesspoint, Accesspoint>
+    {
+        public Accesspoint Convert(ResolutionContext context)
+        {
+            Accesspoint source = (Accesspoint)context.SourceValue;
+            Accesspoint dest = new Accesspoint()
+            {
+                Desc = source.Desc,
+                MacAddress = source.MacAddress,
+                CoordinateId = source.Coordinate.Id
+            };
+
+            return dest;
         }
     }
 }

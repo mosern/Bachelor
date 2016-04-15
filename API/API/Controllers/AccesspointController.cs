@@ -23,7 +23,7 @@ namespace Api.Controllers
         public IHttpActionResult Get(string fields = null, string sort = "id", int? page = null, int pageSize = stdPageSize, bool asObject = true, string objPropName = "accesspoints")
         {
             IQueryable<Accesspoint> accs = accRepo.List();
-            object toReturn = ControllerHelper<AccesspointViewModel>.get(accs, HttpContext.Current, Request, "accesspoints", asObject, objPropName, fields, sort, page, pageSize);
+            object toReturn = ControllerHelper.get<AccesspointViewModel>(accs, HttpContext.Current, Request, "accesspoints", asObject, objPropName, fields, sort, page, pageSize);
 
             if (toReturn != null)
             {
@@ -42,12 +42,28 @@ namespace Api.Controllers
             var acc = accRepo.Read(id);
             if (acc != null)
             {
-                return Ok(ControllerHelper<AccesspointViewModel>.get(acc, fields));
+                return Ok(ControllerHelper.get<AccesspointViewModel>(acc, fields));
 
             }
             else
             {
                 return BadRequest("No accesspoint found");
+            }
+        }
+
+        [Route("accesspoints")]
+        public IHttpActionResult Post(Accesspoint accesspoint)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest();
+
+            try
+            {
+                return Created("api/accesspoints", (Accesspoint)ControllerHelper.post<Accesspoint>(accesspoint));
+            }
+            catch
+            {
+                return BadRequest();
             }
         }
     }

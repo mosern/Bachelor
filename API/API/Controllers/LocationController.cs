@@ -1,6 +1,7 @@
 ﻿using Api.Classes;
 using Api.Dto;
 using Api.Factories;
+using Api.Helpers;
 using Api.Models.Api;
 using Api.Models.EF;
 using Newtonsoft.Json;
@@ -182,20 +183,19 @@ namespace Api.Controllers
         }
 
         [Route("locations")]
-        public IHttpActionResult Post(DTOLocation location)
+        public IHttpActionResult Post(Location location)
         {
             if (!ModelState.IsValid)
                 return BadRequest();
 
             try
             {
-                LocRepo.Create(ConversionFactory.DTOLocationToDatabase(location));
+                return Created("api/locations", (Location)ControllerHelper.post<Location>(location));
             }
             catch
             {
                 return BadRequest();
             }
-            return Ok();
         }
     }
 }

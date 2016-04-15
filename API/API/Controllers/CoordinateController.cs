@@ -25,7 +25,7 @@ namespace Api.Controllers
         public IHttpActionResult Get(string fields = null, string sort = "id", int? page = null, int pageSize = stdPageSize, bool asObject = true, string objPropName = "coordinates")
         {
             IQueryable<Coordinate> coors = coorRepo.List();
-            object toReturn = ControllerHelper<CoordinateViewModel>.get(coors, HttpContext.Current, Request, "coordinates", asObject, objPropName, fields, sort, page, pageSize);
+            object toReturn = ControllerHelper.get<CoordinateViewModel>(coors, HttpContext.Current, Request, "coordinates", asObject, objPropName, fields, sort, page, pageSize);
 
             if (toReturn != null)
             {
@@ -44,12 +44,28 @@ namespace Api.Controllers
             var coor = coorRepo.Read(id);
             if (coor != null)
             {
-                return Ok(ControllerHelper<CoordinateViewModel>.get(coor, fields));
+                return Ok(ControllerHelper.get<CoordinateViewModel>(coor, fields));
 
             }
             else
             {
                 return BadRequest("No coordinate found");
+            }
+        }
+
+        [Route("coordinates")]
+        public IHttpActionResult Post(Coordinate coor)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest();
+
+            try
+            {
+                return Created("api/coordinates", (Coordinate)ControllerHelper.post<Coordinate>(coor));
+            }
+            catch
+            {
+                return BadRequest();
             }
         }
     }

@@ -27,7 +27,7 @@ namespace Api.Controllers
         public IHttpActionResult Get(string fields = null, string sort = "id", int? page = null, int pageSize = stdPageSize, bool asObject = true, string objPropName = "users")
         {
             IQueryable<User> users = userRepo.List();
-            object toReturn = ControllerHelper<UserViewModel>.get(users, HttpContext.Current, Request, "userLocations", asObject, objPropName, fields, sort, page, pageSize);
+            object toReturn = ControllerHelper.get<UserViewModel>(users, HttpContext.Current, Request, "userLocations", asObject, objPropName, fields, sort, page, pageSize);
 
             if(toReturn != null)
             {
@@ -100,7 +100,7 @@ namespace Api.Controllers
                 //    return Ok(ConversionFactory.UserToViewModel(user));
                 //}
 
-                return Ok(ControllerHelper<UserViewModel>.get(user, fields));
+                return Ok(ControllerHelper.get<UserViewModel>(user, fields));
 
             }
             else
@@ -114,7 +114,7 @@ namespace Api.Controllers
         {
 
             IQueryable<UserLocation> locations = userLocRepo.List().Where(u => u.UserId == id);
-            object toReturn = ControllerHelper<LocationViewModel>.get(locations, HttpContext.Current, Request, "userLocations", asObject, objPropName, fields, sort, page, pageSize );
+            object toReturn = ControllerHelper.get<LocationViewModel>(locations, HttpContext.Current, Request, "userLocations", asObject, objPropName, fields, sort, page, pageSize );
 
             if(toReturn != null)
             {
@@ -185,9 +185,25 @@ namespace Api.Controllers
 
             if (userLocation != null)
             {
-                return Ok(ControllerHelper<LocationViewModel>.get(userLocation, fields));
+                return Ok(ControllerHelper.get<LocationViewModel>(userLocation, fields));
             }
             else
+            {
+                return BadRequest();
+            }
+        }
+
+        [Route("users")]
+        public IHttpActionResult Post(User user)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest();
+
+            try
+            {
+                return Created("api/users", (User)ControllerHelper.post<User>(user));
+            }
+            catch
             {
                 return BadRequest();
             }
