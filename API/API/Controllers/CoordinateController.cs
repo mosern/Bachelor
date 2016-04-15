@@ -49,7 +49,7 @@ namespace Api.Controllers
             }
             else
             {
-                return BadRequest("No coordinates found");
+                return BadRequest("No coordinate found");
             }
         }
     }
