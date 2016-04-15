@@ -1,4 +1,5 @@
 ﻿using Api.Factories;
+using Api.Helpers;
 using Api.Models.Api;
 using Api.Models.EF;
 using System;
@@ -52,7 +53,9 @@ namespace Api.Classes
 
                 locid.Add(loc.Id);
 
-                if (!locations.Contains(loc))
+               
+
+                if (!locations.Contains(loc, new CompareEF<LocationViewModel>()))
                 {
                     var temp = locations.ToList();
                     temp.Add(loc);

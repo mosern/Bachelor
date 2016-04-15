@@ -270,6 +270,7 @@
     <Compile Include="Helpers\AuthorizationManager.cs" />
     <Compile Include="Database\Context.cs" />
     <Compile Include="Database\ILocationRepository.cs" />
+    <Compile Include="Helpers\CompareEF.cs" />
     <Compile Include="Helpers\ControllerHelper.cs" />
     <Compile Include="Helpers\IQueryableExtensions.cs" />
     <Compile Include="Helpers\JsonHelper.cs" />
@@ -293,10 +294,8 @@
       <DependentUpon>201604130816558_people.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\LocationConfiguration\Configuration.cs" />
-    <Compile Include="Models\Api\AccesspointInfo.cs" />
     <Compile Include="Models\Api\AccesspointViewModel.cs" />
     <Compile Include="Models\Api\BaseViewModel.cs" />
-    <Compile Include="Models\Api\CoordinateInfo.cs" />
     <Compile Include="Helpers\PaginationHeader.cs" />
     <Compile Include="Models\Api\CoordinateViewModel.cs" />
     <Compile Include="Models\Api\LocationViewModel.cs" />

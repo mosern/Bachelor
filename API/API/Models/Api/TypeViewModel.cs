@@ -7,7 +7,6 @@ namespace Api.Models.Api
 {
     public class TypeViewModel : BaseViewModel
     {
-        public int Id { get; set; }
         public string Name { get; set; }
     }
 }

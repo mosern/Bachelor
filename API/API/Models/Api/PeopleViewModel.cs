@@ -8,7 +8,6 @@ namespace Api.Models.Api
 {
     public class PeopleViewModel : BaseViewModel
     {
-        public int Id { get; set; }
         public string Name { get; set; }
         public string TlfOffice { get; set; }
         public string TlfMobile { get; set; }

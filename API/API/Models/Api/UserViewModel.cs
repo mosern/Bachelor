@@ -7,7 +7,6 @@ namespace Api.Models.Api
 {
     public class UserViewModel : BaseViewModel
     {
-        public int Id { get; set; }
         public string Username { get; set; }
         public IQueryable<LocationViewModel> Locations { get; set; }
 

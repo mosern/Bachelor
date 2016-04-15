@@ -9,7 +9,6 @@ namespace Api.Models.Api
 {
     public class LocationViewModel : BaseViewModel
     {
-        public int Id { get; set; }
         [Required]
         public CoordinateViewModel Coordinate { get; set; }
         [Required]

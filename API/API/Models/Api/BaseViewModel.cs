@@ -7,5 +7,6 @@ namespace Api.Models.Api
 {
     public class BaseViewModel
     {
+        public int Id { get; set; }
     }
 }
