@@ -57,15 +57,15 @@ namespace Api.Controllers
         public IHttpActionResult Post(Coordinate coor)
         {
             if (!ModelState.IsValid)
-                return BadRequest();
+                return BadRequest("Modelstate is invalid");
 
             try
             {
                 return Created("api/coordinates", (Coordinate)ControllerHelper.post<Coordinate>(coor));
             }
-            catch
+            catch(Exception e)
             {
-                return BadRequest();
+                return BadRequest(e.Message);
             }
         }
     }

@@ -197,16 +197,21 @@ namespace Api.Controllers
         public IHttpActionResult Post(User user)
         {
             if (!ModelState.IsValid)
-                return BadRequest();
+                return BadRequest("Modelstate is invalid");
 
             try
             {
                 return Created("api/users", (User)ControllerHelper.post<User>(user));
             }
-            catch
+            catch(Exception e)
             {
-                return BadRequest();
+                return BadRequest(e.Message);
             }
+        }
+
+        public IHttpActionResult Patch(User user)
+        {
+            return InternalServerError();
         }
     }
 }
