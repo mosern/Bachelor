@@ -67,12 +67,13 @@ namespace Api
         {
 
             Location source = (Location)context.SourceValue;
+            Coordinate cor = new LocationRepository<Coordinate>().Create(new Coordinate() { Lat = source.Coordinate.Lat, Lng = source.Coordinate.Lng, Alt = source.Coordinate.Alt });
             Location dest = new Location()
             {
                 Name = source.Name,
                 Hits = source.Hits,
                 LocNr = source.LocNr,
-                CoordinateId = source.Coordinate.Id,
+                CoordinateId = cor.Id,
                 TypeId = source.Type.Id,
                 //Coordinate = new LocationRepository<Coordinate>().Read(source.Coordinate.Id),
                 //Type = new LocationRepository<Models.EF.Type>().Read(source.Type.Id)

@@ -209,9 +209,42 @@ namespace Api.Controllers
             }
         }
 
+        [Route("users/{id}")]
+        public IHttpActionResult Put(User user)
+        {
+            if(user != null)
+            {
+                return Ok();
+            }
+            else
+            {
+                return InternalServerError();
+            }
+        }
+
+        [Route("users/{id}")]
         public IHttpActionResult Patch(User user)
         {
-            return InternalServerError();
+            if (user != null)
+            {
+                return Ok();
+            }
+            else
+            {
+                return InternalServerError();
+            }
+        }
+        [Route("users/{id}")]
+        public IHttpActionResult Delete(int id)
+        {
+            if (id != 0)
+            {
+                return Ok();
+            }
+            else
+            {
+                return InternalServerError();
+            }
         }
     }
 }
