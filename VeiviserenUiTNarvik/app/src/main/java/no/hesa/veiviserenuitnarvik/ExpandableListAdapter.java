@@ -27,9 +27,6 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     private HashMap<String, List<? extends Object>> _listDataChild;
     private List<String> passedClass;
 
-    Person person;
-    Location location;
-
     public ExpandableListAdapter(Context context, List<String> listDataHeader, HashMap<String, List<? extends Object>> listChildData, List<String> passedClass) {
         this._context = context;
         this._listDataHeader = listDataHeader;
@@ -52,34 +49,35 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     public View getChildView(final int groupPosition, final int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
         Object child = getChild(groupPosition, childPosition);
 
-        String childText = "";
-        if (passedClass.get(groupPosition) == "person")
-        {
-            person = (Person)child;
-            childText = person.getName() + "\n" + person.getEmail();
-        }
-
-        if (passedClass.get(groupPosition) == "location")
-        {
-            location = (Location)child;
-            childText = location.getName() + "\n" + location.getLocNr() + "\n" + location.getType().getName();
-        }
-
         if (convertView == null) {
             LayoutInflater infalInflater = (LayoutInflater) this._context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = infalInflater.inflate(R.layout.search_results_child_item, null);
         }
 
+        String childText = "";
+        if (passedClass.get(groupPosition) == "person")
+        {
+            final Person person;
+            person = (Person)child;
+            childText = person.getName() + "\n" + person.getEmail();
+            convertView = setupPersonButtons(convertView, groupPosition, person);
+        }
+
+        if (passedClass.get(groupPosition) == "location") {
+            final Location location;
+            location = (Location) child;
+            childText = location.getName() + "\n" + location.getLocNr() + "\n" + location.getType().getName();
+            convertView = setupLocationButton(convertView, groupPosition, location);
+        }
+
         TextView txtListChild = (TextView) convertView.findViewById(R.id.tv_child_info);
         txtListChild.setText(childText);
-
-        convertView = setupButtons(convertView, groupPosition);
 
         return convertView;
     }
 
-    public View setupButtons(View convertView, final int groupPosition)
+    public View setupLocationButton(View convertView, final int groupPosition, final Location location)
     {
         ImageButton smsButton = (ImageButton) convertView.findViewById(R.id.btn_child_item_sms);
         ImageButton tlfMobileButton = (ImageButton) convertView.findViewById(R.id.btn_child_item_tlfMobile);
@@ -87,74 +85,6 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         ImageButton emailButton = (ImageButton) convertView.findViewById(R.id.btn_child_item_email);
         ImageButton routeButton = (ImageButton)convertView.findViewById(R.id.btn_child_item_routeto);
 
-        if (passedClass.get(groupPosition) == "person") {
-            // SMS
-            smsButton.setOnClickListener(new View.OnClickListener() {
-
-                @Override
-                public void onClick(View v) {
-                    try {
-                        // SEND SMS HERE
-                        sendSMS(person.getTlfMobile());
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                    }
-                }
-            });
-            smsButton.setVisibility(View.VISIBLE);
-
-            // TLFMOBILE
-            tlfMobileButton.setOnClickListener(new View.OnClickListener() {
-
-                @Override
-                public void onClick(View v) {
-                    try {
-                        // CALL MOBILE HERE
-                        callNumber(person.getTlfMobile());
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                    }
-                }
-            });
-            tlfMobileButton.setVisibility(View.VISIBLE);
-
-            // TLFOFFICE
-            tlfOfficeButton.setOnClickListener(new View.OnClickListener() {
-
-                @Override
-                public void onClick(View v) {
-                    try {
-                        // CALL OFFICE HERE
-                        callNumber(person.getTlfOffice());
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                    }
-                }
-            });
-            tlfOfficeButton.setVisibility(View.VISIBLE);
-
-            // EMAIL
-            emailButton.setOnClickListener(new View.OnClickListener() {
-
-                @Override
-                public void onClick(View v) {
-                    try {
-                        // SEND EMAIL HERE
-                        sendEmail(person.getEmail());
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                    }
-                }
-            });
-            emailButton.setVisibility(View.VISIBLE);
-        }
-        else
-        {
-            smsButton.setVisibility(View.INVISIBLE);
-            tlfMobileButton.setVisibility(View.INVISIBLE);
-            tlfOfficeButton.setVisibility(View.INVISIBLE);
-            emailButton.setVisibility(View.INVISIBLE);
-        }
 
         // ROUTE
         routeButton.setOnClickListener(new View.OnClickListener() {
@@ -163,7 +93,98 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
             public void onClick(View v) {
                 try {
                     // REDIRECT WITH ROUTE HERE
-                    redirectWithRoute(groupPosition);
+                    sendLocationDestination(location);
+                }
+                catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+
+        smsButton.setVisibility(View.INVISIBLE);
+        tlfMobileButton.setVisibility(View.INVISIBLE);
+        tlfOfficeButton.setVisibility(View.INVISIBLE);
+        emailButton.setVisibility(View.INVISIBLE);
+
+        return convertView;
+    }
+
+    public View setupPersonButtons(View convertView, final int groupPosition, final Person person)
+    {
+        ImageButton smsButton = (ImageButton) convertView.findViewById(R.id.btn_child_item_sms);
+        ImageButton tlfMobileButton = (ImageButton) convertView.findViewById(R.id.btn_child_item_tlfMobile);
+        ImageButton tlfOfficeButton = (ImageButton) convertView.findViewById(R.id.btn_child_item_tlfOffice);
+        ImageButton emailButton = (ImageButton) convertView.findViewById(R.id.btn_child_item_email);
+        ImageButton routeButton = (ImageButton)convertView.findViewById(R.id.btn_child_item_routeto);
+
+        // SMS
+        smsButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                try {
+                    // SEND SMS HERE
+                    sendSMS(person.getTlfMobile());
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+        smsButton.setVisibility(View.VISIBLE);
+
+        // TLFMOBILE
+        tlfMobileButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                try {
+                    // CALL MOBILE HERE
+                    callNumber(person.getTlfMobile());
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+        tlfMobileButton.setVisibility(View.VISIBLE);
+
+        // TLFOFFICE
+        tlfOfficeButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                try {
+                    // CALL OFFICE HERE
+                    callNumber(person.getTlfOffice());
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+        tlfOfficeButton.setVisibility(View.VISIBLE);
+
+        // EMAIL
+        emailButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                try {
+                    // SEND EMAIL HERE
+                    sendEmail(person.getEmail());
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+        emailButton.setVisibility(View.VISIBLE);
+
+        // ROUTE
+        routeButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                try {
+                    // REDIRECT WITH ROUTE HERE
+                    sendPersonDestination(person);
                 }
                 catch (Exception ex) {
                     ex.printStackTrace();
@@ -174,21 +195,25 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         return convertView;
     }
 
-    private void redirectWithRoute(int groupPosision)
+    private void sendLocationDestination(final Location location )
     {
         Intent intent = new Intent(_context,MapActivity.class);
         intent.setAction("LAT_LNG_RETURN");
-        if(passedClass.get(groupPosision) == "location") {
-            intent.putExtra("lat", location.getCoordinate().getLat());
-            intent.putExtra("lng", location.getCoordinate().getLng());
-        }
-        /*
-        if(passedClass.get(groupPosision) == "person") {
-            intent.putExtra("lat", person.getCoordinate().getLat());
-            intent.putExtra("lng", location.getCoordinate().getLng());
-        }
-        */
+        intent.putExtra("lat", location.getCoordinate().getLat());
+        intent.putExtra("lng", location.getCoordinate().getLng());
         _context.startActivity(intent);
+    }
+
+    private void sendPersonDestination(final Person person)
+    {
+        // TODO: Mangler coordinates for persons
+        /*
+        Intent intent = new Intent(_context,MapActivity.class);
+        intent.setAction("LAT_LNG_RETURN");
+        intent.putExtra("lat", person.getCoordinate().getLat());
+        intent.putExtra("lng", person.getCoordinate().getLng());
+        _context.startActivity(intent);
+        */
     }
 
 //region SMS/CALL/EMAIL

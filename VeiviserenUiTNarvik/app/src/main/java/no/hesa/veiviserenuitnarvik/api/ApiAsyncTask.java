@@ -102,7 +102,7 @@ public class ApiAsyncTask extends AsyncTask<List<Pair<String,String>>,Void,JSONO
             if (responseCode == HttpsURLConnection.HTTP_OK) {
                 String line;
                 StringBuilder sb = new StringBuilder();
-                BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(),"iso-8859-1"),8);
+                BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(),"UTF-8"),8);
                 while ((line = br.readLine()) != null) {
                     sb.append(line+"\n");
                 }
