@@ -1,5 +1,6 @@
 package no.hesa.veiviserenuitnarvik;
 
+import android.annotation.TargetApi;
 import android.app.SearchManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -8,7 +9,13 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
+import android.hardware.TriggerEvent;
+import android.hardware.TriggerEventListener;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
 import android.preference.PreferenceManager;
@@ -51,6 +58,7 @@ import no.hesa.positionlibrary.PositionLibrary;
 import no.hesa.veiviserenuitnarvik.api.ActionInterface;
 import no.hesa.veiviserenuitnarvik.api.Api;
 
+@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback,ActionInterface{
 
     private static final String TAG = "MapActivity";
@@ -73,6 +81,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     Menu menuRef = null;
 
+    private Circle circleOne;
+    private Circle circleTwo;
+    private Circle circleThree;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -143,6 +154,24 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 //        registerPositionReceiver();
 //        registerSearchLocationReceiver();
 
+        //Painting position marker
+        circleThree = mMap.addCircle(new CircleOptions()
+                .center(hin)
+                .radius(3)
+                .strokeColor(Color.rgb(202, 227, 247))
+                .fillColor(Color.rgb(202, 227, 247)));
+
+        circleTwo = mMap.addCircle(new CircleOptions()
+                .center(hin)
+                .radius(1.5)
+                .strokeColor(Color.rgb(151, 200, 240))
+                .fillColor(Color.rgb(151, 200, 240)));
+
+        circleOne = mMap.addCircle(new CircleOptions()
+                .center(hin)
+                .radius(0.5)
+                .strokeColor(Color.rgb(49, 146, 225))
+                .fillColor(Color.rgb(49, 146, 225)));
     }
 
 //region BROADCASTRECEIVERS
@@ -175,7 +204,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                         //Toast.makeText(MapActivity.this, "User location received from library = " + pos[0] + "," + pos[1], Toast.LENGTH_LONG).show();
                         LatLng latLng = new LatLng(pos[0], pos[1]);
                         //mMap.clear();
-                        mMap.addMarker(new MarkerOptions().position(latLng).title("UserLocAsDeterminedByLibrary\nLat:" + pos[0] + " Lng: " + pos[1]));
+                        //circleOne.setCenter(latLng);
+                        //circleTwo.setCenter(latLng);
+                        circleThree.setCenter(latLng);
+                        circleTwo.setCenter(latLng);
+                        circleOne.setCenter(latLng);
+                        //mMap.addMarker(new MarkerOptions().position(latLng).title("UserLocAsDeterminedByLibrary\nLat:" + pos[0] + " Lng: " + pos[1]));
                         //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
                     }
                     else

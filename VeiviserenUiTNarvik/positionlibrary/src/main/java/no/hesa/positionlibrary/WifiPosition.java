@@ -1,15 +1,23 @@
 package no.hesa.positionlibrary;
 
+import android.annotation.TargetApi;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
+import android.hardware.TriggerEvent;
+import android.hardware.TriggerEventListener;
 import android.location.Location;
 import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Handler;
 
 import org.apache.commons.math3.fitting.leastsquares.LeastSquaresOptimizer;
@@ -45,7 +53,7 @@ public class WifiPosition {
                 if(timer == null){
                     timer = new Timer();
                     initializeTimerTask(wifiManager);
-                    timer.schedule(timerTask, 5000, 5000);
+                    timer.schedule(timerTask, 5000, 3000);
                     counter++;
                 }
                 else //If not...
@@ -57,6 +65,23 @@ public class WifiPosition {
     private TimerTask timerTask;
     final Handler handler = new Handler();
     private HashMap<Double, Point> wifiPointsLocationInfList = new HashMap<Double, Point>(); //list of available Wi-Fi access points with corresponding distances from several scans
+    //private double[] lastCalculatedPosition = null;
+    private SensorManager sensorManager;
+    private Sensor sensor;
+    private SensorEventListener sensorEventListener = new SensorEventListener() {
+        @Override
+        public void onSensorChanged(SensorEvent event) {
+            Sensor sensor = event.sensor;
+            if (sensor.getType() == Sensor.TYPE_STEP_DETECTOR) {
+                wifiPointsLocationInfList.clear();
+            }
+        }
+
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+        }
+    };
 
     /**
      * Initialize TimerTask to set up continuous scannig for available Wi-Fi access points
@@ -77,9 +102,14 @@ public class WifiPosition {
 
     public void registerBroadcast(Context c) {
         c.registerReceiver(wifiReceiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
+        sensorManager = (SensorManager) c.getSystemService(c.SENSOR_SERVICE);
+        sensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);
+        sensorManager.registerListener(sensorEventListener, sensor, SensorManager.SENSOR_DELAY_FASTEST);
     }
+
     public void unRegisterBroadcast(Context c) {
         c.unregisterReceiver(wifiReceiver);
+        sensorManager.unregisterListener(sensorEventListener);
     }
 
     public void calculateDistances(Context c) {
@@ -92,7 +122,6 @@ public class WifiPosition {
             }
 
             HashMap<Double, Point> wifiPointsLocationInf = new HashMap<Double, Point>(matchMACtoGeo(wifiPointsScanInf));//Distances to Wi-Fi access points with corresponding geo coordinates
-            //HashMap<Double, Point> wifiPointsLocationInfList = new HashMap<Double, Point>();
 
             //Checking if wifiPointsLocationInfList is empty
             if(wifiPointsLocationInfList.size() == 0){
@@ -124,63 +153,16 @@ public class WifiPosition {
                     }
                     if(!match) //If wifiPointsLocationInfList doesn´t contain geo coordinates with corresponding distance to one of Wi-Fi access points from new scan
                         wifiPointsLocationInfList.put(newKeys[i],newValues[i]);
-                    /*if(wifiPointsLocationInfList.containsValue(newValues[i])){
-                        //If wifiPointsLocationInfList already contains geo coordinates with corresponding distance to
-                        //one of Wi-Fi access points from new scan
-                        for(int j = 0; j < values.length; j++){
-                            //Find index (j) of matching element
-                            if(values[j].getLongitude() == newValues[i].getLongitude()){
-                                //And check distance
-                                if(newKeys[i] > keys[j]){
-                                    //If distance from previous scan is bigger than one from new, replace data in wifiPointsLocationInfList
-                                    wifiPointsLocationInfList.remove(keys[j]);
-                                    wifiPointsLocationInfList.put(newKeys[i], newValues[i]);
-                                }
-                            }
-                        }
-                    }*/
                 }
             }
 
             //If four scans were run
             if(counter == 4){
-                //Check if timer is running and stop it
-                /*if (timer != null){
-                    timer.cancel();
-                    timer = null;
-                }*/
                 //Calculate position
                 findPosition(c);
                 counter = 1;
+                wifiPointsLocationInfList.clear();
             }
-            /*//Sorting wifiPointsLocationInfList by distance
-            Map<Double, Point> sortedWifiPointsLocationInf = new TreeMap<Double, Point>(wifiPointsLocationInfList);
-
-            //Checking number of access points. If there are more than three, than keep only closest three
-            if(sortedWifiPointsLocationInf.size() > 3){
-                Double [] keys = (Double[]) sortedWifiPointsLocationInf.keySet().toArray(new Double[sortedWifiPointsLocationInf.size()]);
-                while (sortedWifiPointsLocationInf.size() > 3){
-                    sortedWifiPointsLocationInf.remove(keys[sortedWifiPointsLocationInf.size() - 1]);
-                }
-            }
-
-            //If there are three available Wi-Fi access points with known coordinates, calculating position
-            double[] calculatedPosition = null;
-            if(sortedWifiPointsLocationInf.size() == 3) {
-                calculatedPosition = calculatePosition(sortedWifiPointsLocationInf);
-            }
-
-            Intent intent = new Intent();
-            intent.setAction("no.hesa.positionlibrary.Output");
-
-            if(calculatedPosition != null)
-                intent.putExtra("position", calculatedPosition);
-            else {
-                double[] noPosition = {0,0};
-                intent.putExtra("position", noPosition);
-            }
-
-            c.sendBroadcast(intent);*/
         }
     }
 
@@ -198,11 +180,31 @@ public class WifiPosition {
 
         //If there are three available Wi-Fi access points with known coordinates, calculating position
         double[] calculatedPosition = null;
-        /*if(sortedWifiPointsLocationInf.size() == 3) {
-            calculatedPosition = calculatePosition(sortedWifiPointsLocationInf);
-        }*/
         calculatedPosition = calculatePosition(sortedWifiPointsLocationInf);
 
+        //Calculate distance between last known position and newly calculated position
+        /*float distance = 0;
+        if(lastCalculatedPosition == null)
+            lastCalculatedPosition = calculatedPosition;
+        else
+            distance = calculateDistance(calculatedPosition);
+
+        //If distance is more than 10 meters send new position to application and change values to last known position
+        if(distance >= 6 || distance == 0){
+            //wifiPointsLocationInfList.clear();
+            lastCalculatedPosition = calculatedPosition;
+            Intent intent = new Intent();
+            intent.setAction("no.hesa.positionlibrary.Output");
+
+            if(calculatedPosition != null)
+                intent.putExtra("position", calculatedPosition);
+            else {
+                double[] noPosition = {0,0};
+                intent.putExtra("position", noPosition);
+            }
+
+            c.sendBroadcast(intent);
+        }*/
         Intent intent = new Intent();
         intent.setAction("no.hesa.positionlibrary.Output");
 
@@ -215,6 +217,17 @@ public class WifiPosition {
 
         c.sendBroadcast(intent);
     }
+
+    /**
+     * Calculate the distance between two geo coordinates (two last estimated positions)
+     * @param calculatedPosition geo coordinates of newly estimated position
+     * @return distance in meters
+     */
+    /*private float calculateDistance(double[] calculatedPosition){
+        float [] dist = new float[1];
+        Location.distanceBetween(lastCalculatedPosition[0], lastCalculatedPosition[1], calculatedPosition[0], calculatedPosition[1], dist);
+        return dist[0];
+    }*/
 
     /**
      * Calculate the distance to one access point given RSSI in db and frequency in MHz
@@ -233,7 +246,7 @@ public class WifiPosition {
         double a = 3; //distance from phone to ceiling (rouge estimation)
 
         double FSPL = tx_PWR + gain_TX + gain_RX - levelInDb - pl_1meter; //free space path loss
-        double exp = (FSPL + 27.55 - (20 * Math.log10(freqInMHz))) / 21.75;
+        double exp = (FSPL + 27.55 - (20 * Math.log10(freqInMHz))) / 21.66;
         //double exp = (27.55 - (20 * Math.log10(freqInMHz)) + Math.abs(levelInDb)) / 20.0;
         //double exp = (tx_PWR - levelInDb + gain_TX - pl_1meter + s)/(10 * n);
         double b = Math.pow(10.0, exp);
