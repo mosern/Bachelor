@@ -345,6 +345,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         menuRef = menu;
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_map, menu);
+        getSupportActionBar().setDisplayShowTitleEnabled(false); // hides toolbar title
 
         SharedPreferences sharedPreferences = getSharedPreferences("AppPref",MODE_PRIVATE);
         String token = sharedPreferences.getString("Code",Api.NO_TOKEN);
@@ -358,7 +359,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         // Retrieve the SearchView and plug it into SearchManager
         final SearchView searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
-        searchView.setIconifiedByDefault(false);
+        searchView.setIconifiedByDefault(false); // autoexpands the search field
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName("no.hesa.veiviserenuitnarvik","no.hesa.veiviserenuitnarvik.SearchResultsActivity")));
 

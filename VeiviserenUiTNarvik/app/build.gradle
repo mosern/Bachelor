@@ -39,6 +39,8 @@ dependencies {
     compile project(':positionlibrary')
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.davemorrissey.labs:subsampling-scale-image-view:3.4.1'
+    compile 'com.google.code.gson:gson:2.6.2'
+    compile 'me.imid.swipebacklayout.lib:library:1.0.0'
 }
 
 

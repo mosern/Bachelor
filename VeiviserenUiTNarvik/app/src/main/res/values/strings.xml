@@ -23,4 +23,14 @@
 
     <string name="search_default_text">Search for person or room</string>
 
+    <!-- -->
+    <string name="sms_selection_descriptor">Send SMS with...</string>
+    <string name="sms_no_sms_apps_installed">No installed SMS applications could be found</string>
+
+    <string name="call_selection_descriptor">Call with...</string>
+    <string name="call_no_calling_apps_installed">No installed phone applications could be found</string>
+
+    <string name="email_selection_descriptor">Send email with...</string>
+    <string name="email_no_email_apps_installed">No installed email clients could be found</string>
+
 </resources>
