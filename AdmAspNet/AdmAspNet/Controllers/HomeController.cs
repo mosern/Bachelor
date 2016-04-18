@@ -59,7 +59,7 @@ namespace AdmAspNet.Controllers
                 client.DefaultRequestHeaders.Accept.Clear();
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-                HttpResponseMessage response = client.GetAsync("api/values").Result;
+                HttpResponseMessage response =  client.GetAsync("api/values").Result;
                 if (response.IsSuccessStatusCode)
                 {
                     return response.Content.ReadAsStringAsync().Result + response.StatusCode;

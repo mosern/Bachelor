@@ -1,0 +1,50 @@
+﻿@model AdmAspNet.Models.ViewModels.LocationViewModel
+
+@{
+    ViewBag.Title = "Delete";
+}
+@section sidebar {
+    @Html.Partial("_SidebarPartial")
+}
+<h2>Slett</h2>
+
+<h3>Er du sikker på at du vil slette?</h3>
+<div>
+    <h4>Lokasjon</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.LocNr)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.LocNr)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Hits)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Hits)
+        </dd>
+
+    </dl>
+
+    @using (Html.BeginForm()) {
+        @Html.AntiForgeryToken()
+
+        <div class="form-actions no-color">
+            <input type="submit" value="Slett" class="btn btn-default" /> |
+            @Html.ActionLink("Tilbake til oversikt", "Index")
+        </div>
+    }
+</div>

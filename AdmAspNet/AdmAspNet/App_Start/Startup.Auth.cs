@@ -19,6 +19,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net;
 using AdmAspNet.Helpers;
+using System.Web.Helpers;
 
 namespace AdmAspNet
 {
@@ -32,6 +33,10 @@ namespace AdmAspNet
         //https://app.pluralsight.com/library/courses/building-securing-restful-api-aspdotnet/exercise-files
         public void ConfigureAuth(IAppBuilder app)
         {
+            JwtSecurityTokenHandler.InboundClaimTypeMap = new Dictionary<string, string>();
+            AntiForgeryConfig.UniqueClaimTypeIdentifier = "unique_user_key";
+            app.UseResourceAuthorization(new AuthorizationManager()); 
+
             app.UseCookieAuthentication(new CookieAuthenticationOptions
             {
                 AuthenticationType = "Cookies"
@@ -55,7 +60,9 @@ namespace AdmAspNet
                             DecodeAndWrite(n.ProtocolMessage.IdToken);
                         },
 
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
                         SecurityTokenValidated = async n =>
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
                         {
                             var identity = n.AuthenticationTicket.Identity;
 
@@ -71,11 +78,13 @@ namespace AdmAspNet
                             nid.AddClaim(new Claim("id_token", n.ProtocolMessage.IdToken));
 
                             nid.AddClaim(new Claim("access_token", n.ProtocolMessage.AccessToken));
+                            var issuerClaim = n.AuthenticationTicket.Identity.FindFirst(Thinktecture.IdentityModel.Client.JwtClaimTypes.Issuer);
+                            var subjectClaim = n.AuthenticationTicket.Identity.FindFirst(Thinktecture.IdentityModel.Client.JwtClaimTypes.Subject);
+
+                            nid.AddClaim(new Claim("unique_user_key", issuerClaim.Value + "_" + subjectClaim.Value));
 
                             nid.AddClaim(usernameClaim);
-
                             nid.AddClaims(roles);
-
 
                             n.AuthenticationTicket = new AuthenticationTicket(
                                 nid,
