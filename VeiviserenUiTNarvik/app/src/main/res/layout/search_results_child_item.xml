@@ -11,22 +11,9 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:textSize="17dip"
-
         android:textColor="@color/search_results_child_item_textcolor"
         android:paddingLeft="?android:attr/expandableListPreferredChildPaddingLeft" />
-    <!--
-        <LinearLayout
-            android:id="@+id/ll_inner_child_item"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="2dp"
-            android:orientation="horizontal"
-            android:paddingLeft="?android:attr/expandableListPreferredChildPaddingLeft" >
 
-
-
-        </LinearLayout>
-    -->
     <GridLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"

@@ -3,12 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="no.hesa.veiviserenuitnarvik.MapActivity">
 
-
     <item android:id="@+id/action_search"
         android:orderInCategory="60"
         android:title="@string/search_default_text"
         android:icon="@drawable/abc_ic_search_api_mtrl_alpha"
-
         app:showAsAction="always"
         app:actionViewClass="android.support.v7.widget.SearchView" />
 

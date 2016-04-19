@@ -12,6 +12,9 @@
         android:id="@+id/exlv_search_results"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/search_results_list_color"
+        android:padding="5dp"
+        android:groupIndicator="@null"
         />
 
 </LinearLayout>

@@ -41,6 +41,7 @@ import com.google.android.gms.maps.model.GroundOverlayOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.indooratlas.android.sdk.IALocationManager;
 import com.indooratlas.android.sdk.resources.IAFloorPlan;
 import com.indooratlas.android.sdk.resources.IALatLng;
@@ -62,6 +63,7 @@ import no.hesa.veiviserenuitnarvik.api.Api;
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback,ActionInterface{
 
     private static final String TAG = "MapActivity";
+    private static final int POLYLINEWIDTH = 4;
 
     /* used to decide when bitmap should be downscaled */
     private static final int MAX_DIMENSION = 2048;
@@ -78,6 +80,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     private BroadcastReceiver positionLibOutputReceiver = null;
     private BroadcastReceiver searchLocationReceiver = null;
+
+    private LatLng currentPosision = null;
+    private LatLng targetPosition = null;
 
     Menu menuRef = null;
 
@@ -139,6 +144,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         LatLng hin = new LatLng(68.436135, 17.434950);
         mMap.addMarker(new MarkerOptions().position(hin).title("UiT Narvik"));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(hin, 17));
+        // TODO: Henning Move to received location from positionlibrary
+        currentPosision = hin;
 
         if (returnedCoordsFromSearchIntent != null) {
             if (returnedCoordsFromSearchIntent.getAction() != null) {
@@ -146,6 +153,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     LatLng latLng = new LatLng(returnedCoordsFromSearchIntent.getDoubleExtra("lng",0),returnedCoordsFromSearchIntent.getDoubleExtra("lat",0));
                     mMap.addMarker(new MarkerOptions().position(latLng).title("TestLoc2"));
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
+                    if (currentPosision != null)
+                    {
+                        drawRoute(currentPosision, latLng);
+                    }
                 }
             }
         }
@@ -174,6 +185,16 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 .fillColor(Color.rgb(49, 146, 225)));
     }
 
+    private void drawRoute(LatLng a, LatLng b)
+    {
+        // draws a line between point a and point b
+        mMap.addPolyline((new PolylineOptions())
+                .add(a, b)
+                .width(POLYLINEWIDTH)
+                .color(getResources().getColor(R.color.blue))
+                .geodesic(false)); // lat/long lines curved by the shape of the planet
+    }
+
 //region BROADCASTRECEIVERS
     private void registerOnMapClickReceiver()
     {
@@ -194,6 +215,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     private void registerPositionReceiver()
     {
+        // TODO: Evgeniia 19.04 får Error receiving broadcast Intent { act=android.net.wifi.SCAN_RESULTS flg=0x4000010 (has extras) } in no.hesa.positionlibrary.WifiPosition$1@34b1cf2
+
         positionLibOutputReceiver= new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -406,7 +429,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 Intent intent = new Intent(getApplicationContext(), SearchResultsActivity.class);
                 intent.setAction(Intent.ACTION_SEARCH);
                 intent.putExtra("query", newText);
-
+                searchView.setQuery("", false); // clears the searchview without submitting
+                searchView.clearFocus();
                 startActivity(intent);
                 return true;
             }
@@ -416,17 +440,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 return false;
             }
         });
-        /*
-        getMenuInflater().inflate(R.menu.menu_map, menu);
-
-        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
-        searchView.setIconifiedByDefault(false); // makes text field always "open"/visible
-        ComponentName cn = new ComponentName("no.hesa.veiviserenuitnarvik","no.hesa.veiviserenuitnarvik.SearchResultsActivity");
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(cn));
-        */
         return true;
-
     }
 
     @Override
@@ -473,7 +487,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         switch (actionString) {
             case Api.ALL_USERS:
-                JSONObject dummyObject = jsonObject;
+                //JSONObject dummyObject = jsonObject;
                 break;
 
             default:

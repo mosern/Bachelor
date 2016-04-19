@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "no.hesa.veiviserenuitnarvik"
-        minSdkVersion 17
+        minSdkVersion 21
         targetSdkVersion 22
         versionCode 1
         versionName "1.0"
@@ -40,7 +40,7 @@ dependencies {
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.davemorrissey.labs:subsampling-scale-image-view:3.4.1'
     compile 'com.google.code.gson:gson:2.6.2'
-    compile 'me.imid.swipebacklayout.lib:library:1.0.0'
+    compile 'me.imid.swipebacklayout.lib:library:1.0.0' //TODO å fjerne denne skaper problemer
 }
 
 

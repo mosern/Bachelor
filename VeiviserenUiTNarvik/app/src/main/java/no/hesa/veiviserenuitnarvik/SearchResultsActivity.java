@@ -1,81 +1,54 @@
 package no.hesa.veiviserenuitnarvik;
 
 import android.app.Activity;
-import android.app.ListActivity;
 import android.app.SearchManager;
 import android.content.Intent;
-import android.location.Location;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.ArrayAdapter;
+import android.support.v7.app.AppCompatActivity;
+import android.view.MotionEvent;
 import android.widget.ExpandableListView;
-import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
-
-import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import com.google.gson.Gson;
 
 
-import me.imid.swipebacklayout.lib.SwipeBackLayout;
-import me.imid.swipebacklayout.lib.app.SwipeBackActivity;
 import no.hesa.veiviserenuitnarvik.api.ActionInterface;
 import no.hesa.veiviserenuitnarvik.api.Api;
 import no.hesa.veiviserenuitnarvik.dataclasses.Person;
 
-public class SearchResultsActivity extends SwipeBackActivity  implements ActionInterface{
+public class SearchResultsActivity extends Activity implements ActionInterface, SimpleGestureFilter.SimpleGestureListener{
 
     // http://www.androidhive.info/2013/07/android-expandable-list-view-tutorial/
-    // https://github.com/ikew0ng/SwipeBackLayout
+
 
     private JSONArray jsonArray = null;
-    TextView txtView;
-    // tutorial variables
+
     ExpandableListAdapter listAdapter;
     ExpandableListView expListView;
     List<String> listDataHeader;
     HashMap<String, List<? extends Object>> listDataChild;
-    private SwipeBackLayout mSwipeBackLayout;
+
+    private SimpleGestureFilter detector;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // overridePendingTransition(R.anim.slide_in, R.anim.slide_out); // doesn't work for transparent activity
+        //overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
         setContentView(R.layout.activity_search_results);
 
+        // Detect touched area
+        detector = new SimpleGestureFilter(this,this);
+
         handleIntent(getIntent());
-        // txtView = (TextView) findViewById(R.id.tv_arraylistout);
-        // get the listview
+
         expListView = (ExpandableListView) findViewById(R.id.exlv_search_results);
-        mSwipeBackLayout = getSwipeBackLayout();
-        mSwipeBackLayout.setEdgeTrackingEnabled(mSwipeBackLayout.EDGE_LEFT);
-
-        mSwipeBackLayout.addSwipeListener(new SwipeBackLayout.SwipeListener() {
-            @Override
-            public void onScrollStateChange(int state, float scrollPercent) {
-                Toast.makeText(getApplicationContext(), "1!", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onEdgeTouch(int edgeFlag) {
-                Toast.makeText(getApplicationContext(), "2!", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onScrollOverThreshold() {
-                Toast.makeText(getApplicationContext(), "3!", Toast.LENGTH_SHORT).show();
-            }
-        });
-
     }
 
     @Override
@@ -83,29 +56,7 @@ public class SearchResultsActivity extends SwipeBackActivity  implements ActionI
         setIntent(intent);
         handleIntent(intent);
     }
-/*
-    @Override
-    public void onListItemClick(ListView listView, View view, int position, long id) {
-        if (jsonArray != null) {
-            if (jsonArray.length() >= position) {
-               try {
 
-                   //jsonArray.getJSONArray(i).getJSONObject(j);
-                    JSONObject jsonObject = jsonArray.getJSONObject(position);
-                    Intent intent = new Intent(this,MapActivity.class);
-                    intent.setAction("LAT_LNG_RETURN");
-                    intent.putExtra("lat",jsonObject.getJSONObject("coordinate").getDouble("lat"));
-                    intent.putExtra("lng",jsonObject.getJSONObject("coordinate").getDouble("lng"));
-                    startActivity(intent);
-
-                }
-                catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-            }
-        }
-    }
-*/
     private void startExtvListeners() {
 /*
         // Listview on child click listener
@@ -151,7 +102,6 @@ public class SearchResultsActivity extends SwipeBackActivity  implements ActionI
 
     @Override
     public void onCompletedAction(JSONObject jsonObject, String actionString) {
-
         switch (actionString) {
             case Api.DO_SEARCH:
                 try {
@@ -171,7 +121,7 @@ public class SearchResultsActivity extends SwipeBackActivity  implements ActionI
                                     listDataHeader.add(jObject.getString("name"));
                                     countDataHeaderInsertions++;
                                     
-                                    if (i == 0) //first array, contains rooms
+                                    if (i == 0) //first array, contains locations
                                     {
                                         List<no.hesa.veiviserenuitnarvik.dataclasses.Location> objDetails = new ArrayList<>();
                                         Gson gson = new Gson();
@@ -194,26 +144,21 @@ public class SearchResultsActivity extends SwipeBackActivity  implements ActionI
                             }
                         }
                     }
-
-                //    txtView.setText(jsonObject.toString()); // text printout av array for testing
-
-                //    ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,arrayList);
-                //    setListAdapter(arrayAdapter);
-
                     listAdapter = new ExpandableListAdapter(this, listDataHeader, listDataChild, orderOfClassTypes);
-
-                    // setting list adapter
-                    expListView.setAdapter(listAdapter);
-
+                    expListView.setAdapter(listAdapter);// setting list adapter
                     startExtvListeners();
+
+                    if (countDataHeaderInsertions <= 3) {
+                        for (int i = 0; i < 3; i++) {
+                            expListView.expandGroup(i);
+                        }
+                    }
 
                 }
                 catch (Exception ex) {
                     ex.printStackTrace();
                 }
                 break;
-
-
             default:
                 break;
         }
@@ -224,4 +169,39 @@ public class SearchResultsActivity extends SwipeBackActivity  implements ActionI
         //Do something here..
     }
 
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent me) {
+        // Call onTouchEvent of SimpleGestureFilter class
+        this.detector.onTouchEvent(me);
+        return super.dispatchTouchEvent(me);
+    }
+
+    @Override
+    public void onSwipe(int direction) {
+        String str = "";
+
+        switch (direction) {
+
+            case SimpleGestureFilter.SWIPE_RIGHT : str = "Swipe Right";
+                //Toast.makeText(this, str, Toast.LENGTH_SHORT).show();
+                finish();
+                break;
+            case SimpleGestureFilter.SWIPE_LEFT :  str = "Swipe Left";
+                finish();
+                break;
+            case SimpleGestureFilter.SWIPE_DOWN :  str = "Swipe Down";
+
+                break;
+            case SimpleGestureFilter.SWIPE_UP :    str = "Swipe Up";
+
+                break;
+
+        }
+      //  Toast.makeText(this, str, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onDoubleTap() {
+        // Toast.makeText(this, "Double Tap", Toast.LENGTH_SHORT).show();
+    }
 }

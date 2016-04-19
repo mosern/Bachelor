@@ -90,7 +90,7 @@
         <activity
             android:name=".SearchResultsActivity"
             android:label="@string/title_activity_search_results"
-            android:theme="@style/Theme.CustomTransparent"> <!-- NoActionBar -->
+            android:theme="@style/Theme.CustomTransparent">
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
                 <category android:name="android.intent.category.DEFAULT" />
