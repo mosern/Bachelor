@@ -25,8 +25,10 @@ namespace Api
                 c.CreateMap<Models.EF.Type, TypeViewModel>();
                 c.CreateMap<TypeViewModel, Models.EF.Type>();
 
-                c.CreateMap<People, PeopleViewModel>().ConvertUsing<PeopleTypeConverter>();
-                c.CreateMap<PeopleViewModel, People>().ConvertUsing<PeopleViewTypeConverter>();
+                //c.CreateMap<People, PeopleViewModel>().ConvertUsing<PeopleTypeConverter>();
+                //c.CreateMap<PeopleViewModel, People>().ConvertUsing<PeopleViewTypeConverter>();
+                c.CreateMap<People, PeopleViewModel>();
+                c.CreateMap<PeopleViewModel, People>();
 
                 c.CreateMap<Location, LocationViewModel>().ConvertUsing<LocationViewTypeConverter>();
                 c.CreateMap<LocationViewModel, Location>().ConvertUsing<ViewLocationTypeConverter>();
@@ -197,7 +199,7 @@ namespace Api
                 Email = source.Email,
                 TlfMobile = source.TlfMobile,
                 TlfOffice = source.TlfOffice,
-                Location = source.Location
+                Location = AutoMapConfig.configureMaping().Map<Location, LocationViewModel>(source.Location)
             };
 
             return dest;
@@ -220,8 +222,8 @@ namespace Api
                 Email = source.Email,
                 TlfMobile = source.TlfMobile,
                 TlfOffice = source.TlfOffice,
-                LocationId = source.Location.Id,
-                Location = source.Location         
+                LocationId = source.Location.Id.Value,
+                Location = AutoMapConfig.configureMaping().Map<LocationViewModel, Location>(source.Location)         
             };
 
             return dest;

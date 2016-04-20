@@ -13,6 +13,6 @@ namespace Api.Models.Api
         public string TlfOffice { get; set; }
         public string TlfMobile { get; set; }
         public string Email { get; set; }
-        public Location Location { get; set; }
+        public LocationViewModel Location { get; set; }
     }
 }
