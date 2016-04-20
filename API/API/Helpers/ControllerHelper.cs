@@ -128,7 +128,9 @@ namespace Api.Helpers
             try
             {
                 X model = AutoMapConfig.configureMaping().Map<object, X>(viewModel);
-                new LocationRepository<X>().Update(model);
+
+                using (var repo = new LocationRepository<X>())
+                    repo.Update(model);
             }
             catch(Exception e)
             {
@@ -152,8 +154,9 @@ namespace Api.Helpers
 
         public static void Patch<X>(object viewModel) where X : BaseModel
         {
-            ExpandoObject dest = new ExpandoObject();
-            X src = new LocationRepository<X>().Read(((BaseViewModel)viewModel).Id.Value);
+            X src;
+            using (var repo = new LocationRepository<X>())
+                src = repo.Read(((BaseViewModel)viewModel).Id.Value);
 
             var srcProp = src.GetType().GetProperties();
 
@@ -169,7 +172,8 @@ namespace Api.Helpers
                 }
             }
 
-            new LocationRepository<X>().Update(src);
+            using (var repo = new LocationRepository<X>())
+                repo.Update(src);
         }
 
         public static void Delete<X>(int id) where X : BaseModel
@@ -177,7 +181,9 @@ namespace Api.Helpers
             try
             {
                 X model = (X)new BaseModel() { Id = id };
-                new LocationRepository<X>().Delete(model);
+
+                using (var repo = new LocationRepository<X>())
+                    repo.Delete(model);
             }
             catch (Exception e)
             {

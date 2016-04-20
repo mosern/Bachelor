@@ -22,10 +22,13 @@ namespace Api.Controllers
         public IHttpActionResult Get(string fields = null, string sort = "id", int? page = null, int pageSize = stdPageSize, bool asObject = true, string objPropName = "accesspoints")
         {
             IQueryable<Accesspoint> accs;
+            object toReturn;
             using (var repo = new LocationRepository<Accesspoint>())
+            {
                 accs = repo.List();
 
-            object toReturn = ControllerHelper.get<AccesspointViewModel>(accs, HttpContext.Current, Request, "accesspoints", asObject, objPropName, fields, sort, page, pageSize);
+                toReturn = ControllerHelper.get<AccesspointViewModel>(accs, HttpContext.Current, Request, "accesspoints", asObject, objPropName, fields, sort, page, pageSize);
+            }
 
             if (toReturn != null)
             {
@@ -35,7 +38,6 @@ namespace Api.Controllers
             {
                 return BadRequest("No accesspoints found");
             }
-
         }
 
         [Route("accesspoints/{id}")]
@@ -43,33 +45,106 @@ namespace Api.Controllers
         {
             Accesspoint acc;
             using (var repo = new LocationRepository<Accesspoint>())
+            {
                 acc = repo.Read(id);
 
-            if (acc != null)
-            {
-                return Ok(ControllerHelper.get<AccesspointViewModel>(acc, fields));
+                if (acc != null)
+                {
+                    return Ok(ControllerHelper.get<AccesspointViewModel>(acc, fields));
 
+                }
+                else
+                {
+                    return BadRequest("No accesspoint found");
+                }
             }
-            else
+                
+        }
+
+        [Route("accesspoints")]
+        public IHttpActionResult Post(AccesspointViewModel acc)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest();
+
+            try
             {
-                return BadRequest("No accesspoint found");
+                return Created("api/accesspoints", ControllerHelper.post<Accesspoint, AccesspointViewModel>(acc));
+            }
+            catch
+            {
+                return BadRequest();
             }
         }
 
-        //[Route("accesspoints")]
-        //public IHttpActionResult Post(AccesspointViewModel accesspoint)
-        //{
-        //    if (!ModelState.IsValid)
-        //        return BadRequest();
+        [Route("accesspoints/{id}")]
+        public IHttpActionResult Put(AccesspointViewModel acc, int id)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    acc.Id = id;
+                    ControllerHelper.Put<Location>(acc);
+                    return Ok();
+                }
+                catch
+                {
+                    return InternalServerError();
+                }
+            }
+            else
+            {
+                return BadRequest();
+            }
+        }
 
-        //    try
-        //    {
-        //        return Created("api/accesspoints", ControllerHelper.post(accesspoint));
-        //    }
-        //    catch
-        //    {
-        //        return BadRequest();
-        //    }
-        //}
+        [Route("accesspoints/{id}")]
+        public IHttpActionResult Patch(AccesspointViewModel acc, int id)
+        {
+            if (acc != null)
+            {
+                try
+                {
+                    acc.Id = id;
+                    ControllerHelper.Patch<Location>(acc);
+                    return Ok();
+                }
+                catch
+                {
+                    return InternalServerError();
+                }
+            }
+            else
+            {
+                return BadRequest();
+            }
+        }
+
+        [Route("accesspoints/{id}")]
+        public IHttpActionResult Delete(int id)
+        {
+            try
+            {
+                using (var repo = new LocationRepository<Accesspoint>())
+                {
+                    Accesspoint acc = repo.Read(id);
+
+                    if (acc != null)
+                    {
+                        ControllerHelper.Delete<Accesspoint>(id);
+                        return Ok();
+                    }
+                    else
+                    {
+                        return BadRequest();
+                    }
+                }
+            }
+            catch
+            {
+                return InternalServerError();
+            }
+        }
     }
 }

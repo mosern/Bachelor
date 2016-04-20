@@ -26,9 +26,14 @@ namespace Api.Controllers
         {
 
             IQueryable<User> users;
+            object toReturn;
             using (var repo = new Repository<User>())
+            {
                 users = repo.List();
-            object toReturn = ControllerHelper.get<UserViewModel>(users, HttpContext.Current, Request, "userLocations", asObject, objPropName, fields, sort, page, pageSize);
+
+                toReturn = ControllerHelper.get<UserViewModel>(users, HttpContext.Current, Request, "userLocations", asObject, objPropName, fields, sort, page, pageSize);
+            }
+
 
             if(toReturn != null)
             {
@@ -44,24 +49,35 @@ namespace Api.Controllers
         [Route("users/{id}")]
         public IHttpActionResult Get(int id, string fields = null)
         {
-            var user = userRepo.Read(id);
-            if (user != null)
+            User user;
+            using (var repo = new Repository<User>())
             {
-                return Ok(ControllerHelper.get<UserViewModel>(user, fields));
+                user = repo.Read(id);
 
+                if (user != null)
+                {
+                    return Ok(ControllerHelper.get<UserViewModel>(user, fields));
+
+                }
+                else
+                {
+                    return BadRequest("No user found");
+                }
             }
-            else
-            {
-                return BadRequest("No user found");
-            }
+                
         }
 
         [Route("users/{id}/locations/", Name="userlocations")]
         public IHttpActionResult Get(int id, string fields = null, string sort = "id", int? page = null, int pageSize = stdPageSize, bool asObject = true, string objPropName = "userLocations")
         {
+            IQueryable<UserLocation> locations;
+            object toReturn;
+            using (var repo = new LocationRepository<UserLocation>())
+            {
+                locations = repo.List().Where(u => u.UserId == id);
 
-            IQueryable<UserLocation> locations = userLocRepo.List().Where(u => u.UserId == id);
-            object toReturn = ControllerHelper.get<LocationViewModel>(locations, HttpContext.Current, Request, "userLocations", asObject, objPropName, fields, sort, page, pageSize );
+                toReturn = ControllerHelper.get<LocationViewModel>(locations, HttpContext.Current, Request, "userLocations", asObject, objPropName, fields, sort, page, pageSize);
+            }
 
             if(toReturn != null)
             {
@@ -76,16 +92,20 @@ namespace Api.Controllers
         [Route("users/{id}/locations/{locid}")]
         public IHttpActionResult Get(int id, int locId, string fields = null)
         {
-            var userLocation = userLocRepo.Read(locId);
+            UserLocation userLocation;
+            using (var repo = new LocationRepository<UserLocation>())
+            {
+                userLocation = repo.Read(locId);
 
-            if (userLocation != null)
-            {
-                return Ok(ControllerHelper.get<LocationViewModel>(userLocation, fields));
-            }
-            else
-            {
-                return BadRequest();
-            }
+                if (userLocation != null)
+                {
+                    return Ok(ControllerHelper.get<LocationViewModel>(userLocation, fields));
+                }
+                else
+                {
+                    return BadRequest();
+                }
+            }            
         }
 
         [Route("users")]

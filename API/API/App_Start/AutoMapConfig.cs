@@ -22,8 +22,6 @@ namespace Api
                 c.CreateMap<User, UserViewModel>().ConvertUsing<UserTypeConverter>();
                 c.CreateMap<UserViewModel, User>();
 
-                c.CreateMap<UserLocation, LocationViewModel>().ConvertUsing<UserLocationTypeConverter>();
-
                 c.CreateMap<Models.EF.Type, TypeViewModel>();
                 c.CreateMap<TypeViewModel, Models.EF.Type>();
 
@@ -38,6 +36,10 @@ namespace Api
 
                 c.CreateMap<Accesspoint, AccesspointViewModel>().ConvertUsing<AccesspointTypeCoverter>();
                 c.CreateMap<AccesspointViewModel, Accesspoint>().ConvertUsing<AccesspointViewTypeConverter>();
+
+                c.CreateMap<UserLocation, LocationViewModel>().ConvertUsing<UserLocationTypeConverter>();
+
+                c.CreateMap<SearchViewModel, IEnumerable<object>>().ConvertUsing<SearchTypeConverter>();
             });
 
             return config.CreateMapper();
@@ -48,7 +50,28 @@ namespace Api
     {
         public UserViewModel Convert(ResolutionContext context)
         {
-            return ConversionFactory.UserToViewModel((User)context.SourceValue);
+            User user = (User)context.SourceValue;
+
+            IQueryable<UserLocation> uLocs;
+            using (var repo = new LocationRepository<UserLocation>())
+                uLocs = repo.List().Where(u => u.UserId == user.Id);
+
+            List<LocationViewModel> locs = new List<LocationViewModel>();
+
+            using (var repo = new LocationRepository<Location>())
+                foreach (UserLocation uLoc in uLocs)
+                {
+                    Location temp = repo.Read(uLoc.LocationId);
+                    temp.Hits = uLoc.Hits;
+                    locs.Add(AutoMapConfig.configureMaping().Map<Location, LocationViewModel>(temp));
+                }
+
+            return new UserViewModel()
+            {
+                Id = user.Id,
+                Username = user.Username,
+                Locations = locs.AsQueryable()
+            };
         }
     }
 
@@ -72,7 +95,23 @@ namespace Api
     {
         public LocationViewModel Convert(ResolutionContext context)
         {
-            return ConversionFactory.UserLocationToViewModel((UserLocation)context.SourceValue);
+            UserLocation userLocation = (UserLocation)context.SourceValue;
+
+            Location location;
+            using (var repo = new LocationRepository<Location>())
+                location = repo.Read(userLocation.Id);
+
+            using (var typeRepo = new LocationRepository<Models.EF.Type>())
+            using (var coorRepo = new LocationRepository<Coordinate>())
+                return new LocationViewModel()
+                {
+                    Id = location.Id,
+                    Name = location.Name,
+                    Hits = userLocation.Hits,
+                    LocNr = location.LocNr,
+                    Type = AutoMapConfig.configureMaping().Map<Models.EF.Type, TypeViewModel>(typeRepo.Read(location.TypeId)),
+                    Coordinate = AutoMapConfig.configureMaping().Map<Coordinate, CoordinateViewModel>(coorRepo.Read(location.CoordinateId))
+                };
         }
     }
 
@@ -80,7 +119,15 @@ namespace Api
     {
         public IQueryable<LocationViewModel> Convert(ResolutionContext context)
         {
-            return ConversionFactory.QueryUserLocationToViewModel((IQueryable<UserLocation>)context.SourceValue);
+            IQueryable<UserLocation> userLocations = (IQueryable<UserLocation>)context.SourceValue;
+            List<LocationViewModel> view = new List<LocationViewModel>();
+
+            foreach (UserLocation userLocation in userLocations)
+            {
+                view.Add(AutoMapConfig.configureMaping().Map<UserLocation, LocationViewModel>(userLocation));
+            }
+
+            return view.AsQueryable();
         }
     }
 
@@ -90,7 +137,11 @@ namespace Api
         {
 
             LocationViewModel source = (LocationViewModel)context.SourceValue;
-            Coordinate cor = new LocationRepository<Coordinate>().Create(new Coordinate() { Lat = source.Coordinate.Lat, Lng = source.Coordinate.Lng, Alt = source.Coordinate.Alt });
+
+            Coordinate cor;
+            using (var repo = new LocationRepository<Coordinate>())
+                cor = repo.Create(new Coordinate() { Lat = source.Coordinate.Lat, Lng = source.Coordinate.Lng, Alt = source.Coordinate.Alt });
+
             Location dest = new Location()
             {
                 Id = source.Id.Value,
@@ -113,14 +164,18 @@ namespace Api
         {
 
             Location source = (Location)context.SourceValue;
-            LocationViewModel dest = new LocationViewModel()
-            {
-                Name = source.Name,
-                Hits = source.Hits,
-                LocNr = source.LocNr,
-                Coordinate = AutoMapConfig.configureMaping().Map<Coordinate, CoordinateViewModel>(new LocationRepository<Coordinate>().Read(source.CoordinateId)),
-                Type = AutoMapConfig.configureMaping().Map<Models.EF.Type, TypeViewModel>(new LocationRepository<Models.EF.Type>().Read(source.TypeId))
-            };
+            LocationViewModel dest;
+            using (var coorRepo = new LocationRepository<Coordinate>())
+            using (var typeRepo = new LocationRepository<Models.EF.Type>())
+                dest = new LocationViewModel()
+                {
+                    Id = source.Id,
+                    Name = source.Name,
+                    Hits = source.Hits,
+                    LocNr = source.LocNr,
+                    Coordinate = AutoMapConfig.configureMaping().Map<Coordinate, CoordinateViewModel>(coorRepo.Read(source.CoordinateId)),
+                    Type = AutoMapConfig.configureMaping().Map<Models.EF.Type, TypeViewModel>(typeRepo.Read(source.TypeId))
+                };
 
             return dest;
         }
@@ -133,11 +188,12 @@ namespace Api
             People source = (People)context.SourceValue;
             PeopleViewModel dest = new PeopleViewModel()
             {
+                Id = source.Id,
                 Name = source.Name,
                 Email = source.Email,
                 TlfMobile = source.TlfMobile,
                 TlfOffice = source.TlfOffice,
-                LocationId = source.Location.Id
+                LocationId = source.LocationId
             };
 
             return dest;
@@ -150,14 +206,18 @@ namespace Api
         public People Convert(ResolutionContext context)
         {
             PeopleViewModel source = (PeopleViewModel)context.SourceValue;
-            People dest = new People()
+
+            People dest;
+            using (var repo = new LocationRepository<Location>())
+                dest = new People()
             {
+                Id = source.Id.Value,
                 Name = source.Name,
                 Email = source.Email,
                 TlfMobile = source.TlfMobile,
                 TlfOffice = source.TlfOffice,
                 LocationId = source.LocationId,
-                Location = new LocationRepository<Location>().Read(source.LocationId)          
+                Location = repo.Read(source.LocationId)          
             };
 
             return dest;
@@ -169,13 +229,17 @@ namespace Api
         public AccesspointViewModel Convert(ResolutionContext context)
         {
             Accesspoint source = (Accesspoint)context.SourceValue;
-            AccesspointViewModel dest = new AccesspointViewModel()
-            {
-                Desc = source.Desc,
-                MacAddress = source.MacAddress,
-                Coordinate = AutoMapConfig.configureMaping().Map<Coordinate, CoordinateViewModel>(new LocationRepository<Coordinate>().Read(source.Coordinate.Id))
 
-            };
+            AccesspointViewModel dest;
+            using (var repo = new LocationRepository<Coordinate>())
+                dest = new AccesspointViewModel()
+                {
+                    Id = source.Id,
+                    Desc = source.Desc,
+                    MacAddress = source.MacAddress,
+                    Coordinate = AutoMapConfig.configureMaping().Map<Coordinate, CoordinateViewModel>(repo.Read(source.Coordinate.Id))
+
+                };
 
             return dest;
         }
@@ -188,12 +252,22 @@ namespace Api
             AccesspointViewModel source = (AccesspointViewModel)context.SourceValue;
             Accesspoint dest = new Accesspoint()
             {
+                Id = source.Id.Value,
                 Desc = source.Desc,
                 MacAddress = source.MacAddress,
                 CoordinateId = source.Coordinate.Id.Value
             };
 
             return dest;
+        }
+    }
+
+    public class SearchTypeConverter : ITypeConverter<SearchViewModel, IEnumerable<object>>
+    {
+        public IEnumerable<object> Convert(ResolutionContext context)
+        {
+            SearchViewModel searchViewModel = (SearchViewModel)context.SourceValue;
+            return new List<object>() { searchViewModel.LocationViewModel, searchViewModel.PeopleViewModel }.AsQueryable();
         }
     }
 }

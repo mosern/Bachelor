@@ -265,7 +265,6 @@
     <Compile Include="Controllers\TypeController.cs" />
     <Compile Include="Dto\DTOLocation.cs" />
     <Compile Include="Dto\DTOPeople.cs" />
-    <Compile Include="Factories\ConversionFactory.cs" />
     <Compile Include="Factories\ShapeFactory.cs" />
     <Compile Include="Helpers\AuthorizationManager.cs" />
     <Compile Include="Database\Context.cs" />

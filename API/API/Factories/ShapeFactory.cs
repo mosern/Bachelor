@@ -21,7 +21,8 @@ namespace Api.Factories
                 if (!property.PropertyType.IsPrimitive 
                     && !property.PropertyType.IsEnum
                     && !property.PropertyType.Equals(typeof(string))
-                    && !property.PropertyType.Equals(typeof(decimal)))
+                    && !property.PropertyType.Equals(typeof(decimal))
+                    && !property.PropertyType.Equals(typeof(int?)))
                 {
 
                     object o = property.GetValue(obj);

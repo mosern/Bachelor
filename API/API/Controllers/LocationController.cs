@@ -48,13 +48,13 @@ namespace Api.Controllers
                 if (page != null)
                 {
                     using (var repo = new LocationRepository<Location>())
-                        result.LocationViewModel = ConversionFactory.QueryLocationToViewModel(repo.List().ApplySort(sort).Skip(pageSize * (page.Value - 1)).Take(pageSize));
+                        result.LocationViewModel = AutoMapConfig.configureMaping().Map<IEnumerable<Location>, IEnumerable<LocationViewModel>>(repo.List().ApplySort(sort).Skip(pageSize * (page.Value - 1)).Take(pageSize)).AsQueryable();
                     result.PeopleViewModel = new List<PeopleViewModel>().AsQueryable();
                 }
                 else
                 {
                     using (var repo = new LocationRepository<Location>())
-                        result.LocationViewModel = ConversionFactory.QueryLocationToViewModel(repo.List().ApplySort(sort));
+                        result.LocationViewModel = AutoMapConfig.configureMaping().Map<IEnumerable<Location>, IEnumerable<LocationViewModel>>(repo.List().ApplySort(sort)).AsQueryable();
                     result.PeopleViewModel = new List<PeopleViewModel>().AsQueryable();
                 }
             }
@@ -142,11 +142,11 @@ namespace Api.Controllers
                     {
                         if (asObject)
                         {
-                            return Ok(JsonHelper.listToObject(ConversionFactory.SearchToQuerry(result), objPropName));
+                            return Ok(JsonHelper.listToObject(AutoMapConfig.configureMaping().Map<SearchViewModel, IEnumerable<object>>(result), objPropName));
                         }
                         else
                         {
-                            return Ok(ConversionFactory.SearchToQuerry(result));
+                            return Ok(AutoMapConfig.configureMaping().Map<SearchViewModel, IEnumerable<object>>(result));
                         }
                     }
                 }
@@ -172,11 +172,11 @@ namespace Api.Controllers
             {
                 if(fields != null)
                 {
-                    return Ok(ShapeFactory<LocationViewModel>.Shape(ConversionFactory.LocationToViewModel(location), fields.ToLower().Split(',').ToList()));
+                    return Ok(ShapeFactory<LocationViewModel>.Shape(AutoMapConfig.configureMaping().Map <Location, LocationViewModel>(location), fields.ToLower().Split(',').ToList()));
                 }
                 else
                 {
-                    return Ok(ConversionFactory.LocationToViewModel(location));
+                    return Ok(AutoMapConfig.configureMaping().Map<Location, LocationViewModel>(location));
                 }
                 
             }
@@ -247,14 +247,27 @@ namespace Api.Controllers
             }
         }
 
-        [Route("users/{id}")]
+        [Route("locations/{id}")]
         public IHttpActionResult Delete(int id)
         {
-            if (id != 0)
-            {
-                return Ok();
+            try
+            {             
+                using(var repo = new LocationRepository<Location>())
+                {
+                    Location location = repo.Read(id);
+
+                    if (location != null)
+                    {
+                        ControllerHelper.Delete<Location>(id);
+                        return Ok();
+                    }
+                    else
+                    {
+                        return BadRequest();
+                    }
+                }
             }
-            else
+            catch
             {
                 return InternalServerError();
             }

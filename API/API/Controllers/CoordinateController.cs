@@ -24,10 +24,13 @@ namespace Api.Controllers
         public IHttpActionResult Get(string fields = null, string sort = "id", int? page = null, int pageSize = stdPageSize, bool asObject = true, string objPropName = "coordinates")
         {
             IQueryable<Coordinate> coors;
+            object toReturn;
             using (var repo = new LocationRepository<Coordinate>())
+            {
                 coors = repo.List();
 
-            object toReturn = ControllerHelper.get<CoordinateViewModel>(coors, HttpContext.Current, Request, "coordinates", asObject, objPropName, fields, sort, page, pageSize);
+                toReturn = ControllerHelper.get<CoordinateViewModel>(coors, HttpContext.Current, Request, "coordinates", asObject, objPropName, fields, sort, page, pageSize);
+            }
 
             if (toReturn != null)
             {
@@ -45,32 +48,106 @@ namespace Api.Controllers
         {
             Coordinate coor;
             using (var repo = new LocationRepository<Coordinate>())
-                coor = coorRepo.Read(id);
+            {
+                coor = repo.Read(id);
 
-            if (coor != null)
-            {
-                return Ok(ControllerHelper.get<CoordinateViewModel>(coor, fields));
+                if (coor != null)
+                {
+                    return Ok(ControllerHelper.get<CoordinateViewModel>(coor, fields));
+                }
+                else
+                {
+                    return BadRequest("No coordinate found");
+                }
             }
-            else
+
+
+        }
+
+        [Route("coordinates")]
+        public IHttpActionResult Post(CoordinateViewModel cor)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest();
+
+            try
             {
-                return BadRequest("No coordinate found");
+                return Created("api/locations", ControllerHelper.post<Coordinate, CoordinateViewModel>(cor));
+            }
+            catch
+            {
+                return BadRequest();
             }
         }
 
-        //[Route("coordinates")]
-        //public IHttpActionResult Post(CoordinateViewModel coor)
-        //{
-        //    if (!ModelState.IsValid)
-        //        return BadRequest("Modelstate is invalid");
+        [Route("coordinates/{id}")]
+        public IHttpActionResult Put(CoordinateViewModel cor, int id)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    cor.Id = id;
+                    ControllerHelper.Put<Coordinate>(cor);
+                    return Ok();
+                }
+                catch
+                {
+                    return InternalServerError();
+                }
+            }
+            else
+            {
+                return BadRequest();
+            }
+        }
 
-        //    try
-        //    {
-        //        return Created("api/coordinates", ControllerHelper.post(coor));
-        //    }
-        //    catch(Exception e)
-        //    {
-        //        return BadRequest(e.Message);
-        //    }
-        //}
+        [Route("coordinates/{id}")]
+        public IHttpActionResult Patch(CoordinateViewModel cor, int id)
+        {
+            if (cor != null)
+            {
+                try
+                {
+                    cor.Id = id;
+                    ControllerHelper.Patch<Coordinate>(cor);
+                    return Ok();
+                }
+                catch
+                {
+                    return InternalServerError();
+                }
+            }
+            else
+            {
+                return BadRequest();
+            }
+        }
+
+        [Route("coordinates/{id}")]
+        public IHttpActionResult Delete(int id)
+        {
+            try
+            {
+                using (var repo = new LocationRepository<Coordinate>())
+                {
+                    Coordinate cor = repo.Read(id);
+
+                    if (cor != null)
+                    {
+                        ControllerHelper.Delete<Coordinate>(id);
+                        return Ok();
+                    }
+                    else
+                    {
+                        return BadRequest();
+                    }
+                }
+            }
+            catch
+            {
+                return InternalServerError();
+            }
+        }
     }
 }

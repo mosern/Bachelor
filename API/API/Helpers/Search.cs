@@ -13,8 +13,6 @@ namespace Api.Classes
 {
     public class Search
     {
-        static LocationRepository<Location> LocRepo = new LocationRepository<Location>();
-        static LocationRepository<People> peoRepo = new LocationRepository<People>();
 
         public static SearchViewModel Location(string searchString)
         {
@@ -39,12 +37,15 @@ namespace Api.Classes
 
             foreach(PeopleViewModel peo in people)
             {
-                var tempLoc = LocRepo.List().Where(l => l.Id == peo.LocationId).FirstOrDefault();
+                Location tempLoc;
+                using(var repo = new LocationRepository<Location>())
+                    tempLoc = repo.List().Where(l => l.Id == peo.LocationId).FirstOrDefault();
+
                 LocationViewModel loc = null;
 
                 if(tempLoc != null)
                 {
-                    loc = ConversionFactory.LocationToViewModel(tempLoc);
+                    loc = AutoMapConfig.configureMaping().Map<Location, LocationViewModel>(tempLoc);
                 }
                 else
                 {
@@ -68,12 +69,15 @@ namespace Api.Classes
             {
                 if (!locid.Contains(loc.Id.Value))
                 {
-                    var tempPeo = peoRepo.List().Where(p => p.LocationId == loc.Id).FirstOrDefault();
+                    People tempPeo;
+                    using (var repo = new LocationRepository<People>())
+                        tempPeo = repo.List().Where(p => p.LocationId == loc.Id).FirstOrDefault();
+
                     PeopleViewModel peo = null;
 
                     if (tempPeo != null)
                     {
-                        peo = ConversionFactory.PeopleToViewModel(tempPeo);
+                        peo = AutoMapConfig.configureMaping().Map<People, PeopleViewModel>(tempPeo);
                     }
                     else
                     {
@@ -213,10 +217,13 @@ namespace Api.Classes
 
         private static IQueryable<PeopleViewModel> peopleByName(string name)
         {
-            var peo = peoRepo.List().Where(p => p.Name.Contains(name));
+            IEnumerable<People> peo;
+            using (var repo = new LocationRepository<People>())
+                peo = repo.List().Where(p => p.Name.Contains(name)).ToList();
+
             if (peo != null)
             {
-                return ConversionFactory.QueryPeopleToViewModel(peo); ;
+                return AutoMapConfig.configureMaping().Map<IEnumerable<People>, IEnumerable<PeopleViewModel>>(peo).AsQueryable();
             }
             else
             {
@@ -226,10 +233,13 @@ namespace Api.Classes
 
         private static IQueryable<LocationViewModel> locationByLocNr(string locNr)
         {
-            var loc = LocRepo.List().Where(l => l.LocNr.Contains(locNr));
+            IEnumerable<Location> loc;
+            using (var repo = new LocationRepository<Location>())
+                loc = new LocationRepository<Location>().List().Where(l => l.LocNr.Contains(locNr));
+
             if (loc != null)
             {
-                return ConversionFactory.QueryLocationToViewModel(loc);
+                return AutoMapConfig.configureMaping().Map<IEnumerable<Location>, IEnumerable<LocationViewModel>>(loc).AsQueryable();
             }
             else
             {
@@ -239,10 +249,13 @@ namespace Api.Classes
 
         private static IQueryable<LocationViewModel> locationByName(string name)
         {
-            var loc = LocRepo.List().Where(l => l.Name.Contains(name));
+            IEnumerable<Location> loc;
+            using (var repo = new LocationRepository<Location>())
+                loc = repo.List().Where(l => l.Name.Contains(name));
+
             if (loc != null)
             {
-                return ConversionFactory.QueryLocationToViewModel(loc); ;
+                return AutoMapConfig.configureMaping().Map<IEnumerable<Location>, IEnumerable<LocationViewModel>>(loc).AsQueryable();
             }
             else
             {
@@ -252,13 +265,16 @@ namespace Api.Classes
 
         private static IQueryable<LocationViewModel> locationById(int id)
         {
-            var loc = LocRepo.Read(id);
-            if(loc != null)
+            Location loc;
+            using (var repo = new LocationRepository<Location>())
+                loc = repo.Read(id);
+
+            if (loc != null)
             {
                 var list = new List<Location>();
                 list.Add(loc);
 
-                return ConversionFactory.QueryLocationToViewModel(list.AsQueryable());
+                return AutoMapConfig.configureMaping().Map<IEnumerable<Location>, IEnumerable<LocationViewModel>>(list).AsQueryable();
             }
             else
             {
