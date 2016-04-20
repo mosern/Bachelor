@@ -1,5 +1,4 @@
 ﻿using Api.Models;
-using Api.Models.EF;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +12,6 @@ namespace Api.Models.Api
         public string TlfOffice { get; set; }
         public string TlfMobile { get; set; }
         public string Email { get; set; }
-        public Location Location { get; set; }
+        public int LocationId { get; set; }
     }
 }
