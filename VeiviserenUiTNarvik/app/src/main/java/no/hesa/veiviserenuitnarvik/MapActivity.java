@@ -126,9 +126,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     protected void onStop()
     {
         super.onStop();
-        if (positionLibrary != null) {
+        if (positionLibrary != null)
             positionLibrary.wifiPosition.unRegisterBroadcast(this);
-        }
+
         if (positionLibOutputReceiver != null)
             unregisterReceiver(positionLibOutputReceiver);
         //unregisterReceiver(searchLocationReceiver);
@@ -144,12 +144,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         LatLng hin = new LatLng(68.436135, 17.434950);
         mMap.addMarker(new MarkerOptions().position(hin).title("UiT Narvik"));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(hin, 17));
-        // TODO: Henning Move to received location from positionlibrary
-        currentPosision = hin;
+
 
         if (returnedCoordsFromSearchIntent != null) {
             if (returnedCoordsFromSearchIntent.getAction() != null) {
-                if (returnedCoordsFromSearchIntent.getAction().equals("LAT_LNG_RETURN")) {
+                if (returnedCoordsFromSearchIntent.getAction().equals("no.hesa.veiviserennarvik.LAT_LNG_RETURN")) {
                     LatLng latLng = new LatLng(returnedCoordsFromSearchIntent.getDoubleExtra("lng",0),returnedCoordsFromSearchIntent.getDoubleExtra("lat",0));
                     mMap.addMarker(new MarkerOptions().position(latLng).title("TestLoc2"));
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
@@ -163,7 +162,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         registerOnMapClickReceiver();
 //        registerPositionReceiver();
-//        registerSearchLocationReceiver();
+        registerSearchLocationReceiver();
 
         //Painting position marker
         circleThree = mMap.addCircle(new CircleOptions()
@@ -217,7 +216,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     {
         // TODO: Evgeniia 19.04 får Error receiving broadcast Intent { act=android.net.wifi.SCAN_RESULTS flg=0x4000010 (has extras) } in no.hesa.positionlibrary.WifiPosition$1@34b1cf2
 
-        positionLibOutputReceiver= new BroadcastReceiver() {
+
+        positionLibOutputReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 if (intent.getAction().equals("no.hesa.positionlibrary.Output")) {
@@ -234,6 +234,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                         circleOne.setCenter(latLng);
                         //mMap.addMarker(new MarkerOptions().position(latLng).title("UserLocAsDeterminedByLibrary\nLat:" + pos[0] + " Lng: " + pos[1]));
                         //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
+                        currentPosision = latLng;
                     }
                     else
                     {
@@ -250,10 +251,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     private void registerSearchLocationReceiver()
     {
-        searchLocationReceiver = new BroadcastReceiver() {
+     //   searchLocationReceiver = new BroadcastReceiver() {
+        class SearchLocationReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals("LAT_LNG_RETURN")) {
+            if (intent.getAction().equals("no.hesa.veiviserennarvik.LAT_LNG_RETURN")) {
                 Toast.makeText(MapActivity.this, "intentReceiver onReceive method", Toast.LENGTH_LONG).show();
                 LatLng latLng = new LatLng(intent.getDoubleExtra("lat",0),intent.getDoubleExtra("lng",0));
                 mMap.addMarker(new MarkerOptions().position(latLng).title("TestLocFromBR"));
@@ -262,7 +264,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 }
             }
         };
-        registerReceiver(searchLocationReceiver, new IntentFilter("LAT_LNG_RETURN"));
+        searchLocationReceiver = new SearchLocationReceiver();
+        registerReceiver(searchLocationReceiver, new IntentFilter("no.hesa.veiviserennarvik.LAT_LNG_RETURN"));
     }
 //endregion
 

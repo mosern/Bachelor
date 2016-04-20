@@ -1,5 +1,6 @@
 package no.hesa.veiviserenuitnarvik;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Typeface;
 
@@ -56,7 +57,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         }
 
         String childText = "";
-        if (passedClass.get(groupPosition) == "person")
+        if (passedClass.get(groupPosition).compareTo("person") == 0)
         {
             final Person person;
             person = (Person)child;
@@ -64,7 +65,8 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
             convertView = setupPersonButtons(convertView, groupPosition, person);
         }
 
-        if (passedClass.get(groupPosition) == "location") {
+        if (passedClass.get(groupPosition).compareTo("location") == 0)
+        {
             final Location location;
             location = (Location) child;
             childText = location.getName() + "\n" + location.getLocNr() + "\n" + location.getType().getName();
@@ -197,11 +199,12 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
     private void sendLocationDestination(final Location location )
     {
-        Intent intent = new Intent(_context,MapActivity.class);
-        intent.setAction("LAT_LNG_RETURN");
+        Intent intent = new Intent(_context, MapActivity.class);
+        intent.setAction("no.hesa.veiviserennarvik.LAT_LNG_RETURN");
         intent.putExtra("lat", location.getCoordinate().getLat());
         intent.putExtra("lng", location.getCoordinate().getLng());
         _context.startActivity(intent);
+//        ((Activity) _context).finish();
     }
 
     private void sendPersonDestination(final Person person)
