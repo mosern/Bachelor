@@ -139,20 +139,24 @@ namespace Api
             LocationViewModel source = (LocationViewModel)context.SourceValue;
 
             Coordinate cor;
+            Location dest;
             using (var repo = new LocationRepository<Coordinate>())
+            {
                 cor = repo.Create(new Coordinate() { Lat = source.Coordinate.Lat, Lng = source.Coordinate.Lng, Alt = source.Coordinate.Alt });
 
-            Location dest = new Location()
-            {
-                Id = source.Id.Value,
-                Name = source.Name,
-                Hits = source.Hits,
-                LocNr = source.LocNr,
-                CoordinateId = cor.Id,
-                TypeId = source.Type.Id.Value,
-                //Coordinate = new LocationRepository<Coordinate>().Read(source.Coordinate.Id),
-                //Type = new LocationRepository<Models.EF.Type>().Read(source.Type.Id)
-            };
+                dest = new Location()
+                {
+                    Id = source.Id.Value,
+                    Name = source.Name,
+                    Hits = source.Hits,
+                    LocNr = source.LocNr,
+                    CoordinateId = cor.Id,
+                    TypeId = source.Type.Id.Value,
+                    //Coordinate = new LocationRepository<Coordinate>().Read(source.Coordinate.Id),
+                    //Type = new LocationRepository<Models.EF.Type>().Read(source.Type.Id)
+                };
+            }
+                
 
             return dest;
         }
@@ -193,7 +197,7 @@ namespace Api
                 Email = source.Email,
                 TlfMobile = source.TlfMobile,
                 TlfOffice = source.TlfOffice,
-                LocationId = source.LocationId
+                Location = source.Location
             };
 
             return dest;
@@ -216,8 +220,8 @@ namespace Api
                 Email = source.Email,
                 TlfMobile = source.TlfMobile,
                 TlfOffice = source.TlfOffice,
-                LocationId = source.LocationId,
-                Location = repo.Read(source.LocationId)          
+                LocationId = source.Location.Id,
+                Location = source.Location         
             };
 
             return dest;
