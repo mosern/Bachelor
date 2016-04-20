@@ -39,7 +39,7 @@ namespace Api.Classes
             {
                 Location tempLoc;
                 using(var repo = new LocationRepository<Location>())
-                    tempLoc = repo.List().Where(l => l.Id == peo.LocationId).FirstOrDefault();
+                    tempLoc = repo.List().Where(l => l.Id == peo.Location.Id).FirstOrDefault();
 
                 LocationViewModel loc = null;
 
