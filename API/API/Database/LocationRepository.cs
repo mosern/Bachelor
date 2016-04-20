@@ -18,7 +18,7 @@ namespace Api.Classes
     public class LocationRepository<X> : ILocationRepository<X> where X : BaseModel
     {
         private Context context;
-        private IDbSet<X> entities;
+        private IDbSet<X> entities = null;
         private string errorMessage = string.Empty;
 
         public LocationRepository()
@@ -134,7 +134,7 @@ namespace Api.Classes
             get
             {
                 if (entities == null)
-                {
+                { 
                     entities = context.Set<X>();
                 }
                 return entities;

@@ -5,8 +5,10 @@ using Api.Models.EF;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Net.Http;
+using System.Reflection;
 using System.Web;
 using UserDB;
 
@@ -92,11 +94,28 @@ namespace Api.Helpers
             }
         }
 
-        public static BaseModel post<X>(BaseModel model) where X : BaseModel
+        public static object post<X, Y>(Y viewModel) where X : BaseModel where Y : BaseViewModel
         {
             try
             {
-                return new LocationRepository<X>().Create(AutoMapConfig.configureMaping().Map<BaseModel, X>(model));
+                X model = AutoMapConfig.configureMaping().Map<Y, X>(viewModel);
+
+                using(var repo = new LocationRepository<X>())
+                model = repo.Create(model);
+
+                return AutoMapConfig.configureMaping().Map<X, Y>(model);
+            }
+            catch(Exception e)
+            {
+                throw e;
+            }
+        }
+
+        public static BaseDbModel post(User user)
+        {
+            try
+            {
+                return new Repository<User>().Create(AutoMapConfig.configureMaping().Map<User, User>(user));
             }
             catch
             {
@@ -104,15 +123,77 @@ namespace Api.Helpers
             }
         }
 
-        public static BaseDbModel post<X>(BaseDbModel model) where X : BaseDbModel
+        public static void Put<X>(object viewModel) where X : BaseModel
         {
             try
             {
-                return new Repository<X>().Create(AutoMapConfig.configureMaping().Map<BaseDbModel, X>(model));
+                X model = AutoMapConfig.configureMaping().Map<object, X>(viewModel);
+                new LocationRepository<X>().Update(model);
             }
-            catch
+            catch(Exception e)
             {
-                throw new Exception();
+                throw e;
+            }
+            
+        }
+
+        public static void Put(User model)
+        {
+            try
+            {
+                new Repository<User>().Update(model);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+
+        }
+
+        public static void Patch<X>(object viewModel) where X : BaseModel
+        {
+            ExpandoObject dest = new ExpandoObject();
+            X src = new LocationRepository<X>().Read(((BaseViewModel)viewModel).Id.Value);
+
+            var srcProp = src.GetType().GetProperties();
+
+            var destProp = viewModel.GetType().GetProperties();
+
+            foreach(PropertyInfo prop in destProp)
+            {
+                var property = src.GetType().GetProperty(prop.Name);
+
+                if (property != null && prop.GetValue(viewModel) != null)
+                {
+                    property.SetValue(src,prop.GetValue(viewModel));
+                }
+            }
+
+            new LocationRepository<X>().Update(src);
+        }
+
+        public static void Delete<X>(int id) where X : BaseModel
+        {
+            try
+            {
+                X model = (X)new BaseModel() { Id = id };
+                new LocationRepository<X>().Delete(model);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+
+        public static void Delete(User user)
+        {
+            try
+            {
+                new Repository<User>().Delete(user);
+            }
+            catch (Exception e)
+            {
+                throw e;
             }
         }
     }

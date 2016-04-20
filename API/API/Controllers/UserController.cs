@@ -18,64 +18,21 @@ namespace Api.Controllers
     [RoutePrefix("api")]
     public class UserController : ApiController
     {
-        Repository<User> userRepo = new Repository<User>();
-        LocationRepository<UserLocation> userLocRepo = new LocationRepository<UserLocation>();
         const int stdPageSize = 5;
 
 
         [Route("users", Name = "users")]
         public IHttpActionResult Get(string fields = null, string sort = "id", int? page = null, int pageSize = stdPageSize, bool asObject = true, string objPropName = "users")
         {
-            IQueryable<User> users = userRepo.List();
+
+            IQueryable<User> users;
+            using (var repo = new Repository<User>())
+                users = repo.List();
             object toReturn = ControllerHelper.get<UserViewModel>(users, HttpContext.Current, Request, "userLocations", asObject, objPropName, fields, sort, page, pageSize);
 
             if(toReturn != null)
             {
                 return Ok(toReturn);
-            //if (page != null)
-            //{
-            //    users = userRepo.List().ApplySort(sort).Skip(pageSize * (page.Value - 1)).Take(pageSize);
-            //}
-            //else
-            //{
-            //    users = userRepo.List().ApplySort(sort);
-            //}
-
-            //if (users != null)
-            //{
-            //    IDictionary<string, object> routeValues = new Dictionary<string, object>();
-
-            //    if (fields != null)
-            //        routeValues.Add("fields", fields);
-
-            //    routeValues.Add("sort", fields);
-
-            //    if(page != null)
-            //    HttpContext.Current.Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(PaginationHeader.Get(page.Value, pageSize, users.Count(), "users", routeValues, Request)));
-
-            //    if (fields != null)
-            //    {
-            //        if (asObject)
-            //        {
-            //            var toReturn = ShapeFactory<UserViewModel>.ShapeList(ConversionFactory.QueryUserToViewModel(users), fields.ToLower().Split(',').ToList());
-            //            return Ok(JsonHelper.listToObject(toReturn, objPropName));
-            //        }
-            //        else
-            //        {
-            //            return Ok(ShapeFactory<UserViewModel>.ShapeList(ConversionFactory.QueryUserToViewModel(users), fields.ToLower().Split(',').ToList()));
-            //        }
-            //    }
-            //    else
-            //    {
-            //        if (asObject)
-            //        {
-            //            return Ok(JsonHelper.listToObject(ConversionFactory.QueryUserToViewModel(users), objPropName));
-            //        }
-            //        else
-            //        {
-            //            return Ok(ConversionFactory.QueryUserToViewModel(users));
-            //        }
-            //    }
             }
             else
             {
@@ -90,16 +47,6 @@ namespace Api.Controllers
             var user = userRepo.Read(id);
             if (user != null)
             {
-                //if (fields != null)
-                //{
-                //    return Ok(ShapeFactory<UserViewModel>.Shape(AutoMapConfig.configureMaping().Map<User, UserViewModel>(user), fields.ToLower().Split(',').ToList()));
-                //}
-                //else
-                //{
-
-                //    return Ok(ConversionFactory.UserToViewModel(user));
-                //}
-
                 return Ok(ControllerHelper.get<UserViewModel>(user, fields));
 
             }
@@ -119,58 +66,6 @@ namespace Api.Controllers
             if(toReturn != null)
             {
                 return Ok(toReturn);
-            
-            //IQueryable<UserLocation> locations;
-            //if (page != null)
-            //{
-            //    locations = userLocRepo.List().Where(u => u.UserId == id).ApplySort(sort).Skip(pageSize * (page.Value - 1)).Take(pageSize);
-            //}
-            //else
-            //{
-            //    locations = userLocRepo.List().Where(u => u.UserId == id).ApplySort(sort);
-            //}
-
-            //if (locations != null)
-            //{
-            //    IDictionary<string, object> routeValues = new Dictionary<string, object>();
-
-            //    if (fields != null)
-            //    {
-            //        routeValues.Add("fields", fields);
-            //        routeValues.Add("sort", sort);
-
-            //        if (page != null)
-            //            HttpContext.Current.Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(PaginationHeader.Get(page.Value, pageSize, locations.Count(), "userlocations", routeValues, Request)));
-
-            //        if (asObject)
-            //        {
-            //            var toReturn = ShapeFactory<LocationViewModel>.ShapeList(ConversionFactory.QueryUserLocationToViewModel(locations), fields.ToLower().Split(',').ToList());
-            //            return Ok(JsonHelper.listToObject(toReturn, objPropName));
-            //        }
-            //        else
-            //        {
-            //            return Ok(ShapeFactory<LocationViewModel>.ShapeList(ConversionFactory.QueryUserLocationToViewModel(locations), fields.ToLower().Split(',').ToList()));
-            //        }
-
-            //    }
-            //    else
-            //    {
-            //        routeValues.Add("sort", sort);
-
-            //        if(page != null)
-            //        HttpContext.Current.Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(PaginationHeader.Get(page.Value, pageSize, locations.Count(), "userlocations", routeValues, Request)));
-
-            //        if (asObject)
-            //        {
-            //            return Ok(JsonHelper.listToObject(ConversionFactory.QueryUserLocationToViewModel(locations), objPropName));
-            //        }
-            //        else
-            //        {
-            //            return Ok(ConversionFactory.QueryUserLocationToViewModel(locations));
-            //        }
-            //    }
-
-
             }
             else
             {
@@ -201,7 +96,7 @@ namespace Api.Controllers
 
             try
             {
-                return Created("api/users", (User)ControllerHelper.post<User>(user));
+                return Created("api/users", ControllerHelper.post(user));
             }
             catch(Exception e)
             {
@@ -210,38 +105,69 @@ namespace Api.Controllers
         }
 
         [Route("users/{id}")]
-        public IHttpActionResult Put(User user)
+        public IHttpActionResult Put(User user, int id)
         {
-            if(user != null)
+            if(user.Username != null && user.Password != null)
             {
-                return Ok();
+                try
+                {
+                    user.Id = id;
+                    ControllerHelper.Put(user);
+                    return Ok();
+                }
+                catch
+                {
+                    return InternalServerError();
+                }
             }
             else
             {
-                return InternalServerError();
+                return BadRequest();
             }
         }
 
         [Route("users/{id}")]
-        public IHttpActionResult Patch(User user)
+        public IHttpActionResult Patch(User user, int id)
         {
             if (user != null)
             {
-                return Ok();
+                try
+                {
+                    user.Id = id;
+                    ControllerHelper.Put(user);
+                    return Ok();
+                }
+                catch
+                {
+                    return InternalServerError();
+                }
             }
             else
             {
-                return InternalServerError();
+                return BadRequest();
             }
         }
+
         [Route("users/{id}")]
         public IHttpActionResult Delete(int id)
         {
-            if (id != 0)
+            try
             {
-                return Ok();
+                User user = new Repository<User>().Read(id);
+
+                if(user != null)
+                {
+                    ControllerHelper.Delete(user);
+                    return Ok(); 
+                }
+                else
+                {
+                    return BadRequest();
+                }
+
+
             }
-            else
+            catch
             {
                 return InternalServerError();
             }

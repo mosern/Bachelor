@@ -13,14 +13,16 @@ namespace Api.Controllers
     [RoutePrefix("api")]
     public class TypeController : ApiController
     {
-        LocationRepository<Models.EF.Type> typeRepo = new LocationRepository<Models.EF.Type>();
         const int stdPageSize = 5;
 
 
         [Route("types", Name = "types")]
         public IHttpActionResult Get(string fields = null, string sort = "id", int? page = null, int pageSize = stdPageSize, bool asObject = true, string objPropName = "types")
         {
-            IQueryable<Models.EF.Type> types = typeRepo.List();
+            IQueryable<Models.EF.Type> types;
+            using (var repo = new LocationRepository<Models.EF.Type>())
+                types = repo.List();
+
             object toReturn = ControllerHelper.get<TypeViewModel>(types, HttpContext.Current, Request, "types", asObject, objPropName, fields, sort, page, pageSize);
 
             if (toReturn != null)
@@ -37,11 +39,13 @@ namespace Api.Controllers
         [Route("types/{id}")]
         public IHttpActionResult Get(int id, string fields = null)
         {
-            var type = typeRepo.Read(id);
+            Models.EF.Type type;
+            using (var repo = new LocationRepository<Models.EF.Type>())
+                type = repo.Read(id);
+
             if (type != null)
             {
                 return Ok(ControllerHelper.get<TypeViewModel>(type, fields));
-
             }
             else
             {
@@ -49,20 +53,20 @@ namespace Api.Controllers
             }
         }
 
-        [Route("types")]
-        public IHttpActionResult Post(Models.EF.Type type)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest();
+        //[Route("types")]
+        //public IHttpActionResult Post(TypeViewModel type)
+        //{
+        //    if (!ModelState.IsValid)
+        //        return BadRequest();
 
-            try
-            {
-                return Created("api/types", (Models.EF.Type)ControllerHelper.post<Models.EF.Type>(type));
-            }
-            catch
-            {
-                return BadRequest();
-            }
-        }
+        //    try
+        //    {
+        //        return Created("api/types", ControllerHelper.post(type));
+        //    }
+        //    catch
+        //    {
+        //        return BadRequest();
+        //    }
+        //}
     }
 }

@@ -12,6 +12,7 @@ using UserDB;
 
 namespace Api
 {
+    //TODO check if all converters is setting id
     public class AutoMapConfig
     {
         public static IMapper configureMaping()
@@ -19,18 +20,24 @@ namespace Api
             var config = new MapperConfiguration(c =>
             {
                 c.CreateMap<User, UserViewModel>().ConvertUsing<UserTypeConverter>();
-                c.CreateMap<User, User>();
+                c.CreateMap<UserViewModel, User>();
+
                 c.CreateMap<UserLocation, LocationViewModel>().ConvertUsing<UserLocationTypeConverter>();
+
                 c.CreateMap<Models.EF.Type, TypeViewModel>();
-                c.CreateMap<Models.EF.Type, Models.EF.Type>();
-                c.CreateMap<People, PeopleViewModel>();
-                c.CreateMap<People, People>().ConvertUsing<PeopleTypeFiller>();
-                c.CreateMap<Location, LocationViewModel>();
-                c.CreateMap<Location, Location>().ConvertUsing<LocationTypeFiller>();
+                c.CreateMap<TypeViewModel, Models.EF.Type>();
+
+                c.CreateMap<People, PeopleViewModel>().ConvertUsing<PeopleTypeConverter>();
+                c.CreateMap<PeopleViewModel, People>().ConvertUsing<PeopleViewTypeConverter>();
+
+                c.CreateMap<Location, LocationViewModel>().ConvertUsing<LocationViewTypeConverter>();
+                c.CreateMap<LocationViewModel, Location>().ConvertUsing<ViewLocationTypeConverter>();
+
                 c.CreateMap<Coordinate, CoordinateViewModel>();
-                c.CreateMap<Coordinate, Coordinate>();
-                c.CreateMap<Accesspoint, AccesspointViewModel>();
-                c.CreateMap<Accesspoint, Accesspoint>().ConvertUsing<AccesspointTypeFiller>();
+                c.CreateMap<CoordinateViewModel, Coordinate>();
+
+                c.CreateMap<Accesspoint, AccesspointViewModel>().ConvertUsing<AccesspointTypeCoverter>();
+                c.CreateMap<AccesspointViewModel, Accesspoint>().ConvertUsing<AccesspointViewTypeConverter>();
             });
 
             return config.CreateMapper();
@@ -42,6 +49,22 @@ namespace Api
         public UserViewModel Convert(ResolutionContext context)
         {
             return ConversionFactory.UserToViewModel((User)context.SourceValue);
+        }
+    }
+
+    //TODO unnecessary?
+    public class UserViewTypeConverter : ITypeConverter<UserViewModel, User>
+    {
+        public User Convert(ResolutionContext context)
+        {
+            UserViewModel source = (UserViewModel)context.SourceValue;
+            User dest = new User()
+            {
+                Id = source.Id.Value,
+                Username = source.Username
+            };
+
+            return dest;
         }
     }
 
@@ -61,20 +84,21 @@ namespace Api
         }
     }
 
-    public class LocationTypeFiller : ITypeConverter<Location, Location>
+    public class ViewLocationTypeConverter : ITypeConverter<LocationViewModel, Location>
     {
         public Location Convert(ResolutionContext context)
         {
 
-            Location source = (Location)context.SourceValue;
+            LocationViewModel source = (LocationViewModel)context.SourceValue;
             Coordinate cor = new LocationRepository<Coordinate>().Create(new Coordinate() { Lat = source.Coordinate.Lat, Lng = source.Coordinate.Lng, Alt = source.Coordinate.Alt });
             Location dest = new Location()
             {
+                Id = source.Id.Value,
                 Name = source.Name,
                 Hits = source.Hits,
                 LocNr = source.LocNr,
                 CoordinateId = cor.Id,
-                TypeId = source.Type.Id,
+                TypeId = source.Type.Id.Value,
                 //Coordinate = new LocationRepository<Coordinate>().Read(source.Coordinate.Id),
                 //Type = new LocationRepository<Models.EF.Type>().Read(source.Type.Id)
             };
@@ -83,12 +107,31 @@ namespace Api
         }
     }
 
-    public class PeopleTypeFiller : ITypeConverter<People, People>
+    public class LocationViewTypeConverter : ITypeConverter<Location, LocationViewModel>
     {
-        public People Convert(ResolutionContext context)
+        public LocationViewModel Convert(ResolutionContext context)
+        {
+
+            Location source = (Location)context.SourceValue;
+            LocationViewModel dest = new LocationViewModel()
+            {
+                Name = source.Name,
+                Hits = source.Hits,
+                LocNr = source.LocNr,
+                Coordinate = AutoMapConfig.configureMaping().Map<Coordinate, CoordinateViewModel>(new LocationRepository<Coordinate>().Read(source.CoordinateId)),
+                Type = AutoMapConfig.configureMaping().Map<Models.EF.Type, TypeViewModel>(new LocationRepository<Models.EF.Type>().Read(source.TypeId))
+            };
+
+            return dest;
+        }
+    }
+
+    public class PeopleTypeConverter : ITypeConverter<People, PeopleViewModel>
+    {
+        public PeopleViewModel Convert(ResolutionContext context)
         {
             People source = (People)context.SourceValue;
-            People dest = new People()
+            PeopleViewModel dest = new PeopleViewModel()
             {
                 Name = source.Name,
                 Email = source.Email,
@@ -101,16 +144,53 @@ namespace Api
         }
     }
 
-    public class AccesspointTypeFiller : ITypeConverter<Accesspoint, Accesspoint>
+    //TODO unnecessary?
+    public class PeopleViewTypeConverter : ITypeConverter<PeopleViewModel, People>
+    {
+        public People Convert(ResolutionContext context)
+        {
+            PeopleViewModel source = (PeopleViewModel)context.SourceValue;
+            People dest = new People()
+            {
+                Name = source.Name,
+                Email = source.Email,
+                TlfMobile = source.TlfMobile,
+                TlfOffice = source.TlfOffice,
+                LocationId = source.LocationId,
+                Location = new LocationRepository<Location>().Read(source.LocationId)          
+            };
+
+            return dest;
+        }
+    }
+
+    public class AccesspointTypeCoverter : ITypeConverter<Accesspoint, AccesspointViewModel>
+    {
+        public AccesspointViewModel Convert(ResolutionContext context)
+        {
+            Accesspoint source = (Accesspoint)context.SourceValue;
+            AccesspointViewModel dest = new AccesspointViewModel()
+            {
+                Desc = source.Desc,
+                MacAddress = source.MacAddress,
+                Coordinate = AutoMapConfig.configureMaping().Map<Coordinate, CoordinateViewModel>(new LocationRepository<Coordinate>().Read(source.Coordinate.Id))
+
+            };
+
+            return dest;
+        }
+    }
+
+    public class AccesspointViewTypeConverter : ITypeConverter<AccesspointViewModel, Accesspoint>
     {
         public Accesspoint Convert(ResolutionContext context)
         {
-            Accesspoint source = (Accesspoint)context.SourceValue;
+            AccesspointViewModel source = (AccesspointViewModel)context.SourceValue;
             Accesspoint dest = new Accesspoint()
             {
                 Desc = source.Desc,
                 MacAddress = source.MacAddress,
-                CoordinateId = source.Coordinate.Id
+                CoordinateId = source.Coordinate.Id.Value
             };
 
             return dest;

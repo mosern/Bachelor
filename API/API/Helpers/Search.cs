@@ -51,7 +51,7 @@ namespace Api.Classes
                     break;
                 }
 
-                locid.Add(loc.Id);
+                locid.Add(loc.Id.Value);
 
                
 
@@ -66,7 +66,7 @@ namespace Api.Classes
 
             foreach (LocationViewModel loc in locations)
             {
-                if (!locid.Contains(loc.Id))
+                if (!locid.Contains(loc.Id.Value))
                 {
                     var tempPeo = peoRepo.List().Where(p => p.LocationId == loc.Id).FirstOrDefault();
                     PeopleViewModel peo = null;

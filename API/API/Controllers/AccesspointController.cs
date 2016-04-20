@@ -15,14 +15,16 @@ namespace Api.Controllers
     [RoutePrefix("api")]
     public class AccesspointController : ApiController
     {
-        LocationRepository<Accesspoint> accRepo = new LocationRepository<Accesspoint>();
         const int stdPageSize = 5;
 
 
         [Route("accesspoints", Name = "accesspoints")]
         public IHttpActionResult Get(string fields = null, string sort = "id", int? page = null, int pageSize = stdPageSize, bool asObject = true, string objPropName = "accesspoints")
         {
-            IQueryable<Accesspoint> accs = accRepo.List();
+            IQueryable<Accesspoint> accs;
+            using (var repo = new LocationRepository<Accesspoint>())
+                accs = repo.List();
+
             object toReturn = ControllerHelper.get<AccesspointViewModel>(accs, HttpContext.Current, Request, "accesspoints", asObject, objPropName, fields, sort, page, pageSize);
 
             if (toReturn != null)
@@ -39,7 +41,10 @@ namespace Api.Controllers
         [Route("accesspoints/{id}")]
         public IHttpActionResult Get(int id, string fields = null)
         {
-            var acc = accRepo.Read(id);
+            Accesspoint acc;
+            using (var repo = new LocationRepository<Accesspoint>())
+                acc = repo.Read(id);
+
             if (acc != null)
             {
                 return Ok(ControllerHelper.get<AccesspointViewModel>(acc, fields));
@@ -51,20 +56,20 @@ namespace Api.Controllers
             }
         }
 
-        [Route("accesspoints")]
-        public IHttpActionResult Post(Accesspoint accesspoint)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest();
+        //[Route("accesspoints")]
+        //public IHttpActionResult Post(AccesspointViewModel accesspoint)
+        //{
+        //    if (!ModelState.IsValid)
+        //        return BadRequest();
 
-            try
-            {
-                return Created("api/accesspoints", (Accesspoint)ControllerHelper.post<Accesspoint>(accesspoint));
-            }
-            catch
-            {
-                return BadRequest();
-            }
-        }
+        //    try
+        //    {
+        //        return Created("api/accesspoints", ControllerHelper.post(accesspoint));
+        //    }
+        //    catch
+        //    {
+        //        return BadRequest();
+        //    }
+        //}
     }
 }

@@ -13,13 +13,13 @@ using System.Net.Http;
 using System.Web;
 using System.Web.Http;
 using System.Web.Http.Description;
+using System.Web.Http.ModelBinding;
 using Thinktecture.IdentityModel.WebApi;
 namespace Api.Controllers
 {
     [RoutePrefix("api")]
     public class LocationController : ApiController
     {
-        static LocationRepository<Location> LocRepo = new LocationRepository<Location>();
         const int stdPageSize = 5;
 
         [Route("locations", Name = "locations")]
@@ -47,12 +47,14 @@ namespace Api.Controllers
             {
                 if (page != null)
                 {
-                    result.LocationViewModel = ConversionFactory.QueryLocationToViewModel(LocRepo.List().ApplySort(sort).Skip(pageSize * (page.Value - 1)).Take(pageSize));
+                    using (var repo = new LocationRepository<Location>())
+                        result.LocationViewModel = ConversionFactory.QueryLocationToViewModel(repo.List().ApplySort(sort).Skip(pageSize * (page.Value - 1)).Take(pageSize));
                     result.PeopleViewModel = new List<PeopleViewModel>().AsQueryable();
                 }
                 else
                 {
-                    result.LocationViewModel = ConversionFactory.QueryLocationToViewModel(LocRepo.List().ApplySort(sort));
+                    using (var repo = new LocationRepository<Location>())
+                        result.LocationViewModel = ConversionFactory.QueryLocationToViewModel(repo.List().ApplySort(sort));
                     result.PeopleViewModel = new List<PeopleViewModel>().AsQueryable();
                 }
             }
@@ -161,7 +163,10 @@ namespace Api.Controllers
         [ResourceAuthorize("Read", "location")]
         public IHttpActionResult Get(int id, string fields = null)
         {
-            var location = LocRepo.Read(id);
+            Location location;
+
+            using (var repo = new LocationRepository<Location>())
+                location = repo.Read(id);
 
             if (location != null)
             {
@@ -183,18 +188,75 @@ namespace Api.Controllers
         }
 
         [Route("locations")]
-        public IHttpActionResult Post(Location location)
+        public IHttpActionResult Post(LocationViewModel location)
         {
             if (!ModelState.IsValid)
                 return BadRequest();
 
             try
             {
-                return Created("api/locations", (Location)ControllerHelper.post<Location>(location));
+                return Created("api/locations", ControllerHelper.post<Location, LocationViewModel>(location));
             }
             catch
             {
                 return BadRequest();
+            }
+        }
+
+        [Route("locations/{id}")]
+        public IHttpActionResult Put(LocationViewModel loc, int id)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    loc.Id = id;
+                    ControllerHelper.Put<Location>(loc);
+                    return Ok();
+                }
+                catch
+                {
+                    return InternalServerError();
+                }
+            }
+            else
+            {
+                return BadRequest();
+            }
+        }
+
+        [Route("locations/{id}")]
+        public IHttpActionResult Patch(LocationViewModel  loc, int id)
+        {
+            if (loc != null)
+            {
+                try
+                {
+                    loc.Id = id;
+                    ControllerHelper.Patch<Location>(loc);
+                    return Ok();
+                }
+                catch
+                {
+                    return InternalServerError();
+                }
+            }
+            else
+            {
+                return BadRequest();
+            }
+        }
+
+        [Route("users/{id}")]
+        public IHttpActionResult Delete(int id)
+        {
+            if (id != 0)
+            {
+                return Ok();
+            }
+            else
+            {
+                return InternalServerError();
             }
         }
     }

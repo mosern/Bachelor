@@ -17,14 +17,16 @@ namespace Api.Controllers
     [RoutePrefix("api")]
     public class CoordinateController : ApiController
     {
-        LocationRepository<Coordinate> coorRepo = new LocationRepository<Coordinate>();
         const int stdPageSize = 5;
 
 
         [Route("coordinates", Name = "coordinates")]
         public IHttpActionResult Get(string fields = null, string sort = "id", int? page = null, int pageSize = stdPageSize, bool asObject = true, string objPropName = "coordinates")
         {
-            IQueryable<Coordinate> coors = coorRepo.List();
+            IQueryable<Coordinate> coors;
+            using (var repo = new LocationRepository<Coordinate>())
+                coors = repo.List();
+
             object toReturn = ControllerHelper.get<CoordinateViewModel>(coors, HttpContext.Current, Request, "coordinates", asObject, objPropName, fields, sort, page, pageSize);
 
             if (toReturn != null)
@@ -41,11 +43,13 @@ namespace Api.Controllers
         [Route("coordinates/{id}")]
         public IHttpActionResult Get(int id, string fields = null)
         {
-            var coor = coorRepo.Read(id);
+            Coordinate coor;
+            using (var repo = new LocationRepository<Coordinate>())
+                coor = coorRepo.Read(id);
+
             if (coor != null)
             {
                 return Ok(ControllerHelper.get<CoordinateViewModel>(coor, fields));
-
             }
             else
             {
@@ -53,20 +57,20 @@ namespace Api.Controllers
             }
         }
 
-        [Route("coordinates")]
-        public IHttpActionResult Post(Coordinate coor)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest("Modelstate is invalid");
+        //[Route("coordinates")]
+        //public IHttpActionResult Post(CoordinateViewModel coor)
+        //{
+        //    if (!ModelState.IsValid)
+        //        return BadRequest("Modelstate is invalid");
 
-            try
-            {
-                return Created("api/coordinates", (Coordinate)ControllerHelper.post<Coordinate>(coor));
-            }
-            catch(Exception e)
-            {
-                return BadRequest(e.Message);
-            }
-        }
+        //    try
+        //    {
+        //        return Created("api/coordinates", ControllerHelper.post(coor));
+        //    }
+        //    catch(Exception e)
+        //    {
+        //        return BadRequest(e.Message);
+        //    }
+        //}
     }
 }

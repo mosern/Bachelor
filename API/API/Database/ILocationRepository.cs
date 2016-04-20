@@ -11,7 +11,7 @@ namespace Api.Classes
     /// Written by: Andreas Mosvoll
     /// </summary>
     /// <typeparam name="X"></typeparam>
-    public interface ILocationRepository<X>
+    public interface ILocationRepository<X> : IDisposable
     {
         X Create(X entity);
         X Read(int id);
