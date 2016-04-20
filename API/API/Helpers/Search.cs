@@ -219,68 +219,77 @@ namespace Api.Classes
         {
             IEnumerable<People> peo;
             using (var repo = new LocationRepository<People>())
+            {
                 peo = repo.List().Where(p => p.Name.Contains(name)).ToList();
 
-            if (peo != null)
-            {
-                return AutoMapConfig.configureMaping().Map<IEnumerable<People>, IEnumerable<PeopleViewModel>>(peo).AsQueryable();
+                if (peo != null)
+                {
+                    return AutoMapConfig.configureMaping().Map<IEnumerable<People>, IEnumerable<PeopleViewModel>>(peo).AsQueryable();
+                }
+                else
+                {
+                    return new List<PeopleViewModel>().AsQueryable();
+                }
             }
-            else
-            {
-                return new List<PeopleViewModel>().AsQueryable();
-            }
+                
         }
 
         private static IQueryable<LocationViewModel> locationByLocNr(string locNr)
         {
             IEnumerable<Location> loc;
             using (var repo = new LocationRepository<Location>())
+            {
                 loc = new LocationRepository<Location>().List().Where(l => l.LocNr.Contains(locNr));
 
-            if (loc != null)
-            {
-                return AutoMapConfig.configureMaping().Map<IEnumerable<Location>, IEnumerable<LocationViewModel>>(loc).AsQueryable();
-            }
-            else
-            {
-                return new List<LocationViewModel>().AsQueryable();
-            }
+                if (loc != null)
+                {
+                    return AutoMapConfig.configureMaping().Map<IEnumerable<Location>, IEnumerable<LocationViewModel>>(loc).AsQueryable();
+                }
+                else
+                {
+                    return new List<LocationViewModel>().AsQueryable();
+                }
+            }             
         }
 
         private static IQueryable<LocationViewModel> locationByName(string name)
         {
             IEnumerable<Location> loc;
             using (var repo = new LocationRepository<Location>())
+            {
                 loc = repo.List().Where(l => l.Name.Contains(name));
 
-            if (loc != null)
-            {
-                return AutoMapConfig.configureMaping().Map<IEnumerable<Location>, IEnumerable<LocationViewModel>>(loc).AsQueryable();
+                if (loc != null)
+                {
+                    return AutoMapConfig.configureMaping().Map<IEnumerable<Location>, IEnumerable<LocationViewModel>>(loc).AsQueryable();
+                }
+                else
+                {
+                    return new List<LocationViewModel>().AsQueryable();
+                }
             }
-            else
-            {
-                return new List<LocationViewModel>().AsQueryable();
-            }
+
         }
 
         private static IQueryable<LocationViewModel> locationById(int id)
         {
             Location loc;
             using (var repo = new LocationRepository<Location>())
+            {
                 loc = repo.Read(id);
 
-            if (loc != null)
-            {
-                var list = new List<Location>();
-                list.Add(loc);
+                if (loc != null)
+                {
+                    var list = new List<Location>();
+                    list.Add(loc);
 
-                return AutoMapConfig.configureMaping().Map<IEnumerable<Location>, IEnumerable<LocationViewModel>>(list).AsQueryable();
-            }
-            else
-            {
-                return new List<LocationViewModel>().AsQueryable();
-            }
-            
+                    return AutoMapConfig.configureMaping().Map<IEnumerable<Location>, IEnumerable<LocationViewModel>>(list).AsQueryable();
+                }
+                else
+                {
+                    return new List<LocationViewModel>().AsQueryable();
+                }
+            }            
         }
 
     }
