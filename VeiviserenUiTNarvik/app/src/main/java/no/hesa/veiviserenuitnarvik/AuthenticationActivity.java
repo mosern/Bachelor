@@ -1,16 +1,11 @@
 package no.hesa.veiviserenuitnarvik;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.net.Uri;
 import android.net.http.SslError;
-import android.os.AsyncTask;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
@@ -20,15 +15,11 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.w3c.dom.Text;
-
 import java.math.BigInteger;
 import java.security.SecureRandom;
 
 
-public class AuthenticationActivity extends AppCompatActivity {
+public class AuthenticationActivity extends Activity {
 
     private static String CLIENT_ID = "and";
     private static String REDIRECT_URI = "http://localhost:123";
