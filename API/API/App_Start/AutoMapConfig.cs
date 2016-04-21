@@ -55,25 +55,28 @@ namespace Api
             User user = (User)context.SourceValue;
 
             IQueryable<UserLocation> uLocs;
-            using (var repo = new LocationRepository<UserLocation>())
-                uLocs = repo.List().Where(u => u.UserId == user.Id);
+            using (var userLocRepo = new LocationRepository<UserLocation>())
+            using (var locRepo = new LocationRepository<Location>())
+            {
+                uLocs = userLocRepo.List().Where(u => u.UserId == user.Id);
 
-            List<LocationViewModel> locs = new List<LocationViewModel>();
+                List<LocationViewModel> locs = new List<LocationViewModel>();
 
-            using (var repo = new LocationRepository<Location>())
+
                 foreach (UserLocation uLoc in uLocs)
                 {
-                    Location temp = repo.Read(uLoc.LocationId);
+                    Location temp = locRepo.Read(uLoc.LocationId);
                     temp.Hits = uLoc.Hits;
                     locs.Add(AutoMapConfig.configureMaping().Map<Location, LocationViewModel>(temp));
                 }
 
-            return new UserViewModel()
-            {
-                Id = user.Id,
-                Username = user.Username,
-                Locations = locs.AsQueryable()
-            };
+                return new UserViewModel()
+                {
+                    Id = user.Id,
+                    Username = user.Username,
+                    Locations = locs.AsQueryable()
+                };
+            }
         }
     }
 

@@ -13,6 +13,7 @@ namespace Api.Models.EF
 
         [Required]
         public string LocNr { get; set; }
+        public string Desc { get; set; }
 
         public int Hits { get; set; }
 

@@ -25,8 +25,17 @@ namespace Api.Factories
                     && !property.PropertyType.Equals(typeof(int?)))
                 {
 
-                    object o = property.GetValue(obj);
-                    var value = ShapeFactory<BaseViewModel>.Shape((BaseViewModel)o, fields);
+                    var o = property.GetValue(obj);
+
+                    object value;
+                    if (new BaseViewModel().GetType().IsInstanceOfType(o))
+                    {
+                        value = ShapeFactory<BaseViewModel>.Shape((BaseViewModel)o, fields);
+                    }
+                    else
+                    {
+                        value = ShapeFactory<BaseViewModel>.ShapeList((IEnumerable<BaseViewModel>)o, fields);
+                    }
 
                     ((IDictionary<string, object>)toReturn).Add(property.Name, value);
 
