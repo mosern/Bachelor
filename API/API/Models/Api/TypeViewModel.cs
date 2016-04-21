@@ -8,7 +8,6 @@ namespace Api.Models.Api
 {
     public class TypeViewModel : BaseViewModel
     {
-        [Required]
         public string Name { get; set; }
     }
 }
