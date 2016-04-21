@@ -14,8 +14,20 @@ using UserDB;
 
 namespace Api.Helpers
 {
+    /// <summary>
+    /// Basic controller functionality implementet as generic methodes. This makes implementing a new controller easy.
+    /// 
+    /// Written by: Andreas Mosvoll
+    /// </summary>
     public class ControllerHelper
     {
+        /// <summary>
+        /// Converts object to X where X is of type BaseViewModel and optionally applies field filtering.
+        /// </summary>
+        /// <typeparam name="X">Type of ViewModel, used for converting object to a viewmodel</typeparam>
+        /// <param name="obj">The object to process</param>
+        /// <param name="fields">The fields to include in returned object. Returns all fields if no field is specified</param>
+        /// <returns>Processed object</returns>
         public static object get<X>(object obj, string fields = null) where X : BaseViewModel
         {
             if (fields != null)

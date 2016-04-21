@@ -94,6 +94,7 @@ namespace Api
                 {
                     Id = location.Id,
                     Name = location.Name,
+                    Desc = location.Desc,
                     Hits = userLocation.Hits,
                     LocNr = location.LocNr,
                     Type = AutoMapConfig.configureMaping().Map<Models.EF.Type, TypeViewModel>(typeRepo.Read(location.TypeId)),
