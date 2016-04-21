@@ -121,6 +121,7 @@ namespace Api
                     Id = source.Id.Value,
                     Name = source.Name,
                     Hits = source.Hits,
+                    Desc = source.Desc,
                     LocNr = source.LocNr,
                     CoordinateId = cor.Id,
                     TypeId = source.Type.Id.Value,
