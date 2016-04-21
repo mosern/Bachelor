@@ -25,8 +25,6 @@ namespace Api
                 c.CreateMap<Models.EF.Type, TypeViewModel>();
                 c.CreateMap<TypeViewModel, Models.EF.Type>();
 
-                //c.CreateMap<People, PeopleViewModel>().ConvertUsing<PeopleTypeConverter>();
-                //c.CreateMap<PeopleViewModel, People>().ConvertUsing<PeopleViewTypeConverter>();
                 c.CreateMap<People, PeopleViewModel>();
                 c.CreateMap<PeopleViewModel, People>();
 
@@ -80,22 +78,6 @@ namespace Api
         }
     }
 
-    //TODO unnecessary?
-    public class UserViewTypeConverter : ITypeConverter<UserViewModel, User>
-    {
-        public User Convert(ResolutionContext context)
-        {
-            UserViewModel source = (UserViewModel)context.SourceValue;
-            User dest = new User()
-            {
-                Id = source.Id.Value,
-                Username = source.Username
-            };
-
-            return dest;
-        }
-    }
-
     public class UserLocationTypeConverter : ITypeConverter<UserLocation, LocationViewModel>
     {
         public LocationViewModel Convert(ResolutionContext context)
@@ -117,22 +99,6 @@ namespace Api
                     Type = AutoMapConfig.configureMaping().Map<Models.EF.Type, TypeViewModel>(typeRepo.Read(location.TypeId)),
                     Coordinate = AutoMapConfig.configureMaping().Map<Coordinate, CoordinateViewModel>(coorRepo.Read(location.CoordinateId))
                 };
-        }
-    }
-
-    public class IQUserLocationTypeConverter : ITypeConverter<IQueryable<UserLocation>, IQueryable<LocationViewModel>>
-    {
-        public IQueryable<LocationViewModel> Convert(ResolutionContext context)
-        {
-            IQueryable<UserLocation> userLocations = (IQueryable<UserLocation>)context.SourceValue;
-            List<LocationViewModel> view = new List<LocationViewModel>();
-
-            foreach (UserLocation userLocation in userLocations)
-            {
-                view.Add(AutoMapConfig.configureMaping().Map<UserLocation, LocationViewModel>(userLocation));
-            }
-
-            return view.AsQueryable();
         }
     }
 
@@ -185,49 +151,6 @@ namespace Api
                     Coordinate = AutoMapConfig.configureMaping().Map<Coordinate, CoordinateViewModel>(coorRepo.Read(source.CoordinateId)),
                     Type = AutoMapConfig.configureMaping().Map<Models.EF.Type, TypeViewModel>(typeRepo.Read(source.TypeId))
                 };
-
-            return dest;
-        }
-    }
-
-    public class PeopleTypeConverter : ITypeConverter<People, PeopleViewModel>
-    {
-        public PeopleViewModel Convert(ResolutionContext context)
-        {
-            People source = (People)context.SourceValue;
-            PeopleViewModel dest = new PeopleViewModel()
-            {
-                Id = source.Id,
-                Name = source.Name,
-                Email = source.Email,
-                TlfMobile = source.TlfMobile,
-                TlfOffice = source.TlfOffice,
-                Location = AutoMapConfig.configureMaping().Map<Location, LocationViewModel>(source.Location)
-            };
-
-            return dest;
-        }
-    }
-
-    //TODO unnecessary?
-    public class PeopleViewTypeConverter : ITypeConverter<PeopleViewModel, People>
-    {
-        public People Convert(ResolutionContext context)
-        {
-            PeopleViewModel source = (PeopleViewModel)context.SourceValue;
-
-            People dest;
-            using (var repo = new LocationRepository<Location>())
-                dest = new People()
-            {
-                Id = source.Id.Value,
-                Name = source.Name,
-                Email = source.Email,
-                TlfMobile = source.TlfMobile,
-                TlfOffice = source.TlfOffice,
-                LocationId = source.Location.Id.Value,
-                Location = AutoMapConfig.configureMaping().Map<LocationViewModel, Location>(source.Location)         
-            };
 
             return dest;
         }

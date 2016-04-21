@@ -10,15 +10,15 @@ namespace Api.Models.Api
     public class LocationViewModel : BaseViewModel
     {
         [Required]
-        public CoordinateViewModel Coordinate { get; set; }
-        [Required]
-        public TypeViewModel Type { get; set; }
-        [Required]
         public string Name { get; set; }
         public string Desc { get; set; }
         [Required, MaxLength(5)]
         public string LocNr { get; set; }
         [Required]
         public int Hits { get; set; }
+        [Required]
+        public CoordinateViewModel Coordinate { get; set; }
+        [Required]
+        public TypeViewModel Type { get; set; }
     }
 }

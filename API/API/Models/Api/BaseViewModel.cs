@@ -8,7 +8,6 @@ namespace Api.Models.Api
 {
     public class BaseViewModel
     {
-        [Required]
         public int? Id { get; set; }
     }
 }
