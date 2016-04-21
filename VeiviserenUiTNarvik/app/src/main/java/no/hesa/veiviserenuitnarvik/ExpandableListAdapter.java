@@ -57,20 +57,20 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         }
 
         String childText = "";
-        if (passedClass.get(groupPosition).compareTo("person") == 0)
-        {
-            final Person person;
-            person = (Person)child;
-            childText = person.getName() + "\n" + person.getEmail();
-            convertView = setupPersonButtons(convertView, groupPosition, person);
-        }
+        if (passedClass != null) {
+            if (passedClass.get(groupPosition).compareTo("person") == 0) {
+                final Person person;
+                person = (Person) child;
+                childText = person.getName() + "\n" + person.getLocation().getLocNr() + "\n" + person.getEmail();
+                convertView = setupPersonButtons(convertView, groupPosition, person);
+            }
 
-        if (passedClass.get(groupPosition).compareTo("location") == 0)
-        {
-            final Location location;
-            location = (Location) child;
-            childText = location.getName() + "\n" + location.getLocNr() + "\n" + location.getType().getName();
-            convertView = setupLocationButton(convertView, groupPosition, location);
+            if (passedClass.get(groupPosition).compareTo("location") == 0) {
+                final Location location;
+                location = (Location) child;
+                childText = location.getName() + "\n" + location.getLocNr() + "\n" + location.getType().getName();
+                convertView = setupLocationButton(convertView, groupPosition, location);
+            }
         }
 
         TextView txtListChild = (TextView) convertView.findViewById(R.id.tv_child_info);
@@ -210,13 +210,12 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     private void sendPersonDestination(final Person person)
     {
         // TODO: Mangler coordinates for persons
-        /*
+
         Intent intent = new Intent(_context,MapActivity.class);
-        intent.setAction("LAT_LNG_RETURN");
-        intent.putExtra("lat", person.getCoordinate().getLat());
-        intent.putExtra("lng", person.getCoordinate().getLng());
+        intent.setAction("no.hesa.veiviserennarvik.LAT_LNG_RETURN");
+        intent.putExtra("lat", person.getLocation().getCoordinate().getLat());
+        intent.putExtra("lng", person.getLocation().getCoordinate().getLng());
         _context.startActivity(intent);
-        */
     }
 
 //region SMS/CALL/EMAIL

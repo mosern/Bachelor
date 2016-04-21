@@ -1,10 +1,13 @@
 package no.hesa.veiviserenuitnarvik.api;
 
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.util.Pair;
+import android.widget.Toast;
 
 import org.json.JSONObject;
 
@@ -18,6 +21,10 @@ import java.util.List;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import no.hesa.veiviserenuitnarvik.MainActivity;
+import no.hesa.veiviserenuitnarvik.MapActivity;
+import no.hesa.veiviserenuitnarvik.SearchResultsActivity;
+
 /**
  * A simple asynctask that communicates with the API
  */
@@ -28,7 +35,12 @@ public class ApiAsyncTask extends AsyncTask<List<Pair<String,String>>,Void,JSONO
     private String dataType;
     private String token = null;
     private boolean authenticationError = false;
+/*
+    ProgressDialog dialog;
+    SearchResultsActivity activity;
 
+    private ProgressDialog progressDialog;
+*/
     /**
      * An overloaded constructor that defaults the data method to get
      * @param actionInterface The interface that is used to callback to the activity
@@ -47,6 +59,7 @@ public class ApiAsyncTask extends AsyncTask<List<Pair<String,String>>,Void,JSONO
      * @param dataType POST or GET data
      */
     public ApiAsyncTask(ActionInterface actionInterface, String actionString,String url,String dataType) {
+
         this.actionInterface = actionInterface;
         this.actionString = actionString;
         this.url = url;
@@ -64,7 +77,6 @@ public class ApiAsyncTask extends AsyncTask<List<Pair<String,String>>,Void,JSONO
     public ApiAsyncTask(ActionInterface actionInterface, String actionString, String url, String dataType, String token) {
         this(actionInterface,actionString,url,dataType);
         this.token = token;
-
     }
 
     /**
@@ -119,7 +131,13 @@ public class ApiAsyncTask extends AsyncTask<List<Pair<String,String>>,Void,JSONO
         }
         return jObj;
     }
-
+/*
+    @Override
+    protected void onPreExecute() {
+        dialog = ProgressDialog.show(activity, "title", "message");
+        super.onPreExecute();
+    }
+*/
     /**
      * Is called when the execution is completed. Does a callback to the activity
      * @param jsonObject JSONObject to parse
@@ -127,12 +145,14 @@ public class ApiAsyncTask extends AsyncTask<List<Pair<String,String>>,Void,JSONO
     @Override
     protected void onPostExecute(JSONObject jsonObject) {
         super.onPostExecute(jsonObject);
+//        dialog.cancel();
         if (!authenticationError) {
             actionInterface.onCompletedAction(jsonObject,actionString); //Everything is okay, return to activity
         }
         else {
             actionInterface.onAuthorizationFailed(); //Authorization failed
         }
+
     }
 
     /**

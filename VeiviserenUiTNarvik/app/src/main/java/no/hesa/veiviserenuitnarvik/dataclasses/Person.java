@@ -5,6 +5,7 @@ package no.hesa.veiviserenuitnarvik.dataclasses;
  */
 public class Person extends Object {
 
+    private Location location;
     private String name;
     private String tlfOffice;
     private String tlfMobile;
@@ -23,6 +24,13 @@ public class Person extends Object {
         return "Name: " + name + " TlfOffice: " + tlfOffice + " TlfMobile: " + tlfMobile + " Email: " + email + " LocationId: " + locationId + " PersonId: " + id;
     }
 
+    public Location getLocation() {
+        return location;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
+    }
 
     public String getName() {
         return name;

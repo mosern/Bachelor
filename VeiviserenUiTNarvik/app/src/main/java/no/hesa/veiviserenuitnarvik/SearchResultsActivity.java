@@ -1,6 +1,7 @@
 package no.hesa.veiviserenuitnarvik;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.Intent;
 import android.os.Bundle;
@@ -35,6 +36,7 @@ public class SearchResultsActivity extends Activity implements ActionInterface, 
     HashMap<String, List<? extends Object>> listDataChild;
 
     private SimpleGestureFilter detector;
+    private ProgressDialog progressDialog;
 
 
     @Override
@@ -109,40 +111,46 @@ public class SearchResultsActivity extends Activity implements ActionInterface, 
                     int countDataHeaderInsertions = 0;
                     listDataChild = new HashMap<String, List<? extends Object>>();
                     List<String> orderOfClassTypes = new ArrayList<>();
+                    if (jsonObject != null) {
+                        jsonArray = jsonObject.getJSONArray("locations");
 
-                    jsonArray = jsonObject.getJSONArray("locations");
+                        for (int i = 0; i < jsonArray.length(); i++) { // iterates both arrays within Locations-array
+                            if (jsonArray.getJSONArray(i) != null) {
+                                for (int j = 0; j < jsonArray.getJSONArray(i).length(); j++) { // iterates the contents of each array, so the objects within are available
+                                    if (jsonArray.getJSONArray(i).length() != 0) {
+                                        JSONObject jObject = jsonArray.getJSONArray(i).getJSONObject(j);
 
-                    for (int i = 0; i < jsonArray.length(); i++) { // iterates both arrays within Locations-array
-                        if (jsonArray.getJSONArray(i) != null) {
-                            for (int j = 0; j < jsonArray.getJSONArray(i).length(); j++) { // iterates the contents of each array, so the objects within are available
-                                if (jsonArray.getJSONArray(i).length() != 0) {
-                                    JSONObject jObject = jsonArray.getJSONArray(i).getJSONObject(j);
+                                        listDataHeader.add(jObject.getString("name"));
+                                        countDataHeaderInsertions++;
 
-                                    listDataHeader.add(jObject.getString("name"));
-                                    countDataHeaderInsertions++;
-                                    
-                                    if (i == 0) //first array, contains locations
-                                    {
-                                        List<no.hesa.veiviserenuitnarvik.dataclasses.Location> objDetails = new ArrayList<>();
-                                        Gson gson = new Gson();
-                                        no.hesa.veiviserenuitnarvik.dataclasses.Location obj = gson.fromJson(jObject.toString(), no.hesa.veiviserenuitnarvik.dataclasses.Location.class); // convert
-                                        objDetails.add(obj);
-                                        listDataChild.put(listDataHeader.get(countDataHeaderInsertions - 1), objDetails);
-                                        orderOfClassTypes.add("location");
-                                    }
+                                        if (i == 0) //first array, contains locations
+                                        {
+                                            List<no.hesa.veiviserenuitnarvik.dataclasses.Location> objDetails = new ArrayList<>();
+                                            Gson gson = new Gson();
+                                            no.hesa.veiviserenuitnarvik.dataclasses.Location obj = gson.fromJson(jObject.toString(), no.hesa.veiviserenuitnarvik.dataclasses.Location.class); // convert
+                                            objDetails.add(obj);
+                                            listDataChild.put(listDataHeader.get(countDataHeaderInsertions - 1), objDetails);
+                                            orderOfClassTypes.add("location");
+                                        }
 
-                                    if (i == 1) // second array, contains persons
-                                    {
-                                        List<Person> objDetails = new ArrayList<>();
-                                        Gson gson = new Gson();
-                                        Person obj = gson.fromJson(jObject.toString(), Person.class); // convert
-                                        objDetails.add(obj);
-                                        listDataChild.put(listDataHeader.get(countDataHeaderInsertions - 1), objDetails);
-                                        orderOfClassTypes.add("person");
+                                        if (i == 1) // second array, contains persons
+                                        {
+                                            List<Person> objDetails = new ArrayList<>();
+                                            Gson gson = new Gson();
+                                            Person obj = gson.fromJson(jObject.toString(), Person.class); // convert
+                                            objDetails.add(obj);
+                                            listDataChild.put(listDataHeader.get(countDataHeaderInsertions - 1), objDetails);
+                                            orderOfClassTypes.add("person");
+                                        }
                                     }
                                 }
                             }
                         }
+                    }
+                    else
+                    {
+                        Toast.makeText(getApplicationContext(), "No results, please try another search", Toast.LENGTH_LONG).show();
+                        this.finish();
                     }
                     listAdapter = new ExpandableListAdapter(this, listDataHeader, listDataChild, orderOfClassTypes);
                     expListView.setAdapter(listAdapter);// setting list adapter

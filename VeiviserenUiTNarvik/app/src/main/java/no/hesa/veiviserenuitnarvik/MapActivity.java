@@ -102,7 +102,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        Api api = new Api(this,getApplicationContext().getResources());
+        Api api = new Api(this, getApplicationContext().getResources());
         api.allUsers();
 /*
         SharedPreferences sharedPreferences = getSharedPreferences("AppPref",MODE_PRIVATE);
@@ -419,7 +419,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         // Retrieve the SearchView and plug it into SearchManager
         final SearchView searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
-        searchView.setIconifiedByDefault(false); // autoexpands the search field
+        //searchView.setIconifiedByDefault(false); // autoexpands the search field
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName("no.hesa.veiviserenuitnarvik","no.hesa.veiviserenuitnarvik.SearchResultsActivity")));
 
@@ -428,7 +428,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
             @Override
             public boolean onQueryTextSubmit(String newText) {
-                Toast.makeText(MapActivity.this, "You searched for: " + newText, Toast.LENGTH_SHORT).show();
+                //Toast.makeText(MapActivity.this, "You searched for: " + newText, Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(getApplicationContext(), SearchResultsActivity.class);
                 intent.setAction(Intent.ACTION_SEARCH);
                 intent.putExtra("query", newText);
@@ -492,6 +492,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             case Api.ALL_USERS:
                 //JSONObject dummyObject = jsonObject;
                 break;
+            case Api.DO_SEARCH:
 
             default:
                 break;
