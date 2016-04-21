@@ -148,6 +148,7 @@ namespace Api
                 {
                     Id = source.Id,
                     Name = source.Name,
+                    Desc = source.Desc,
                     Hits = source.Hits,
                     LocNr = source.LocNr,
                     Coordinate = AutoMapConfig.configureMaping().Map<Coordinate, CoordinateViewModel>(coorRepo.Read(source.CoordinateId)),

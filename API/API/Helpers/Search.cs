@@ -239,7 +239,7 @@ namespace Api.Classes
             IEnumerable<Location> loc;
             using (var repo = new LocationRepository<Location>())
             {
-                loc = new LocationRepository<Location>().List().Where(l => l.LocNr.Contains(locNr));
+                loc = repo.List().Where(l => l.LocNr.Contains(locNr));
 
                 if (loc != null)
                 {

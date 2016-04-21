@@ -54,7 +54,7 @@ namespace Api.Controllers
                 else
                 {
                     using (var repo = new LocationRepository<Location>())
-                        result.LocationViewModel = AutoMapConfig.configureMaping().Map<IEnumerable<Location>, IEnumerable<LocationViewModel>>(repo.List().ApplySort(sort)).AsQueryable();
+                        result.LocationViewModel = AutoMapConfig.configureMaping().Map<IEnumerable<Location>, IEnumerable<LocationViewModel>>(repo.List().ApplySort(sort).ToList()).AsQueryable();
                     result.PeopleViewModel = new List<PeopleViewModel>().AsQueryable();
                 }
             }
