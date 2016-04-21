@@ -43,6 +43,7 @@ import com.google.android.gms.maps.model.GroundOverlayOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.indooratlas.android.sdk.IALocationManager;
 import com.indooratlas.android.sdk.resources.IAFloorPlan;
@@ -85,6 +86,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     private LatLng currentPosision = null;
     private LatLng targetPosition = null;
+    private PolylineOptions po = null;
+    private Polyline polyline = null;
 
     Menu menuRef = null;
 
@@ -154,10 +157,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     LatLng latLng = new LatLng(returnedCoordsFromSearchIntent.getDoubleExtra("lng",0),returnedCoordsFromSearchIntent.getDoubleExtra("lat",0));
                     mMap.addMarker(new MarkerOptions().position(latLng).title("TestLoc2"));
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
-                    if (currentPosision != null)
-                    {
-                        drawRoute(currentPosision, latLng);
-                    }
+                    targetPosition = latLng;
                 }
             }
         }
@@ -189,11 +189,16 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private void drawRoute(LatLng a, LatLng b)
     {
         // draws a line between point a and point b
-        mMap.addPolyline((new PolylineOptions())
+        if (polyline != null)
+            polyline.remove();
+
+        po = new PolylineOptions()
                 .add(a, b)
                 .width(POLYLINEWIDTH)
                 .color(getResources().getColor(R.color.blue))
-                .geodesic(false)); // lat/long lines curved by the shape of the planet
+                .geodesic(false); // lat/long lines curved by the shape of the planet
+
+        polyline = mMap.addPolyline(po);
     }
 
 //region BROADCASTRECEIVERS
@@ -234,9 +239,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                         circleThree.setCenter(latLng);
                         circleTwo.setCenter(latLng);
                         circleOne.setCenter(latLng);
-                        //mMap.addMarker(new MarkerOptions().position(latLng).title("UserLocAsDeterminedByLibrary\nLat:" + pos[0] + " Lng: " + pos[1]));
-                        //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
+                        // mMap.addMarker(new MarkerOptions().position(latLng).title("UserLocAsDeterminedByLibrary\nLat:" + pos[0] + " Lng: " + pos[1]));
+                        // mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
                         currentPosision = latLng;
+                        if (targetPosition != null) {
+                            drawRoute(currentPosision, targetPosition);
+                        }
                     }
                     else
                     {
@@ -263,6 +271,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 mMap.addMarker(new MarkerOptions().position(latLng).title("TestLocFromBR"));
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
                 mMap.addCircle(new CircleOptions().center(latLng).radius(3.0).fillColor(R.color.radiusfillcolor).strokeColor(R.color.radiusstrokecolor).strokeWidth(2));
+                targetPosition = latLng;
                 }
             }
         };
