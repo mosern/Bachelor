@@ -192,10 +192,11 @@ namespace Api.Helpers
         {
             try
             {
-                X model = (X)new BaseModel() { Id = id };
-
                 using (var repo = new LocationRepository<X>())
+                {
+                    X model = repo.Read(id);
                     repo.Delete(model);
+                }
             }
             catch (Exception e)
             {
