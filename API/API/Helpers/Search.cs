@@ -33,66 +33,66 @@ namespace Api.Classes
                 case 1: people = peopleByName(searchString); break;
             }
 
-            List<int> locid = new List<int>();
+            //List<int> locid = new List<int>();
 
-            foreach(PeopleViewModel peo in people)
-            {
-                Location tempLoc;
-                using(var repo = new LocationRepository<Location>())
-                    tempLoc = repo.List().Where(l => l.Id == peo.Location.Id).FirstOrDefault();
+            //foreach(PeopleViewModel peo in people)
+            //{
+            //    Location tempLoc;
+            //    using(var repo = new LocationRepository<Location>())
+            //        tempLoc = repo.List().Where(l => l.Id == peo.Location.Id).FirstOrDefault();
 
-                LocationViewModel loc = null;
+            //    LocationViewModel loc = null;
 
-                if(tempLoc != null)
-                {
-                    loc = AutoMapConfig.configureMaping().Map<Location, LocationViewModel>(tempLoc);
-                }
-                else
-                {
-                    break;
-                }
+            //    if(tempLoc != null)
+            //    {
+            //        loc = AutoMapConfig.configureMaping().Map<Location, LocationViewModel>(tempLoc);
+            //    }
+            //    else
+            //    {
+            //        break;
+            //    }
 
-                locid.Add(loc.Id.Value);
+            //    locid.Add(loc.Id.Value);
 
                
 
-                if (!locations.Contains(loc, new CompareEF<LocationViewModel>()))
-                {
-                    var temp = locations.ToList();
-                    temp.Add(loc);
+            //    if (!locations.Contains(loc, new CompareEF<LocationViewModel>()))
+            //    {
+            //        var temp = locations.ToList();
+            //        temp.Add(loc);
 
-                    locations = temp.AsQueryable();
-                }
-            }
+            //        locations = temp.AsQueryable();
+            //    }
+            //}
 
-            foreach (LocationViewModel loc in locations)
-            {
-                if (!locid.Contains(loc.Id.Value))
-                {
-                    People tempPeo;
-                    using (var repo = new LocationRepository<People>())
-                        tempPeo = repo.List().Where(p => p.LocationId == loc.Id).FirstOrDefault();
+            //foreach (LocationViewModel loc in locations)
+            //{
+            //    if (!locid.Contains(loc.Id.Value))
+            //    {
+            //        People tempPeo;
+            //        using (var repo = new LocationRepository<People>())
+            //            tempPeo = repo.List().Where(p => p.LocationId == loc.Id).FirstOrDefault();
 
-                    PeopleViewModel peo = null;
+            //        PeopleViewModel peo = null;
 
-                    if (tempPeo != null)
-                    {
-                        peo = AutoMapConfig.configureMaping().Map<People, PeopleViewModel>(tempPeo);
-                    }
-                    else
-                    {
-                        break;
-                    }
+            //        if (tempPeo != null)
+            //        {
+            //            peo = AutoMapConfig.configureMaping().Map<People, PeopleViewModel>(tempPeo);
+            //        }
+            //        else
+            //        {
+            //            break;
+            //        }
 
-                    if (!people.Contains(peo))
-                    {
-                        var temp = people.ToList();
-                        temp.Add(peo);
+            //        if (!people.Contains(peo))
+            //        {
+            //            var temp = people.ToList();
+            //            temp.Add(peo);
 
-                        people = temp.AsQueryable();
-                    }
-                }
-            }
+            //            people = temp.AsQueryable();
+            //        }
+            //    }
+            //}
 
 
             result.LocationViewModel = locations;
