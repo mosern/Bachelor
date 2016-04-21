@@ -15,6 +15,7 @@ namespace Api.Models.Api
         public TypeViewModel Type { get; set; }
         [Required]
         public string Name { get; set; }
+        public string Desc { get; set; }
         [Required, MaxLength(5)]
         public string LocNr { get; set; }
         [Required]
