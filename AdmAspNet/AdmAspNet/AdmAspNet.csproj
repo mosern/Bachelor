@@ -215,6 +215,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Helpers\AuthorizationManager.cs" />
+    <Compile Include="Helpers\LocationBinder.cs" />
     <Compile Include="Helpers\MenuExtensions.cs" />
     <Compile Include="Models\DataContracts\Coordinate.cs" />
     <Compile Include="Models\DataContracts\Location.cs" />
@@ -278,6 +279,9 @@
     <Content Include="Views\Location\Details.cshtml" />
     <Content Include="Views\Location\Delete.cshtml" />
     <Content Include="Views\Location\Create.cshtml" />
+    <Content Include="Views\Location\Edit.cshtml" />
+    <Content Include="Views\Shared\_SuccessPartial.cshtml" />
+    <Content Include="Views\Shared\_ErrorPartial.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -77,6 +77,12 @@ namespace AdmAspNet.Classes
             string url = ConfigurationManager.AppSettings["apiLocations"];
             return PostApi(url, location);
         }
+
+        public bool UpdateLocation(int id, Location location)
+        {
+            string url = ConfigurationManager.AppSettings["apiLocations"]+"/"+id;
+            return PatchApi(url, location); 
+        }
         #endregion
 
         #region UserMethods
@@ -170,6 +176,24 @@ namespace AdmAspNet.Classes
             return false;
         }
 
+        private bool PatchApi<T>(string url, T data) where T : class {
+            using (var client = SetupClient())
+            {
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    DataContractJsonSerializer jsonSerializer = new DataContractJsonSerializer(typeof(T));
+                    jsonSerializer.WriteObject(ms, data);
+                    string jsonData = Encoding.Default.GetString(ms.ToArray());
+                    StringContent stringContent = new StringContent(jsonData, Encoding.Default, "application/json");
+                    HttpResponseMessage response = client.PutAsync(url, stringContent).Result; 
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return true; 
+                    }
+                }
+            }
+            return false; 
+        }
         /// <summary>
         /// Handle the deletion of an object that 
         /// </summary>
@@ -194,8 +218,7 @@ namespace AdmAspNet.Classes
         /// <returns>A HTTP client with the standard settings</returns>
         private HttpClient SetupClient()
         {
-            using (HttpClient client = new HttpClient())
-            {
+            HttpClient client = new HttpClient(); 
                 if (token != null)
                 {
                     client.SetBearerToken(token);
@@ -204,8 +227,6 @@ namespace AdmAspNet.Classes
                 client.DefaultRequestHeaders.Accept.Clear();
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                 return client; 
-            }
-
         }
         #endregion
 

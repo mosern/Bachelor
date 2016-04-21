@@ -23,6 +23,9 @@ namespace AdmAspNet.Models.ViewModels
         [Display(Name="Treff")]
         public int Hits { get; }
 
+        [Display(Name="Beskrivelse")]
+        public string Desc { get; set; }
+
         [Display(Name ="Type")]
         public TypeViewModel Type { get; set; }
 

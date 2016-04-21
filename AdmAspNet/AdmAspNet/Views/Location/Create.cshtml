@@ -1,17 +1,24 @@
 ﻿@model AdmAspNet.Models.ViewModels.LocationViewModel
 
 @{
-    ViewBag.Title = "Create";
+    ViewBag.Title = "Opprett ny lokasjon";
 }
 
 <h2>Create</h2>
-
 @using (Html.BeginForm()) 
 {
     @Html.AntiForgeryToken()
     
     <div class="form-horizontal">
         <h4>LocationViewModel</h4>
+        @if (ViewBag.SuccessMessage != null)
+        {
+            Html.RenderPartial("_SuccessPartial");
+        }
+        @if(ViewBag.ErrorMessage != null)
+        {
+            Html.RenderPartial("_ErrorPartial"); 
+        }
         <hr />
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
         <div class="form-group">
@@ -27,6 +34,38 @@
             <div class="col-md-10">
                 @Html.EditorFor(model => model.LocNr, new { htmlAttributes = new { @class = "form-control" } })
                 @Html.ValidationMessageFor(model => model.LocNr, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Desc, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Desc, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Desc, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Coordinate.Lat, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Coordinate.Lat, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Coordinate.Lat, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Coordinate.Lng, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Coordinate.Lng, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Coordinate.Lng, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Coordinate.Alt, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Coordinate.Alt, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Coordinate.Alt, "", new { @class = "text-danger" })
             </div>
         </div>
 

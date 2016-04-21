@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AdmAspNet.Helpers;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -17,10 +18,11 @@ namespace AdmAspNet
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
-            ServicePointManager.ServerCertificateValidationCallback += (sender,certificate,chain,sslPolicyErrors) =>
+            /*ServicePointManager.ServerCertificateValidationCallback += (sender,certificate,chain,sslPolicyErrors) =>
             {
                 return true;
-            }; 
+            };*/
+            ModelBinders.Binders.Add(typeof(LocationBinder), new LocationBinder()); 
         }
     }
 }

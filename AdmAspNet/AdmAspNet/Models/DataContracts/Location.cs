@@ -24,6 +24,9 @@ namespace AdmAspNet.Models.DataContracts
         [DataMember(Name ="locNr")]
         public string LocNr { get; set; }
 
+        [DataMember(Name="desc")]
+        public string Desc { get; set; }
+
         [DataMember(Name ="hits")]
         public int Hits { get; set; }
     }
