@@ -18,6 +18,7 @@ import android.net.wifi.ScanResult;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
+import android.os.CountDownTimer;
 import android.os.Handler;
 
 import org.apache.commons.math3.fitting.leastsquares.LeastSquaresOptimizer;
@@ -38,6 +39,7 @@ import java.util.TreeMap;
  * A class that takes care of positioning using wifi access-points
  */
 
+@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 public class WifiPosition {
     private List<ScanResult> scanResults = null;
     private static final double radius = 6371*1000; //earth radius
@@ -53,11 +55,18 @@ public class WifiPosition {
                 if(timer == null){
                     timer = new Timer();
                     initializeTimerTask(wifiManager);
-                    timer.schedule(timerTask, 5000, 3000);
+                    timer.schedule(timerTask, 1000, 500);
                     counter++;
                 }
-                else //If not...
+                else {
+                //If not...
+                    //sensorUpdateTrigger = false;
                     counter++;
+                }
+
+                //sensorManager = (SensorManager) c.getSystemService(c.SENSOR_SERVICE);
+                //sensor = sensorManager.getDefaultSensor(Sensor.TYPE_SIGNIFICANT_MOTION);
+                //sensorManager.requestTriggerSensor(triggerEventListener, sensor);
             }
         }
     };
@@ -68,12 +77,67 @@ public class WifiPosition {
     //private double[] lastCalculatedPosition = null;
     private SensorManager sensorManager;
     private Sensor sensor;
+    /*private TriggerEventListener triggerEventListener = new TriggerEventListener() {
+        @Override
+        public void onTrigger(TriggerEvent event) {
+            if(sensorUpdateTrigger)
+                wifiPointsLocationInfList.clear();
+        }
+    };*/
     private SensorEventListener sensorEventListener = new SensorEventListener() {
         @Override
-        public void onSensorChanged(SensorEvent event) {
+        public void onSensorChanged(final SensorEvent event) {
             Sensor sensor = event.sensor;
-            if (sensor.getType() == Sensor.TYPE_STEP_DETECTOR) {
-                wifiPointsLocationInfList.clear();
+            //double[] gravity = new double[3];
+            //double[] linear_acceleration = new double[3];
+            //final float alpha = 0.8f;
+
+            if (sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+                /*for(int i = 0; i < gravity.length; i++){
+                    //Isolating the force of gravity with the low-pass filter
+                    //double timeGone = (1 - alpha) * event.values[i];
+                    linear_acceleration[i] = event.values[i];
+                }
+
+                // Isolate the force of gravity with the low-pass filter.
+                gravity[0] = alpha * gravity[0] + (1 - alpha) * event.values[0];
+                gravity[1] = alpha * gravity[1] + (1 - alpha) * event.values[1];
+                gravity[2] = alpha * gravity[2] + (1 - alpha) * event.values[2];
+
+                // Remove the gravity contribution with the high-pass filter.
+                linear_acceleration[0] = event.values[0] - gravity[0];
+                linear_acceleration[1] = event.values[1] - gravity[1];
+                linear_acceleration[2] = event.values[2] - gravity[2];*/
+
+                //If it is the fist time onSensorChanged event is run, read the start data on acceleration
+                if(firstSensorChange){
+                    new CountDownTimer(4000, 1000) {
+                        public void onFinish() {
+                            // When timer is finished
+                            xStartValue = event.values[0];
+                            yStartValue = event.values[1];
+                        }
+
+                        public void onTick(long millisUntilFinished) {
+
+                        }
+                    }.start();
+                    firstSensorChange = false;
+                }
+                else{//If not
+                    long curentTime = System.currentTimeMillis();
+                    long timeGone = curentTime - lastUpdateTime;
+                    //Check if more than 2.3 seconds are gone since last detected movement and it is not first detected movement
+                    if(lastUpdateTime != 0 && (timeGone >= 2300)){
+                        //Check if it was significant enough movement
+                        if((Math.abs(event.values[0]) > (xStartValue + 2)) || (Math.abs(event.values[1]) > (yStartValue + 2))){
+                            moving = true;
+                            lastUpdateTime = curentTime;
+                        }
+                    }
+                    else if(lastUpdateTime == 0)
+                        lastUpdateTime = curentTime;
+                }
             }
         }
 
@@ -82,6 +146,12 @@ public class WifiPosition {
 
         }
     };
+    private long lastUpdateTime = 0; //last time there was detected movement of device
+    //private boolean sensorUpdateTrigger = false;
+    private boolean moving = false; //Variable that shows if device is moving (true) or not (false)
+    private boolean firstSensorChange = true; //Variable that shows if it is first time sensor data was changed
+    private double xStartValue = 0; //acceleration on x-axis at the time of first onSensorChanged run
+    private double yStartValue = 0; //acceleration on y-axis at the time of first onSensorChanged run
 
     /**
      * Initialize TimerTask to set up continuous scannig for available Wi-Fi access points
@@ -102,14 +172,19 @@ public class WifiPosition {
 
     public void registerBroadcast(Context c) {
         c.registerReceiver(wifiReceiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
+        WifiManager wifiManager = (WifiManager) c.getSystemService(Context.WIFI_SERVICE);
+        wifiManager.startScan();
+        //Register listner to detect if device changed position
         sensorManager = (SensorManager) c.getSystemService(c.SENSOR_SERVICE);
-        sensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);
+        sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        //sensorManager.requestTriggerSensor(triggerEventListener, sensor);
+        //sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         sensorManager.registerListener(sensorEventListener, sensor, SensorManager.SENSOR_DELAY_FASTEST);
     }
 
     public void unRegisterBroadcast(Context c) {
         c.unregisterReceiver(wifiReceiver);
-        sensorManager.unregisterListener(sensorEventListener);
+        //sensorManager.unregisterListener(sensorEventListener);
     }
 
     public void calculateDistances(Context c) {
@@ -160,8 +235,14 @@ public class WifiPosition {
             if(counter == 4){
                 //Calculate position
                 findPosition(c);
+                //Check if there was detected movent, if yes, clear wifiPointsLocationInfList
+                if(moving){
+                    wifiPointsLocationInfList.clear();
+                    moving = false;
+                }
+                //sensorUpdateTrigger = true;
                 counter = 1;
-                wifiPointsLocationInfList.clear();
+                //wifiPointsLocationInfList.clear();
             }
         }
     }
