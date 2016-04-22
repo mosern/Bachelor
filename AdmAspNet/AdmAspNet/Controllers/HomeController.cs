@@ -21,7 +21,7 @@ namespace AdmAspNet.Controllers
 
         public ActionResult Index()
         {
-            return View();
+            return RedirectToAction("Index", "Admin"); 
         }
 
         [ResourceAuthorize("Read","About")]

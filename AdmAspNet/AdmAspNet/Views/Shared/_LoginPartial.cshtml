@@ -6,10 +6,10 @@
             @{ 
                 var claimsIdentity = this.User.Identity as System.Security.Claims.ClaimsIdentity;
             }
-            Hello, @claimsIdentity.FindFirst("username").Value!
+            Hei, @claimsIdentity.FindFirst("username").Value!
         </li>
         <li>
-            @Html.ActionLink("Sign out", "SignOut", "Account")
+            @Html.ActionLink("Logg ut", "SignOut", "Account")
         </li>
     </ul>
     </text>
@@ -17,6 +17,6 @@
 else
 {
     <ul class="nav navbar-nav navbar-right">
-        <li>@Html.ActionLink("Sign in", "SignIn", "Account", routeValues: null, htmlAttributes: new { id = "loginLink" })</li>
+        <li>@Html.ActionLink("Logg inn", "SignIn", "Account", routeValues: null, htmlAttributes: new { id = "loginLink" })</li>
     </ul>
 }

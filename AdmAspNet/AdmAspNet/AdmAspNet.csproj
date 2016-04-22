@@ -273,7 +273,6 @@
     <Content Include="Service References\Application Insights\ConnectedService.json" />
     <Content Include="Views\Admin\Index.cshtml" />
     <Content Include="Views\Shared\_SidebarPartial.cshtml" />
-    <Content Include="Views\Admin\Location.cshtml" />
     <Content Include="Views\Location\Index.cshtml" />
     <Content Include="Views\Shared\ErrorView.cshtml" />
     <Content Include="Views\Location\Details.cshtml" />
@@ -282,6 +281,7 @@
     <Content Include="Views\Location\Edit.cshtml" />
     <Content Include="Views\Shared\_SuccessPartial.cshtml" />
     <Content Include="Views\Shared\_ErrorPartial.cshtml" />
+    <Content Include="Views\Shared\Forbidden.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

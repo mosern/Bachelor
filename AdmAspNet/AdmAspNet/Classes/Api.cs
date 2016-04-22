@@ -81,7 +81,13 @@ namespace AdmAspNet.Classes
         public bool UpdateLocation(int id, Location location)
         {
             string url = ConfigurationManager.AppSettings["apiLocations"]+"/"+id;
-            return PatchApi(url, location); 
+            return PutApi(url, location); 
+        }
+
+        public bool DeleteLocation(int id)
+        {
+            string url = ConfigurationManager.AppSettings["apiLocations"] + "/" + id;
+            return DeleteObject(url); 
         }
         #endregion
 
@@ -176,7 +182,7 @@ namespace AdmAspNet.Classes
             return false;
         }
 
-        private bool PatchApi<T>(string url, T data) where T : class {
+        private bool PutApi<T>(string url, T data) where T : class {
             using (var client = SetupClient())
             {
                 using (MemoryStream ms = new MemoryStream())
@@ -194,8 +200,9 @@ namespace AdmAspNet.Classes
             }
             return false; 
         }
+
         /// <summary>
-        /// Handle the deletion of an object that 
+        /// Handle the deletion of an object
         /// </summary>
         /// <param name="url">The url to delete</param>
         /// <returns>True if the data was deleted, false if not</returns>

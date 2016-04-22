@@ -1,0 +1,10 @@
+﻿
+@{
+    ViewBag.Title = "Ikke tilgang";
+}
+
+<h2>Ingen tilgang</h2>
+@{ 
+    ViewBag.ErrorMessage = "Du har ikke tilgang til denne siden. Dersom du mener du skal ha tilgang, kontakt en administrator";
+    Html.RenderPartial("_ErrorPartial");
+}

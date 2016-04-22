@@ -3,7 +3,9 @@
 @{
     ViewBag.Title = "Rediger lokasjon";
 }
-
+@section sidebar {
+    @Html.Partial("_SidebarPartial")
+}
 <h2>Rediger</h2>
 
 @using (Html.BeginForm())
@@ -12,6 +14,14 @@
     
     <div class="form-horizontal">
         <h4>Lokasjon</h4>
+        @if (ViewBag.SuccessMessage != null)
+        {
+            Html.RenderPartial("_SuccessPartial");
+        }
+        @if (ViewBag.ErrorMessage != null)
+        {
+            Html.RenderPartial("_ErrorPartial");
+        }
         <hr />
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
         @Html.HiddenFor(model => model.Id)
@@ -33,8 +43,48 @@
         </div>
 
         <div class="form-group">
+            @Html.LabelFor(model => model.Desc, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Desc, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Desc, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Coordinate.Lat, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Coordinate.Lat, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Coordinate.Lat, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Coordinate.Lng, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Coordinate.Lng, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Coordinate.Lng, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Coordinate.Alt, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Coordinate.Alt, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Coordinate.Alt, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Type, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownListFor(model => model.Type.Id, new SelectList(Model.Types, "Id", "Name", Model.Types.First().Id))
+                @Html.ValidationMessageFor(model => model.Types, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
-                <input type="submit" value="Save" class="btn btn-default" />
+                <input type="submit" value="Lagre" class="btn btn-default" />
             </div>
         </div>
     </div>

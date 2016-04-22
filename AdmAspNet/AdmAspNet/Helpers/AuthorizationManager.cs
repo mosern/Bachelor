@@ -16,6 +16,7 @@ namespace AdmAspNet.Helpers
             {
                 case "ContactDetails" : return AuthorizeContactDetails(context);
                 case "About" : return AuthorizeAbout(context);
+                case "Admin": return AuthorizeAdmin(context);
                 default : return Nok();
             }
         }
@@ -43,6 +44,20 @@ namespace AdmAspNet.Helpers
                     return Eval(false);
                 default:
                     return Nok();
+            }
+        }
+
+        private Task<bool> AuthorizeAdmin(ResourceAuthorizationContext context)
+        {
+            switch (context.Action.First().Value)
+            {
+                case "Read":
+                    return Eval(context.Principal.HasClaim("roles", "Administrator"));
+                case "Write":
+                    return Eval(context.Principal.HasClaim("roles","Administrator"));
+                default:
+                    return Nok(); 
+
             }
         }
     }

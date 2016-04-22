@@ -3,14 +3,16 @@
 @{
     ViewBag.Title = "Opprett ny lokasjon";
 }
-
-<h2>Create</h2>
+@section sidebar {
+    @Html.Partial("_SidebarPartial")
+}
+<h2>Opprett</h2>
 @using (Html.BeginForm()) 
 {
     @Html.AntiForgeryToken()
     
     <div class="form-horizontal">
-        <h4>LocationViewModel</h4>
+        <h4>Lokasjon</h4>
         @if (ViewBag.SuccessMessage != null)
         {
             Html.RenderPartial("_SuccessPartial");
@@ -86,5 +88,5 @@
 }
 
 <div>
-    @Html.ActionLink("Back to List", "Index")
+    @Html.ActionLink("Tilbake til liste", "Index")
 </div>

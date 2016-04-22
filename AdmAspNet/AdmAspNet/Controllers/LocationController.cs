@@ -10,9 +10,12 @@ using AutoMapper;
 using AdmAspNet.Models.ViewModels;
 using System.Web.Routing;
 using AdmAspNet.Helpers;
+using Thinktecture.IdentityModel.Mvc;
 
 namespace AdmAspNet.Controllers
 {
+    [ResourceAuthorize("Write","Admin")]
+    [HandleForbidden]
     public class LocationController : Controller
     {
         private string tokenString = null;
@@ -31,7 +34,7 @@ namespace AdmAspNet.Controllers
         }
 
         /// <summary>
-        /// Viser en liste over alle de forskjellige lokasjonene 
+        /// Shows a list of all the locations
         /// </summary>
         /// <returns></returns>
         public ActionResult Index()
@@ -43,7 +46,7 @@ namespace AdmAspNet.Controllers
         }
 
         /// <summary>
-        /// Lar deg opprette en lokasjon
+        /// Allow a user to create a location
         /// </summary>
         /// <returns></returns>
         public ActionResult Create()
@@ -57,7 +60,7 @@ namespace AdmAspNet.Controllers
         }
 
         /// <summary>
-        /// Lar deg opprette en lokasjon
+        /// Allow the user to create a location 
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
@@ -104,6 +107,7 @@ namespace AdmAspNet.Controllers
             return View(locationViewModel); 
         }
 
+
         public ActionResult Delete(int? id)
         {
             if (id == null)
@@ -114,7 +118,7 @@ namespace AdmAspNet.Controllers
             Location locationObject; 
             if ((locationObject = api.GetLocationById(id.Value)) == null)
             {
-                ViewBag.ErrorMessage = "Kan ikke finne lokasjonen du forespurte";
+                ViewBag.ErrorMessage = "Kan ikke finne lokasjonen du prøver å slette";
                 return View("ErrorView"); 
             }
             var mapper = mapConfig.CreateMapper();
@@ -122,6 +126,27 @@ namespace AdmAspNet.Controllers
             return View(locationViewModel); 
         }
 
+        [HttpPost]
+        public ActionResult Delete(int id)
+        {
+            Location locationObject; 
+            if ((locationObject = api.GetLocationById(id)) == null)
+            {
+                ViewBag.ErrorMessage = "Kan ikke finne lokasjonen du prøver å slette";
+                return View("ErrorView"); 
+            }
+            if (api.DeleteLocation(id))
+            {
+                ViewBag.SuccessMessage = "Lokasjonen ble slettet";
+            }
+            else
+            {
+                ViewBag.ErrorMessage = "En feil oppstod, kontakt en systemadministrator"; 
+            }
+            var mapper = mapConfig.CreateMapper();
+            LocationViewModel viewModel = mapper.Map<LocationViewModel>(locationObject); 
+            return View(viewModel); 
+        }
         public ActionResult Edit(int? id)
         {
             if (id == null)
@@ -136,10 +161,40 @@ namespace AdmAspNet.Controllers
                 return View("ErrorView"); 
             }
             var mapper = mapConfig.CreateMapper();
+            List<Models.DataContracts.Type> typeList = api.GetAllTypes();
+            List<TypeViewModel> typeViewModel = mapper.Map<List<TypeViewModel>>(typeList); 
             LocationViewModel locationViewModel = mapper.Map<LocationViewModel>(locationObject);
+            locationViewModel.Types = typeViewModel; 
             return View(locationViewModel); 
         }
 
+        [HttpPost]
+        public ActionResult Edit(int id,[ModelBinder(typeof(LocationBinder))] LocationViewModel input)
+        {
+            var mapper = mapConfig.CreateMapper();
+            List<Models.DataContracts.Type> typeList = api.GetAllTypes();
+            List<TypeViewModel> typeViewModel = mapper.Map<List<TypeViewModel>>(typeList);
+            input.Types = typeViewModel; 
+            if (!ModelState.IsValid)
+            {
+                return View(input); 
+            }
+            if (api.GetLocationById(id) == null)
+            {
+                ViewBag.ErrorMessage = "Kan ikke finne lokasjonen du forsøkte å redigere";
+                return View("ErrorView");
+            }
+            Location locationObject = mapper.Map<Location>(input); 
+            if (api.UpdateLocation(id,locationObject))
+            {
+                ViewBag.SuccessMessage = "Lokasjonen ble oppdatert"; 
+            }
+            else
+            {
+                ViewBag.ErrorMessage = "En feil oppstod, kontakt en systemadministrator"; 
+            }
+            return View(input); 
+        }
 
         protected override void Initialize(RequestContext requestContext)
         {

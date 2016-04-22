@@ -1,7 +1,7 @@
 ﻿@model AdmAspNet.Models.ViewModels.LocationViewModel
 
 @{
-    ViewBag.Title = "Delete";
+    ViewBag.Title = "Slett lokasjon";
 }
 @section sidebar {
     @Html.Partial("_SidebarPartial")
@@ -11,6 +11,14 @@
 <h3>Er du sikker på at du vil slette?</h3>
 <div>
     <h4>Lokasjon</h4>
+    @if (ViewBag.SuccessMessage != null)
+    {
+        Html.RenderPartial("_SuccessPartial");
+    }
+    @if (ViewBag.ErrorMessage != null)
+    {
+        Html.RenderPartial("_ErrorPartial");
+    }
     <hr />
     <dl class="dl-horizontal">
         <dt>

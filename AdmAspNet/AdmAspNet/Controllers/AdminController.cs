@@ -13,9 +13,12 @@ using System.Runtime.Serialization.Json;
 using System.Security.Claims;
 using System.Web;
 using System.Web.Mvc;
+using Thinktecture.IdentityModel.Mvc;
 
 namespace AdmAspNet.Controllers
 {
+    [ResourceAuthorize("Write", "Admin")]
+    [HandleForbidden]
     public class AdminController : Controller
     {
         private static string apiBaseAddress = ConfigurationManager.AppSettings["apiBaseAddress"]; 
@@ -23,25 +26,6 @@ namespace AdmAspNet.Controllers
         public ActionResult Index()
         {
             return View();
-        }
-
-        public ActionResult Location()
-        {
-            string tokenString = null;
-            var token = (User.Identity as ClaimsIdentity).FindFirst("access_token");
-            if (token != null)
-            {
-                tokenString = token.Value;
-            }
-            Api api = new Api(tokenString);
-            List<Location> listLocation = api.GetAllLocations();
-
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<Location, LocationViewModel>());
-
-            var mapper = config.CreateMapper();
-
-            List<LocationViewModel> listViewModel = mapper.Map<List<LocationViewModel>>(listLocation);
-            return View(listViewModel); 
         }
     }
 }
