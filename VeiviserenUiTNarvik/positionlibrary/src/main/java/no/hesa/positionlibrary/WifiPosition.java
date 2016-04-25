@@ -9,13 +9,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.hardware.TriggerEvent;
-import android.hardware.TriggerEventListener;
-import android.location.Location;
-import android.location.LocationManager;
-import android.location.LocationProvider;
 import android.net.wifi.ScanResult;
-import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.CountDownTimer;
@@ -25,12 +19,12 @@ import org.apache.commons.math3.fitting.leastsquares.LeastSquaresOptimizer;
 import org.apache.commons.math3.fitting.leastsquares.LevenbergMarquardtOptimizer;
 import org.apache.commons.math3.linear.RealVector;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.TreeMap;
@@ -63,10 +57,6 @@ public class WifiPosition {
                     //sensorUpdateTrigger = false;
                     counter++;
                 }
-
-                //sensorManager = (SensorManager) c.getSystemService(c.SENSOR_SERVICE);
-                //sensor = sensorManager.getDefaultSensor(Sensor.TYPE_SIGNIFICANT_MOTION);
-                //sensorManager.requestTriggerSensor(triggerEventListener, sensor);
             }
         }
     };
@@ -74,43 +64,16 @@ public class WifiPosition {
     private TimerTask timerTask;
     final Handler handler = new Handler();
     private HashMap<Double, Point> wifiPointsLocationInfList = new HashMap<Double, Point>(); //list of available Wi-Fi access points with corresponding distances from several scans
-    //private double[] lastCalculatedPosition = null;
     private SensorManager sensorManager;
     private Sensor sensor;
-    /*private TriggerEventListener triggerEventListener = new TriggerEventListener() {
-        @Override
-        public void onTrigger(TriggerEvent event) {
-            if(sensorUpdateTrigger)
-                wifiPointsLocationInfList.clear();
-        }
-    };*/
     private SensorEventListener sensorEventListener = new SensorEventListener() {
         @Override
         public void onSensorChanged(final SensorEvent event) {
             Sensor sensor = event.sensor;
-            //double[] gravity = new double[3];
-            //double[] linear_acceleration = new double[3];
-            //final float alpha = 0.8f;
 
             if (sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-                /*for(int i = 0; i < gravity.length; i++){
-                    //Isolating the force of gravity with the low-pass filter
-                    //double timeGone = (1 - alpha) * event.values[i];
-                    linear_acceleration[i] = event.values[i];
-                }
-
-                // Isolate the force of gravity with the low-pass filter.
-                gravity[0] = alpha * gravity[0] + (1 - alpha) * event.values[0];
-                gravity[1] = alpha * gravity[1] + (1 - alpha) * event.values[1];
-                gravity[2] = alpha * gravity[2] + (1 - alpha) * event.values[2];
-
-                // Remove the gravity contribution with the high-pass filter.
-                linear_acceleration[0] = event.values[0] - gravity[0];
-                linear_acceleration[1] = event.values[1] - gravity[1];
-                linear_acceleration[2] = event.values[2] - gravity[2];*/
-
                 //If it is the fist time onSensorChanged event is run, read the start data on acceleration
-                if(firstSensorChange){
+                /*if(firstSensorChange){
                     new CountDownTimer(4000, 1000) {
                         public void onFinish() {
                             // When timer is finished
@@ -137,7 +100,19 @@ public class WifiPosition {
                     }
                     else if(lastUpdateTime == 0)
                         lastUpdateTime = curentTime;
+                }*/
+                long curentTime = System.currentTimeMillis();
+                long timeGone = curentTime - lastUpdateTime;
+                //Check if more than 2.3 seconds are gone since last detected movement and it is not first detected movement
+                if(lastUpdateTime != 0 && (timeGone >= 2300)){
+                    //Check if it was significant enough movement
+                    if((Math.abs(event.values[0]) > (xStartValue + 2)) || (Math.abs(event.values[1]) > (yStartValue + 2))){
+                        moving = true;
+                        lastUpdateTime = curentTime;
+                    }
                 }
+                else if(lastUpdateTime == 0)
+                    lastUpdateTime = curentTime;
             }
         }
 
@@ -152,6 +127,7 @@ public class WifiPosition {
     private boolean firstSensorChange = true; //Variable that shows if it is first time sensor data was changed
     private double xStartValue = 0; //acceleration on x-axis at the time of first onSensorChanged run
     private double yStartValue = 0; //acceleration on y-axis at the time of first onSensorChanged run
+    private double [] lastSendtPosition = new double[3];
 
     /**
      * Initialize TimerTask to set up continuous scannig for available Wi-Fi access points
@@ -174,11 +150,9 @@ public class WifiPosition {
         c.registerReceiver(wifiReceiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
         WifiManager wifiManager = (WifiManager) c.getSystemService(Context.WIFI_SERVICE);
         wifiManager.startScan();
-        //Register listner to detect if device changed position
+        //Register listener to detect if device changed position
         sensorManager = (SensorManager) c.getSystemService(c.SENSOR_SERVICE);
-        sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        //sensorManager.requestTriggerSensor(triggerEventListener, sensor);
-        //sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);;
         sensorManager.registerListener(sensorEventListener, sensor, SensorManager.SENSOR_DELAY_FASTEST);
     }
 
@@ -261,42 +235,48 @@ public class WifiPosition {
 
         //If there are three available Wi-Fi access points with known coordinates, calculating position
         double[] calculatedPosition = null;
-        calculatedPosition = calculatePosition(sortedWifiPointsLocationInf);
-
-        //Calculate distance between last known position and newly calculated position
-        /*float distance = 0;
-        if(lastCalculatedPosition == null)
-            lastCalculatedPosition = calculatedPosition;
-        else
-            distance = calculateDistance(calculatedPosition);
-
-        //If distance is more than 10 meters send new position to application and change values to last known position
-        if(distance >= 6 || distance == 0){
-            //wifiPointsLocationInfList.clear();
-            lastCalculatedPosition = calculatedPosition;
-            Intent intent = new Intent();
-            intent.setAction("no.hesa.positionlibrary.Output");
-
-            if(calculatedPosition != null)
-                intent.putExtra("position", calculatedPosition);
-            else {
-                double[] noPosition = {0,0};
-                intent.putExtra("position", noPosition);
-            }
-
-            c.sendBroadcast(intent);
-        }*/
-        Intent intent = new Intent();
-        intent.setAction("no.hesa.positionlibrary.Output");
-
-        if(calculatedPosition != null)
-            intent.putExtra("position", calculatedPosition);
-        else {
-            double[] noPosition = {0,0};
-            intent.putExtra("position", noPosition);
+        int floor;
+        if(sortedWifiPointsLocationInf.size() < 3){
+            calculatedPosition = new double[]{0, 0};
+            floor = 1;
+        }
+        else{
+            calculatedPosition = calculatePosition(sortedWifiPointsLocationInf);
+            floor = findFloor(sortedWifiPointsLocationInf);
         }
 
+        //Send result to application
+        Intent intent = new Intent();
+        intent.setAction("no.hesa.positionlibrary.Output");
+        intent.putExtra("position", calculatedPosition);
+        intent.putExtra("floor", floor);
         c.sendBroadcast(intent);
+    }
+
+    /**
+     * Find out what floor are user at
+     * @param sortedWifiPointsLocationInf list of distances to three closest Wi-Fi access points with corresponding geo coordinates
+     * @return floor number
+     */
+    private int findFloor(Map<Double, Point> sortedWifiPointsLocationInf) {
+        Point [] values = (Point[]) sortedWifiPointsLocationInf.values().toArray(new Point[sortedWifiPointsLocationInf.size()]);
+        ArrayList<Integer> floors = new ArrayList<>(values.length);
+        ArrayList<Integer> occurences = new ArrayList<>();
+
+        //Fill floors array with floor number corresponding to Wi-Fi access point
+        for(int i = 0; i < values.length; i++){
+            floors.add(values[i].getFloor());
+        }
+
+        //Count occurences of every floor
+        for(int i = 0; i < 6; i++){
+            occurences.add(Collections.frequency(floors, i));
+        }
+
+        //Get number to the most often occured floor
+        int result = occurences.indexOf(Collections.max(occurences));
+
+        return result;
     }
 
     /**
@@ -386,22 +366,14 @@ public class WifiPosition {
         String [] values = (String[]) wifiPointsScanInf.keySet().toArray(new String[wifiPointsScanInf.size()]);
 
         //List of MAC addresses to known Wi-Fi access point with corresponding geo coordinates
-        //frequency: 2.4
         TreeMap<String, Point> wifiPointsMacGeo = new TreeMap<String, Point>();
-        /*wifiPointsMacGeo.put("ec:bd:1d:8b:8d:b0", new Point(68.43611583610615, 17.43369428932667));
-        wifiPointsMacGeo.put("ec:bd:1d:6b:8d:40", new Point(68.43606297172468, 17.433767840266228));
-        wifiPointsMacGeo.put("ec:bd:1d:6b:8e:70", new Point(68.43617239716085, 17.433753423392773));
-        wifiPointsMacGeo.put("ec:bd:1d:88:85:70", new Point(68.43623622842107, 17.43380941450596));
-        wifiPointsMacGeo.put("34:ab:4e:fc:5f:40", new Point(68.4362602575168, 17.43396732956171));
-        wifiPointsMacGeo.put("5c:83:8f:34:f9:59", new Point(68.43618089979086, 17.434068247675896));*/
-
         //frequency: 5.0
-        wifiPointsMacGeo.put("ec:bd:1d:88:8d:bf", new Point(68.43611583610615, 17.43369428932667));
-        wifiPointsMacGeo.put("ec:bd:1d:6b:8d:4f", new Point(68.43606297172468, 17.433767840266228));
-        wifiPointsMacGeo.put("ec:bd:1d:6b:8e:7f", new Point(68.43617239716085, 17.433753423392773));
-        wifiPointsMacGeo.put("ec:bd:1d:88:85:7f", new Point(68.43623622842107, 17.43380941450596));
-        wifiPointsMacGeo.put("34:ab:4e:fc:5f:4f", new Point(68.4362602575168, 17.43396732956171));
-        wifiPointsMacGeo.put("5c:83:8f:34:f9:5f", new Point(68.43618089979086, 17.434068247675896));
+        wifiPointsMacGeo.put("ec:bd:1d:88:8d:bf", new Point(68.43611583610615, 17.43369428932667, 1));
+        wifiPointsMacGeo.put("ec:bd:1d:6b:8d:4f", new Point(68.43606297172468, 17.433767840266228, 1));
+        wifiPointsMacGeo.put("ec:bd:1d:6b:8e:7f", new Point(68.43617239716085, 17.433753423392773, 1));
+        wifiPointsMacGeo.put("ec:bd:1d:88:85:7f", new Point(68.43623622842107, 17.43380941450596, 1));
+        wifiPointsMacGeo.put("34:ab:4e:fc:5f:4f", new Point(68.4362602575168, 17.43396732956171, 1));
+        wifiPointsMacGeo.put("5c:83:8f:34:f9:5f", new Point(68.43618089979086, 17.434068247675896, 1));
 
         //Checking MAC addresses of available Wi-Fi access points against list of MAC addresses to known Wi-Fi access points
         for(int i = 0; i < wifiPointsScanInf.size(); i++){

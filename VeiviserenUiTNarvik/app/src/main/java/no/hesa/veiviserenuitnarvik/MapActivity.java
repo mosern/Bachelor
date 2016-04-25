@@ -222,26 +222,19 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     private void registerPositionReceiver()
     {
-        // TODO: Evgeniia 19.04 får Error receiving broadcast Intent { act=android.net.wifi.SCAN_RESULTS flg=0x4000010 (has extras) } in no.hesa.positionlibrary.WifiPosition$1@34b1cf2
-
-
         positionLibOutputReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 if (intent.getAction().equals("no.hesa.positionlibrary.Output")) {
                     double[] pos = intent.getDoubleArrayExtra("position");
+                    int floor = intent.getIntExtra("floor", 1);
                     if (pos[0] != 0 && pos[1] != 0)
                     {
-                        //Toast.makeText(MapActivity.this, "User location received from library = " + pos[0] + "," + pos[1], Toast.LENGTH_LONG).show();
                         LatLng latLng = new LatLng(pos[0], pos[1]);
-                        //mMap.clear();
-                        //circleOne.setCenter(latLng);
-                        //circleTwo.setCenter(latLng);
+                        //Move position marker
                         circleThree.setCenter(latLng);
                         circleTwo.setCenter(latLng);
                         circleOne.setCenter(latLng);
-                        // mMap.addMarker(new MarkerOptions().position(latLng).title("UserLocAsDeterminedByLibrary\nLat:" + pos[0] + " Lng: " + pos[1]));
-                        // mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
                         currentPosision = latLng;
                         if (targetPosition != null) {
                             drawRoute(currentPosision, targetPosition);
