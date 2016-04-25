@@ -14,12 +14,24 @@ using System.Web.Http;
 
 namespace Api.Controllers
 {
+    /// <summary>
+    /// Controller that handels crud for Coordinates
+    /// </summary>
     [RoutePrefix("api")]
     public class CoordinateController : ApiController
     {
         const int stdPageSize = 5;
 
-
+        /// <summary>
+        /// Gets a list of coordinates
+        /// </summary>
+        /// <param name="fields">Optional. The fields to include in returned object. Returns all fields if no field is specified</param>
+        /// <param name="sort">Optional, sorts accending by id if not set. The fields to sort by, use "," to serparate fields. Use "-" in fornt of field name to sort decending. Sorts accesnding by id as default</param>
+        /// <param name="page">Optional. The page you want</param>
+        /// <param name="pageSize">Optional, standard value is 5. The size you want your pages to be</param>
+        /// <param name="asObject">Optional, standard value is true. Spesify if you want a collection or a object with the collection as a property</param>
+        /// <param name="objPropName">Optional, standard value is "coordiantes". Name of object if asObject is true</param>
+        /// <returns>200 ok with processed list of all coordinatess in the database</returns>
         [Route("coordinates", Name = "coordinates")]
         public IHttpActionResult Get(string fields = null, string sort = "id", int? page = null, int pageSize = stdPageSize, bool asObject = true, string objPropName = "coordinates")
         {
@@ -43,6 +55,12 @@ namespace Api.Controllers
 
         }
 
+        /// <summary>
+        /// Gets a spesific coordinates
+        /// </summary>
+        /// <param name="id"> id for the accesspoint you want to get</param>
+        /// <param name="fields">Optional. The fields to include in returned object. Returns all fields if no field is specified</param>
+        /// <returns>200 ok with processed coordinates object</returns>
         [Route("coordinates/{id}")]
         public IHttpActionResult Get(int id, string fields = null)
         {
@@ -64,6 +82,11 @@ namespace Api.Controllers
 
         }
 
+        /// <summary>
+        /// Creates new coordinates
+        /// </summary>
+        /// <param name="cor">CoordinateViewModel with info about the coordnate to create</param>
+        /// <returns>201 created with the new object</returns>
         [Route("coordinates")]
         public IHttpActionResult Post(CoordinateViewModel cor)
         {
@@ -80,6 +103,12 @@ namespace Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Full update of a coordinate
+        /// </summary>
+        /// <param name="cor">All information about the coordinate to be updated</param>
+        /// <param name="id">Id of the coordinate to be updated</param>
+        /// <returns>200 ok</returns>
         [Route("coordinates/{id}")]
         public IHttpActionResult Put(CoordinateViewModel cor, int id)
         {
@@ -102,6 +131,12 @@ namespace Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Partial update of a coordinate
+        /// </summary>
+        /// <param name="cor">Information about the coodinate to be updated</param>
+        /// <param name="id">Id of the coordiante to be updated</param>
+        /// <returns>200 ok</returns>
         [Route("coordinates/{id}")]
         public IHttpActionResult Patch(CoordinateViewModel cor, int id)
         {
@@ -124,6 +159,11 @@ namespace Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Removes an coordinate
+        /// </summary>
+        /// <param name="id">Id of the coordinate to remove</param>
+        /// <returns>200 ok</returns>
         [Route("coordinates/{id}")]
         public IHttpActionResult Delete(int id)
         {

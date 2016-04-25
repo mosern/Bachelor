@@ -8,6 +8,9 @@ using System.Web.Http.Routing;
 
 namespace Api.Classes
 {
+    /// <summary>
+    /// PaginationHeader object and static metode for creating it.
+    /// </summary>
     public class PaginationHeader
     {
         int page;
@@ -29,6 +32,7 @@ namespace Api.Classes
 
             ExpandoObject routeValues = new ExpandoObject();
 
+            //TODO Check what this is about!
             //foreach (KeyValuePair<string, object> entry in _routeValues)
             //{
             //    _routeValues.Add(entry.Key, entry.Value);

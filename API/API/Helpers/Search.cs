@@ -11,9 +11,16 @@ using System.Web;
 
 namespace Api.Classes
 {
+    /// <summary>
+    /// Handles search fuctionality
+    /// </summary>
     public class Search
     {
-
+        /// <summary>
+        /// Takes a search stirng and returns the result
+        /// </summary>
+        /// <param name="searchString"></param>
+        /// <returns>SearchViewModel, contains the result in form of a list LocationViewModel and a list of PeopleViewModel</returns>
         public static SearchViewModel Location(string searchString)
         {
             SearchViewModel result = new SearchViewModel();
@@ -33,6 +40,7 @@ namespace Api.Classes
                 case 1: people = peopleByName(searchString); break;
             }
 
+            //TODO Clean this up!
             //List<int> locid = new List<int>();
 
             //foreach(PeopleViewModel peo in people)
@@ -45,7 +53,7 @@ namespace Api.Classes
 
             //    if(tempLoc != null)
             //    {
-            //        loc = AutoMapConfig.configureMaping().Map<Location, LocationViewModel>(tempLoc);
+            //        loc = AutoMapConfig.getMapper().Map<Location, LocationViewModel>(tempLoc);
             //    }
             //    else
             //    {
@@ -77,7 +85,7 @@ namespace Api.Classes
 
             //        if (tempPeo != null)
             //        {
-            //            peo = AutoMapConfig.configureMaping().Map<People, PeopleViewModel>(tempPeo);
+            //            peo = AutoMapConfig.getMapper().Map<People, PeopleViewModel>(tempPeo);
             //        }
             //        else
             //        {
@@ -102,6 +110,11 @@ namespace Api.Classes
 
         }
 
+        /// <summary>
+        /// Checks what the search string contains
+        /// </summary>
+        /// <param name="searchString"></param>
+        /// <returns>int based on type of input. 1 for Loc number, 2 for LocName, 0 for unknown</returns>
         private static int getTypeLocation(string searchString)
         {
             if (isLocNr(searchString))
@@ -118,6 +131,11 @@ namespace Api.Classes
             }
         }
 
+        /// <summary>
+        /// Checks what the search string contains
+        /// </summary>
+        /// <param name="searchString"></param>
+        /// <returns>int based on type of input. 1 for people name, 0 for unknown</returns>
         private static int getTypePeople(string searchString)
         {
 
@@ -131,6 +149,11 @@ namespace Api.Classes
             }
         }
 
+        /// <summary>
+        /// Checks if search string is a locNr
+        /// </summary>
+        /// <param name="checkString"></param>
+        /// <returns>bool</returns>
         private static bool isLocNr(string checkString)
         {
             if(checkString.Length > 5)
@@ -177,6 +200,11 @@ namespace Api.Classes
                 
         }
 
+        /// <summary>
+        /// Checks if search string is a locName
+        /// </summary>
+        /// <param name="checkString"></param>
+        /// <returns>bool</returns>
         private static bool isLocName(string checkString)
         {
             if(checkString.Length <= 20)
@@ -189,6 +217,7 @@ namespace Api.Classes
             }
         }
 
+        //TODO Remove?
         //private static bool isLocId(string checkString)
         //{
         //    try
@@ -203,6 +232,11 @@ namespace Api.Classes
 
         //}
 
+        /// <summary>
+        /// Checks if search string is a people name
+        /// </summary>
+        /// <param name="checkString"></param>
+        /// <returns>bool</returns>
         private static bool isPeoName(string checkString)
         {
             if (checkString.Length <= 20)
@@ -215,6 +249,11 @@ namespace Api.Classes
             }
         }
 
+        /// <summary>
+        /// gets people objects where name contains search string
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         private static IQueryable<PeopleViewModel> peopleByName(string name)
         {
             IEnumerable<People> peo;
@@ -224,7 +263,7 @@ namespace Api.Classes
 
                 if (peo != null)
                 {
-                    return AutoMapConfig.configureMaping().Map<IEnumerable<People>, IEnumerable<PeopleViewModel>>(peo).AsQueryable();
+                    return AutoMapConfig.getMapper().Map<IEnumerable<People>, IEnumerable<PeopleViewModel>>(peo).AsQueryable();
                 }
                 else
                 {
@@ -234,6 +273,11 @@ namespace Api.Classes
                 
         }
 
+        /// <summary>
+        /// gets location objects where locNr contains search string
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         private static IQueryable<LocationViewModel> locationByLocNr(string locNr)
         {
             IEnumerable<Location> loc;
@@ -243,7 +287,7 @@ namespace Api.Classes
 
                 if (loc != null)
                 {
-                    return AutoMapConfig.configureMaping().Map<IEnumerable<Location>, IEnumerable<LocationViewModel>>(loc).AsQueryable();
+                    return AutoMapConfig.getMapper().Map<IEnumerable<Location>, IEnumerable<LocationViewModel>>(loc).AsQueryable();
                 }
                 else
                 {
@@ -252,6 +296,11 @@ namespace Api.Classes
             }             
         }
 
+        /// <summary>
+        /// gets location objects where name contains search string
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         private static IQueryable<LocationViewModel> locationByName(string name)
         {
             IEnumerable<Location> loc;
@@ -261,7 +310,7 @@ namespace Api.Classes
 
                 if (loc != null)
                 {
-                    return AutoMapConfig.configureMaping().Map<IEnumerable<Location>, IEnumerable<LocationViewModel>>(loc).AsQueryable();
+                    return AutoMapConfig.getMapper().Map<IEnumerable<Location>, IEnumerable<LocationViewModel>>(loc).AsQueryable();
                 }
                 else
                 {
@@ -271,6 +320,11 @@ namespace Api.Classes
 
         }
 
+        /// <summary>
+        /// gets location objects where id equals search string
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         private static IQueryable<LocationViewModel> locationById(int id)
         {
             Location loc;
@@ -283,7 +337,7 @@ namespace Api.Classes
                     var list = new List<Location>();
                     list.Add(loc);
 
-                    return AutoMapConfig.configureMaping().Map<IEnumerable<Location>, IEnumerable<LocationViewModel>>(list).AsQueryable();
+                    return AutoMapConfig.getMapper().Map<IEnumerable<Location>, IEnumerable<LocationViewModel>>(list).AsQueryable();
                 }
                 else
                 {

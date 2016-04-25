@@ -32,14 +32,29 @@ namespace Api.Helpers
         {
             if (fields != null)
             {
-                return ShapeFactory<X>.Shape(AutoMapConfig.configureMaping().Map<object, X>(obj), fields.ToLower().Split(',').ToList());
+                return ShapeFactory<X>.Shape(AutoMapConfig.getMapper().Map<object, X>(obj), fields.ToLower().Split(',').ToList());
             }
             else
             {
-                return AutoMapConfig.configureMaping().Map<object, X>(obj);
+                return AutoMapConfig.getMapper().Map<object, X>(obj);
             }
         }
 
+        /// <summary>
+        /// Converts collection of object to X where X is of type BaseViewModel and optionally applies field filtering, sorting and paging with support for custom pagesize.
+        /// </summary>
+        /// <typeparam name="X">Type of ViewModel, used for converting object to a viewmodel</typeparam>
+        /// <param name="obj">The object to process</param>
+        /// <param name="context">HttpContext used to add "x-pagination" header</param>
+        /// <param name="request">Used by PaginationHeader class to initiate UrlHelper that is used to generate links for next and previous page</param>
+        /// <param name="routeName">Used in pagination header</param>
+        /// <param name="asObject">Spesify if you want a collection or a object with the collection as a property</param>
+        /// <param name="objPropName">Name of object if asObject is true</param>
+        /// <param name="fields">The fields to include in returned object. Returns all fields if no field is specified</param>
+        /// <param name="sort">The fields to sort by, user "," to serparate fields. Use "-" in fornt of field name to sort decending. Sorts accesnding by id as default</param>
+        /// <param name="page">The page you want</param>
+        /// <param name="pageSize">The size you want your pages to be</param>
+        /// <returns>Processed object</returns>
         public static object get<X>(IQueryable<object> obj, HttpContext context, HttpRequestMessage request, string routeName, bool asObject, string objPropName, string fields = null, string sort = "id", int? page = null, int? pageSize = null) where X : BaseViewModel
         {
 
@@ -66,7 +81,7 @@ namespace Api.Helpers
                     if (page != null)
                         context.Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(PaginationHeader.Get(page.Value, pageSize.Value, obj.Count(), routeName, routeValues, request)));
 
-                    var toShape = AutoMapConfig.configureMaping().Map<IEnumerable<object>, IEnumerable<X>>(temp);
+                    var toShape = AutoMapConfig.getMapper().Map<IEnumerable<object>, IEnumerable<X>>(temp);
                     IQueryable<object> toReturn = ShapeFactory<X>.ShapeList(toShape, fields.ToLower().Split(',').ToList()).AsQueryable();
 
                     if (asObject)
@@ -86,7 +101,7 @@ namespace Api.Helpers
                     if (page != null)
                         context.Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(PaginationHeader.Get(page.Value, pageSize.Value, obj.Count(), "objects", routeValues, request)));
 
-                    var toReturn = AutoMapConfig.configureMaping().Map<IEnumerable<object>, IEnumerable<X>>(temp).AsQueryable();
+                    var toReturn = AutoMapConfig.getMapper().Map<IEnumerable<object>, IEnumerable<X>>(temp).AsQueryable();
 
                     if (asObject)
                     {
@@ -106,16 +121,23 @@ namespace Api.Helpers
             }
         }
 
+        /// <summary>
+        /// Creates new object in database from viewmodel
+        /// </summary>
+        /// <typeparam name="X">Type of database model, must inherit BaseModel</typeparam>
+        /// <typeparam name="Y">Type of ViewModel, must inherit BaseViewModel</typeparam>
+        /// <param name="viewModel">The view model containing data to create new database object from</param>
+        /// <returns>ViewModel created from the new database object</returns>
         public static object post<X, Y>(Y viewModel) where X : BaseModel where Y : BaseViewModel
         {
             try
             {
-                X model = AutoMapConfig.configureMaping().Map<Y, X>(viewModel);
+                X model = AutoMapConfig.getMapper().Map<Y, X>(viewModel);
 
                 using(var repo = new LocationRepository<X>())
                 model = repo.Create(model);
 
-                return AutoMapConfig.configureMaping().Map<X, Y>(model);
+                return AutoMapConfig.getMapper().Map<X, Y>(model);
             }
             catch(Exception e)
             {
@@ -123,11 +145,12 @@ namespace Api.Helpers
             }
         }
 
+        //TODO Find a solution that works for users and BaseModel
         public static BaseDbModel post(User user)
         {
             try
             {
-                return new Repository<User>().Create(AutoMapConfig.configureMaping().Map<User, User>(user));
+                return new Repository<User>().Create(AutoMapConfig.getMapper().Map<User, User>(user));
             }
             catch
             {
@@ -135,11 +158,16 @@ namespace Api.Helpers
             }
         }
 
+        /// <summary>
+        /// Full update of object in database from viewmodel
+        /// </summary>
+        /// <typeparam name="X">Type of database model, must inherit BaseModel</typeparam>
+        /// <param name="viewModel">The view model containing data to be set to existing database object</param>
         public static void Put<X>(object viewModel) where X : BaseModel
         {
             try
             {
-                X model = AutoMapConfig.configureMaping().Map<object, X>(viewModel);
+                X model = AutoMapConfig.getMapper().Map<object, X>(viewModel);
 
                 using (var repo = new LocationRepository<X>())
                     repo.Update(model);
@@ -151,6 +179,7 @@ namespace Api.Helpers
             
         }
 
+        //TODO Find a solution that works for users and BaseModel
         public static void Put(User model)
         {
             try
@@ -164,6 +193,11 @@ namespace Api.Helpers
 
         }
 
+        /// <summary>
+        /// Partial update of object in database from viewmodel
+        /// </summary>
+        /// <typeparam name="X">Type of database model, must inherit BaseModel</typeparam>
+        /// <param name="viewModel">The view model containing data to be set to existing database object</param>
         public static void Patch<X>(object viewModel) where X : BaseModel
         {
             X src;
@@ -188,6 +222,11 @@ namespace Api.Helpers
                 repo.Update(src);
         }
 
+        /// <summary>
+        /// Removes a object from the database
+        /// </summary>
+        /// <typeparam name="X"></typeparam>
+        /// <param name="id"></param>
         public static void Delete<X>(int id) where X : BaseModel
         {
             try
@@ -204,6 +243,7 @@ namespace Api.Helpers
             }
         }
 
+        //TODO Find a solution that works for users and BaseModel
         public static void Delete(User user)
         {
             try

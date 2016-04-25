@@ -7,6 +7,7 @@ using Thinktecture.IdentityModel.Owin.ResourceAuthorization;
 
 namespace Api.Classes
 {
+    //Implementation of Identityservers resourceAutorization
     //https://identityserver.github.io/Documentation/docsv2/overview/mvcGettingStarted.html
     public class AuthorizationManager : ResourceAuthorizationManager
     {

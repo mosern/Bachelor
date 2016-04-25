@@ -12,12 +12,24 @@ using System.Web.Http;
 
 namespace Api.Controllers
 {
+    /// <summary>
+    /// Controller that handels crud for Accesspoints
+    /// </summary>
     [RoutePrefix("api")]
     public class AccesspointController : ApiController
     {
         const int stdPageSize = 5;
 
-
+        /// <summary>
+        /// Gets a list of accesspoints
+        /// </summary>
+        /// <param name="fields">Optional. The fields to include in returned object. Returns all fields if no field is specified</param>
+        /// <param name="sort">Optional, sorts accending by id if not set. The fields to sort by, use "," to serparate fields. Use "-" in fornt of field name to sort decending. Sorts accesnding by id as default</param>
+        /// <param name="page">Optional. The page you want</param>
+        /// <param name="pageSize">Optional, standard value is 5. The size you want your pages to be</param>
+        /// <param name="asObject">Optional, standard value is true. Spesify if you want a collection or a object with the collection as a property</param>
+        /// <param name="objPropName">Optional, standard value is "accesspoints". Name of object if asObject is true</param>
+        /// <returns>200 ok with processed list of all accesspoints in the database</returns>
         [Route("accesspoints", Name = "accesspoints")]
         public IHttpActionResult Get(string fields = null, string sort = "id", int? page = null, int pageSize = stdPageSize, bool asObject = true, string objPropName = "accesspoints")
         {
@@ -40,6 +52,12 @@ namespace Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Gets a spesific accesspoint
+        /// </summary>
+        /// <param name="id"> id for the accesspoint you want to get</param>
+        /// <param name="fields">Optional. The fields to include in returned object. Returns all fields if no field is specified</param>
+        /// <returns>200 ok with processed accesspoint object</returns>
         [Route("accesspoints/{id}")]
         public IHttpActionResult Get(int id, string fields = null)
         {
@@ -61,6 +79,11 @@ namespace Api.Controllers
                 
         }
 
+        /// <summary>
+        /// Creates new accesspont
+        /// </summary>
+        /// <param name="acc">AccesspointViewModel with info about the accesspoint to create</param>
+        /// <returns>201 created with the new object</returns>
         [Route("accesspoints")]
         public IHttpActionResult Post(AccesspointViewModel acc)
         {
@@ -77,6 +100,12 @@ namespace Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Full update of a accesspoint
+        /// </summary>
+        /// <param name="acc">All information about the accesspoint to be updated</param>
+        /// <param name="id">Id of the accesspoint to be updated</param>
+        /// <returns>200 ok</returns>
         [Route("accesspoints/{id}")]
         public IHttpActionResult Put(AccesspointViewModel acc, int id)
         {
@@ -85,7 +114,7 @@ namespace Api.Controllers
                 try
                 {
                     acc.Id = id;
-                    ControllerHelper.Put<Location>(acc);
+                    ControllerHelper.Put<Accesspoint>(acc);
                     return Ok();
                 }
                 catch
@@ -99,6 +128,12 @@ namespace Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Partial update of a accesspoint
+        /// </summary>
+        /// <param name="acc">Information about the accesspoint to be updated</param>
+        /// <param name="id">Id of the accesspoint to be updated</param>
+        /// <returns>200 ok</returns>
         [Route("accesspoints/{id}")]
         public IHttpActionResult Patch(AccesspointViewModel acc, int id)
         {
@@ -107,7 +142,7 @@ namespace Api.Controllers
                 try
                 {
                     acc.Id = id;
-                    ControllerHelper.Patch<Location>(acc);
+                    ControllerHelper.Patch<Accesspoint>(acc);
                     return Ok();
                 }
                 catch
@@ -121,6 +156,11 @@ namespace Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Removes an accesspoint
+        /// </summary>
+        /// <param name="id">Id of the accespoint to remove</param>
+        /// <returns>200 ok</returns>
         [Route("accesspoints/{id}")]
         public IHttpActionResult Delete(int id)
         {

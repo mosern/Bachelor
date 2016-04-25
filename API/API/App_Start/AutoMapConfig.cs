@@ -12,10 +12,12 @@ using UserDB;
 
 namespace Api
 {
-    //TODO check if all converters is setting id
+    /// <summary>
+    /// Configuration of automapper, used to convert between db models to viewmodels
+    /// </summary>
     public class AutoMapConfig
     {
-        public static IMapper configureMaping()
+        public static IMapper getMapper()
         {
             var config = new MapperConfiguration(c =>
             {
@@ -65,7 +67,7 @@ namespace Api
                 {
                     Location temp = locRepo.Read(uLoc.LocationId);
                     temp.Hits = uLoc.Hits;
-                    locs.Add(AutoMapConfig.configureMaping().Map<Location, LocationViewModel>(temp));
+                    locs.Add(AutoMapConfig.getMapper().Map<Location, LocationViewModel>(temp));
                 }
 
                 return new UserViewModel()
@@ -97,8 +99,8 @@ namespace Api
                     Desc = location.Desc,
                     Hits = userLocation.Hits,
                     LocNr = location.LocNr,
-                    Type = AutoMapConfig.configureMaping().Map<Models.EF.Type, TypeViewModel>(typeRepo.Read(location.TypeId)),
-                    Coordinate = AutoMapConfig.configureMaping().Map<Coordinate, CoordinateViewModel>(coorRepo.Read(location.CoordinateId))
+                    Type = AutoMapConfig.getMapper().Map<Models.EF.Type, TypeViewModel>(typeRepo.Read(location.TypeId)),
+                    Coordinate = AutoMapConfig.getMapper().Map<Coordinate, CoordinateViewModel>(coorRepo.Read(location.CoordinateId))
                 };
         }
     }
@@ -114,7 +116,14 @@ namespace Api
             Location dest;
             using (var repo = new LocationRepository<Coordinate>())
             {
-                cor = repo.Create(new Coordinate() { Lat = source.Coordinate.Lat, Lng = source.Coordinate.Lng, Alt = source.Coordinate.Alt });
+                if (source.Id.Value == 0)
+                {
+                    cor = repo.Create(new Coordinate() { Lat = source.Coordinate.Lat, Lng = source.Coordinate.Lng, Alt = source.Coordinate.Alt });
+                }
+                else
+                {
+                    cor = repo.Create(new Coordinate { Id = source.Id.Value });
+                }
 
                 dest = new Location()
                 {
@@ -125,8 +134,6 @@ namespace Api
                     LocNr = source.LocNr,
                     CoordinateId = cor.Id,
                     TypeId = source.Type.Id.Value,
-                    //Coordinate = new LocationRepository<Coordinate>().Read(source.Coordinate.Id),
-                    //Type = new LocationRepository<Models.EF.Type>().Read(source.Type.Id)
                 };
             }
                 
@@ -151,8 +158,8 @@ namespace Api
                     Desc = source.Desc,
                     Hits = source.Hits,
                     LocNr = source.LocNr,
-                    Coordinate = AutoMapConfig.configureMaping().Map<Coordinate, CoordinateViewModel>(coorRepo.Read(source.CoordinateId)),
-                    Type = AutoMapConfig.configureMaping().Map<Models.EF.Type, TypeViewModel>(typeRepo.Read(source.TypeId))
+                    Coordinate = AutoMapConfig.getMapper().Map<Coordinate, CoordinateViewModel>(coorRepo.Read(source.CoordinateId)),
+                    Type = AutoMapConfig.getMapper().Map<Models.EF.Type, TypeViewModel>(typeRepo.Read(source.TypeId))
                 };
 
             return dest;
@@ -165,14 +172,14 @@ namespace Api
         {
             Accesspoint source = (Accesspoint)context.SourceValue;
 
-            AccesspointViewModel dest;
+            AccesspointViewModel dest = new AccesspointViewModel();
             using (var repo = new LocationRepository<Coordinate>())
                 dest = new AccesspointViewModel()
                 {
                     Id = source.Id,
                     Desc = source.Desc,
                     MacAddress = source.MacAddress,
-                    Coordinate = AutoMapConfig.configureMaping().Map<Coordinate, CoordinateViewModel>(repo.Read(source.Coordinate.Id))
+                    Coordinate = AutoMapConfig.getMapper().Map<Coordinate, CoordinateViewModel>(repo.Read(source.CoordinateId))
 
                 };
 
@@ -185,12 +192,24 @@ namespace Api
         public Accesspoint Convert(ResolutionContext context)
         {
             AccesspointViewModel source = (AccesspointViewModel)context.SourceValue;
+            Coordinate cor;
+
+            if(source.Coordinate.Id.Value == 0)
+            {
+                using (var repo = new LocationRepository<Coordinate>())
+                    cor = repo.Create(new Coordinate() { Lat = source.Coordinate.Lat, Lng = source.Coordinate.Lng, Alt = source.Coordinate.Alt });
+            }
+            else
+            {
+                cor = new Coordinate { Id = source.Id.Value };
+            }
+
             Accesspoint dest = new Accesspoint()
             {
                 Id = source.Id.Value,
                 Desc = source.Desc,
                 MacAddress = source.MacAddress,
-                CoordinateId = source.Coordinate.Id.Value
+                CoordinateId = cor.Id
             };
 
             return dest;
