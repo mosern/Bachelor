@@ -11,6 +11,7 @@ namespace Api.Models.Api
     {
         [Required]
         public string Name { get; set; }
+        [Required]
         public string Desc { get; set; }
         [Required, MaxLength(5)]
         public string LocNr { get; set; }

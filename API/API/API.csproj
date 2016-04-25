@@ -293,6 +293,10 @@
     <Compile Include="Migrations\LocationConfiguration\201604210714162_descJobtitle.Designer.cs">
       <DependentUpon>201604210714162_descJobtitle.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\LocationConfiguration\201604251116459_RequireDescJobtitle.cs" />
+    <Compile Include="Migrations\LocationConfiguration\201604251116459_RequireDescJobtitle.Designer.cs">
+      <DependentUpon>201604251116459_RequireDescJobtitle.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\LocationConfiguration\Configuration.cs" />
     <Compile Include="Models\Api\AccesspointViewModel.cs" />
     <Compile Include="Models\Api\BaseViewModel.cs" />
@@ -389,6 +393,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\LocationConfiguration\201604210714162_descJobtitle.resx">
       <DependentUpon>201604210714162_descJobtitle.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\LocationConfiguration\201604251116459_RequireDescJobtitle.resx">
+      <DependentUpon>201604251116459_RequireDescJobtitle.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
