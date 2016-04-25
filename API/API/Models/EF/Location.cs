@@ -18,7 +18,9 @@ namespace Api.Models.EF
 
         public int Hits { get; set; }
 
+
         public int CoordinateId { get; set; }
+        [Required]
         public virtual Coordinate Coordinate { get; set; }
 
         public int TypeId { get; set; }

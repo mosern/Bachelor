@@ -121,7 +121,7 @@ namespace Api
                 }
                 else
                 {
-                    cor = repo.Create(new Coordinate { Id = source.Id.Value });
+                    cor = new Coordinate { Id = source.Id.Value };
                 }
 
                 dest = new Location()

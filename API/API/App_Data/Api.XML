@@ -873,7 +873,7 @@
             <summary>
             gets location objects where locNr contains search string
             </summary>
-            <param name="name"></param>
+            <param name="locNr"></param>
             <returns></returns>
         </member>
         <member name="M:Api.Classes.Search.locationByName(System.String)">
@@ -887,7 +887,7 @@
             <summary>
             gets location objects where id equals search string
             </summary>
-            <param name="name"></param>
+            <param name="id"></param>
             <returns></returns>
         </member>
         <member name="T:Api.Classes.PaginationHeader">

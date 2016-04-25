@@ -276,7 +276,7 @@ namespace Api.Classes
         /// <summary>
         /// gets location objects where locNr contains search string
         /// </summary>
-        /// <param name="name"></param>
+        /// <param name="locNr"></param>
         /// <returns></returns>
         private static IQueryable<LocationViewModel> locationByLocNr(string locNr)
         {
@@ -323,7 +323,7 @@ namespace Api.Classes
         /// <summary>
         /// gets location objects where id equals search string
         /// </summary>
-        /// <param name="name"></param>
+        /// <param name="id"></param>
         /// <returns></returns>
         private static IQueryable<LocationViewModel> locationById(int id)
         {

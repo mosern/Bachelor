@@ -11,6 +11,7 @@ namespace Api.Migrations.LocationConfiguration
         {
             AutomaticMigrationsEnabled = false;
             MigrationsDirectory = @"Migrations\LocationConfiguration";
+            
         }
 
         protected override void Seed(Api.Classes.Context context)

@@ -36,6 +36,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>App_Data\Api.XML</DocumentationFile>
+    <NoWarn>1591</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -297,6 +298,14 @@
     <Compile Include="Migrations\LocationConfiguration\201604251116459_RequireDescJobtitle.Designer.cs">
       <DependentUpon>201604251116459_RequireDescJobtitle.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\LocationConfiguration\201604251327275_Path.cs" />
+    <Compile Include="Migrations\LocationConfiguration\201604251327275_Path.Designer.cs">
+      <DependentUpon>201604251327275_Path.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\LocationConfiguration\201604251441520_cascade.cs" />
+    <Compile Include="Migrations\LocationConfiguration\201604251441520_cascade.Designer.cs">
+      <DependentUpon>201604251441520_cascade.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\LocationConfiguration\Configuration.cs" />
     <Compile Include="Models\Api\AccesspointViewModel.cs" />
     <Compile Include="Models\Api\BaseViewModel.cs" />
@@ -311,6 +320,9 @@
     <Compile Include="Models\EF\BaseModel.cs" />
     <Compile Include="Models\EF\Coordinate.cs" />
     <Compile Include="Models\EF\Location.cs" />
+    <Compile Include="Models\EF\LocationPoint.cs" />
+    <Compile Include="Models\EF\PathNeighbours.cs" />
+    <Compile Include="Models\EF\PathPoint.cs" />
     <Compile Include="Models\EF\People.cs" />
     <Compile Include="Models\EF\Type.cs" />
     <Compile Include="Models\EF\UserLocation.cs" />
@@ -397,6 +409,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\LocationConfiguration\201604251116459_RequireDescJobtitle.resx">
       <DependentUpon>201604251116459_RequireDescJobtitle.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\LocationConfiguration\201604251327275_Path.resx">
+      <DependentUpon>201604251327275_Path.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\LocationConfiguration\201604251441520_cascade.resx">
+      <DependentUpon>201604251441520_cascade.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
