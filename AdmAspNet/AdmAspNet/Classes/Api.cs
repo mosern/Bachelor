@@ -129,6 +129,49 @@ namespace AdmAspNet.Classes
         }
         #endregion
 
+        #region AccessPointMethods
+        /// <summary>
+        /// Returns a list with all accesspoints from the API
+        /// </summary>
+        /// <returns>A list with all accesspoints</returns>
+        public List<AccessPoint> GetAllAccessPoints()
+        {
+            string url = ConfigurationManager.AppSettings["apiAccessPoints"] + "/?asObject=false";
+            List<AccessPoint> returnList = CallApi<List<AccessPoint>>(url);
+            return returnList;
+        }
+
+        /// <summary>
+        /// Adds a new accesspoint to the database 
+        /// </summary>
+        /// <param name="accessPoint">The accesspoint to be added</param>
+        /// <returns>True if successful, false if not</returns>
+        public bool PostAccessPoint(AccessPoint accessPoint)
+        {
+            string url = ConfigurationManager.AppSettings["apiAccessPoints"];
+            return PostApi(url, accessPoint); 
+        }
+
+
+        public bool UpdateAccessPoint(int id, AccessPoint accessPoint)
+        {
+            string url = ConfigurationManager.AppSettings["apiAccessPoints"] + "/" + id;
+            return PutApi(url, accessPoint); 
+        }
+
+        public bool DeleteAccessPoint(int id)
+        {
+            string url = ConfigurationManager.AppSettings["apiAccessPoints"] + "/" + id;
+            return DeleteObject(url); 
+        }
+
+        public AccessPoint GetAccessPointById(int id)
+        {
+            string url = ConfigurationManager.AppSettings["apiAccessPoints"] + "/" + id;
+            return CallApi<AccessPoint>(url); 
+        }
+        #endregion
+
         #region HelperMethods
         /// <summary>
         /// Handle GET calls to the API with a generic type

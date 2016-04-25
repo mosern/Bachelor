@@ -1,0 +1,60 @@
+﻿@model AdmAspNet.Models.ViewModels.AccessPointViewModel
+
+@{
+    ViewBag.Title = "Detaljer";
+}
+@section sidebar {
+    @Html.Partial("_SidebarPartial")
+}
+<h2>Detaljer</h2>
+
+<div>
+    <h4>Aksesspunkt</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Desc)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Desc)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.MacAddress)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.MacAddress)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Coordinate.Lng)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Coordinate.Lng)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Coordinate.Lat)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Coordinate.Lat)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Coordinate.Alt)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Coordinate.Alt)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Endre", "Edit", new { id = Model.Id }) |
+    @Html.ActionLink("Tilbake til oversikt", "Index")
+</p>

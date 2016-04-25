@@ -9,6 +9,7 @@ namespace AdmAspNet.Models.ViewModels
     public class CoordinateViewModel
     {
         public int Id { get; set; }
+
         [Display(Name ="Lengdegrad")]
         public double Lng { get; set; }
         [Display(Name ="Breddegrad")]

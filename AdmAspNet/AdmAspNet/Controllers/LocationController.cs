@@ -14,8 +14,8 @@ using Thinktecture.IdentityModel.Mvc;
 
 namespace AdmAspNet.Controllers
 {
-    [ResourceAuthorize("Write","Admin")]
-    [HandleForbidden]
+    /*[ResourceAuthorize("Write","Admin")]
+    [HandleForbidden]*/
     public class LocationController : Controller
     {
         private string tokenString = null;
@@ -172,6 +172,7 @@ namespace AdmAspNet.Controllers
         public ActionResult Edit(int id,[ModelBinder(typeof(LocationBinder))] LocationViewModel input)
         {
             var mapper = mapConfig.CreateMapper();
+            Location locationTmp; 
             List<Models.DataContracts.Type> typeList = api.GetAllTypes();
             List<TypeViewModel> typeViewModel = mapper.Map<List<TypeViewModel>>(typeList);
             input.Types = typeViewModel; 
@@ -179,12 +180,19 @@ namespace AdmAspNet.Controllers
             {
                 return View(input); 
             }
-            if (api.GetLocationById(id) == null)
+            if ((locationTmp =api.GetLocationById(id)) == null)
             {
                 ViewBag.ErrorMessage = "Kan ikke finne lokasjonen du forsøkte å redigere";
                 return View("ErrorView");
             }
-            Location locationObject = mapper.Map<Location>(input); 
+            Location locationObject = mapper.Map<Location>(input);
+            bool latEquals = locationObject.Coordinate.Lat.Equals(locationTmp.Coordinate.Lat);
+            bool lngEquals = locationObject.Coordinate.Lng.Equals(locationTmp.Coordinate.Lng);
+            bool altEquals = locationObject.Coordinate.Alt.Equals(locationTmp.Coordinate.Alt); 
+            if (latEquals && lngEquals && altEquals)
+            {
+                locationObject.Coordinate.Id = locationTmp.Coordinate.Id; 
+            }
             if (api.UpdateLocation(id,locationObject))
             {
                 ViewBag.SuccessMessage = "Lokasjonen ble oppdatert"; 

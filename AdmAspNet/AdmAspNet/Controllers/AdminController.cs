@@ -17,11 +17,10 @@ using Thinktecture.IdentityModel.Mvc;
 
 namespace AdmAspNet.Controllers
 {
-    [ResourceAuthorize("Write", "Admin")]
-    [HandleForbidden]
+    /*[ResourceAuthorize("Write", "Admin")]
+    [HandleForbidden]*/
     public class AdminController : Controller
     {
-        private static string apiBaseAddress = ConfigurationManager.AppSettings["apiBaseAddress"]; 
         // GET: Admin
         public ActionResult Index()
         {
