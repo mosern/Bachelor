@@ -124,7 +124,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        fetchFloorPlan(getResources().getString(R.string.indooratlas_floor_1_floorplanid));
+        fetchFloorPlan(getResources().getString(R.string.indooratlas_floor_1_floorplanid)); // 1 etg
+     //   fetchFloorPlan(getResources().getString(R.string.indooratlas_floor_2_floorplanid)); // 2 etg
     }
 
     @Override
