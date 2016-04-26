@@ -35,6 +35,11 @@ namespace AdmAspNet.Controllers
             return View(viewModel);
         }
 
+        public ActionResult Create()
+        {
+            return View(); 
+        }
+
         protected override void Initialize(RequestContext requestContext)
         {
             base.Initialize(requestContext);

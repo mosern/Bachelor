@@ -40,6 +40,10 @@ namespace AdmAspNet.Controllers
         public ActionResult Index()
         {
             List<Location> locationList = api.GetAllLocations();
+            if (locationList == null)
+            {
+                locationList = new List<Location>(); 
+            }
             var mapper = mapConfig.CreateMapper();
             List<LocationViewModel> listViewModdel = mapper.Map<List<LocationViewModel>>(locationList);
             return View(listViewModdel);
@@ -55,7 +59,14 @@ namespace AdmAspNet.Controllers
             var mapper = mapConfig.CreateMapper();
             List<TypeViewModel> listViewModel = mapper.Map<List<TypeViewModel>>(list);
             LocationViewModel locationViewModel = new LocationViewModel();
-            locationViewModel.Types = listViewModel;
+            if (listViewModel.Count == 0)
+            {
+                locationViewModel.DropDown = new SelectList(new List<Models.DataContracts.Type>()); 
+            }
+            else
+            {
+                locationViewModel.DropDown = new SelectList(listViewModel, "Id", "Name", listViewModel.First().Id); 
+            }
             return View(locationViewModel);
         }
 
@@ -73,11 +84,25 @@ namespace AdmAspNet.Controllers
             Location locationObject = mapper.Map<Location>(input);
             if (!ModelState.IsValid)
             {
-                input.Types = listViewModel;
+                if (listViewModel.Count == 0)
+                {
+                    input.DropDown = new SelectList(listViewModel); 
+                }
+                else
+                {
+                    input.DropDown = new SelectList(listViewModel, "Id", "Name", listViewModel.First().Id); 
+                }
                 return View(input); 
             }
             LocationViewModel baseViewModel = new LocationViewModel();
-            baseViewModel.Types = listViewModel; 
+            if (listViewModel.Count == 0)
+            {
+                baseViewModel.DropDown = new SelectList(listViewModel); 
+            }
+            else
+            {
+                baseViewModel.DropDown = new SelectList(listViewModel, "Id", "Name", listViewModel.First().Id); 
+            }
             if (api.PostLocation(locationObject))
             {
                 ViewBag.SuccessMessage = "Lokasjonen ble opprettet"; 
@@ -164,7 +189,14 @@ namespace AdmAspNet.Controllers
             List<Models.DataContracts.Type> typeList = api.GetAllTypes();
             List<TypeViewModel> typeViewModel = mapper.Map<List<TypeViewModel>>(typeList); 
             LocationViewModel locationViewModel = mapper.Map<LocationViewModel>(locationObject);
-            locationViewModel.Types = typeViewModel; 
+            if (typeViewModel.Count == 0)
+            {
+                locationViewModel.DropDown = new SelectList(typeViewModel); 
+            }
+            else
+            {
+                locationViewModel.DropDown = new SelectList(typeViewModel, "Id", "Name", typeViewModel.First().Id); 
+            }
             return View(locationViewModel); 
         }
 
@@ -175,7 +207,14 @@ namespace AdmAspNet.Controllers
             Location locationTmp; 
             List<Models.DataContracts.Type> typeList = api.GetAllTypes();
             List<TypeViewModel> typeViewModel = mapper.Map<List<TypeViewModel>>(typeList);
-            input.Types = typeViewModel; 
+            if (typeViewModel.Count == 0)
+            {
+                input.DropDown = new SelectList(typeViewModel); 
+            }
+            else
+            {
+                input.DropDown = new SelectList(typeViewModel, "Id", "Name", typeViewModel.First().Id); 
+            }
             if (!ModelState.IsValid)
             {
                 return View(input); 

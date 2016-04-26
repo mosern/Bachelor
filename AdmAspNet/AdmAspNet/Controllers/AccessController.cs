@@ -161,8 +161,12 @@ namespace AdmAspNet.Controllers
             AccessPoint accessPoint; 
             if ((accessPoint = api.GetAccessPointById(id.Value)) == null)
             {
-                ViewBag.ErrorMessage = "Kan ikke finne aksesspunktet du spurte etter"; 
+                ViewBag.ErrorMessage = "Kan ikke finne aksesspunktet du spurte etter";
+                return View("ErrorView"); 
             }
+            var mapper = mapConfig.CreateMapper();
+            AccessPointViewModel viewModel = mapper.Map<AccessPointViewModel>(accessPoint);
+            return View(viewModel); 
         }
         protected override void Initialize(RequestContext requestContext)
         {

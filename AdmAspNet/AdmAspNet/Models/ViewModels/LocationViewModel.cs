@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
+using System.Web.Mvc;
 
 namespace AdmAspNet.Models.ViewModels
 {
@@ -30,6 +31,8 @@ namespace AdmAspNet.Models.ViewModels
         public TypeViewModel Type { get; set; }
 
         public virtual List<TypeViewModel> Types { get; set; }
+
+        public SelectList DropDown { get; set; }
 
     }
 }
