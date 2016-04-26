@@ -1,4 +1,4 @@
-package no.hesa.positionlibrary;
+package no.hesa.positionlibrary.trillateration;
 
 import org.apache.commons.math3.fitting.leastsquares.MultivariateJacobianFunction;
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;

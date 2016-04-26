@@ -9,6 +9,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import no.hesa.positionlibrary.trillateration.LinearLeastSquaresSolver;
+import no.hesa.positionlibrary.trillateration.NonLinearLeastSquaresSolver;
+import no.hesa.positionlibrary.trillateration.TrilaterationFunction;
+
 import static org.junit.Assert.*;
 
 /**

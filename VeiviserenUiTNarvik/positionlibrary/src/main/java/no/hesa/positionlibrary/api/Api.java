@@ -1,12 +1,9 @@
 package no.hesa.positionlibrary.api;
 
-import android.content.res.Resources;
 import android.util.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
-
-//import no.hesa.veiviserenuitnarvik.R;
 
 /**
  * Created by thasimon on 10.04.2016.
@@ -17,30 +14,41 @@ public class Api {
     public static final String DO_SEARCH = "DO_SEARCH";
     public static final String LOCATION_BY_ID = "LOCATION_BY_ID";
     public static final String NO_TOKEN = "NO_TOKEN";
+    public static final String ALL_ACCESS_POINTS = "LOAD_ALL_ACCESS_POINTS";
     //Fields
     private ActionInterface actionInterface;
-    private Resources res;
 
     private final String usersURL = "https://bachelorapi2.azurewebsites.net/api/users";
     private final String locationsURL = "https://bachelorapi2.azurewebsites.net/api/locations";
+    private final String accessPointsURL = "https://bachelorapi2.azurewebsites.net/api/accesspoints";
 
     /**
      * Initiate the API repository
      * @param actionInterface The interface that does the callback after the asynctask is done calling the API
-     * @param res A resource identifier to get all the strings associated with the API
+     //* @param res A resource identifier to get all the strings associated with the API
      */
-    public Api(ActionInterface actionInterface,Resources res) {
+    public Api(ActionInterface actionInterface) {
+        this.actionInterface = actionInterface;
+    }
+    /*public Api(ActionInterface actionInterface,Resources res) {
         this.actionInterface = actionInterface;
         this.res = res;
-    }
+    }*/
 
     /**
      * Returns all users in the API
      */
     public void allUsers() {
-        //String url = "https://bachelorapi2.azurewebsites.net/api/users";
         List<Pair<String,String>> params = new ArrayList<>();
         callAsyncTask(usersURL,params,ALL_USERS,"GET");
+    }
+
+    /**
+     * Returns all wi-fi access points in the API
+     */
+    public void allAccessPoints() {
+        List<Pair<String,String>> params = new ArrayList<>();
+        callAsyncTask(accessPointsURL,params,ALL_ACCESS_POINTS,"GET");
     }
 
     /**
@@ -48,7 +56,6 @@ public class Api {
      * @param searchString The string that is used for searching
      */
     public void doSearch(String searchString) {
-        //String url = res.getString(R.string.api_locations);
         List<Pair<String,String>> params = new ArrayList<>();
         params.add(new Pair<String, String>("search",searchString));
         callAsyncTask(locationsURL,params,DO_SEARCH,"GET");

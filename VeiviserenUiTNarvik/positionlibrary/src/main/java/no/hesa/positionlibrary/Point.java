@@ -1,5 +1,7 @@
 package no.hesa.positionlibrary;
 
+import java.util.Objects;
+
 /**
  * Created by evgeniia on 08.04.16.
  */
@@ -25,4 +27,22 @@ public class Point {
     public int getFloor(){
         return floor;
     }
+
+    @Override
+    public boolean equals(Object object){
+        if(object == null)
+            return false;
+        if (!Point.class.isAssignableFrom(object.getClass()))
+            return false;
+        Point point = (Point) object;
+        if(this.longitude != point.longitude)
+            return false;
+        if(this.latitude != point.latitude)
+            return false;
+        if(this.floor != point.floor)
+            return false;
+        return true;
+    }
+
+
 }

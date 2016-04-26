@@ -99,7 +99,8 @@ public class SearchResultsActivity extends Activity implements ActionInterface, 
     private void handleIntent(Intent intent) {
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String query = intent.getStringExtra(SearchManager.QUERY);
-            Api api = new Api(this,getResources());
+            //Api api = new Api(this,getResources());
+            Api api = new Api(this);
             api.doSearch(query);
         }
     }
