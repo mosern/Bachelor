@@ -99,7 +99,7 @@ namespace Api
                     Hits = userLocation.Hits,
                     LocNr = location.LocNr,
                     Type = AutoMapConfig.getMapper().Map<Models.EF.Type, TypeViewModel>(typeRepo.Read(location.TypeId)),
-                    Coordinate = AutoMapConfig.getMapper().Map<Coordinate, CoordinateViewModel>(coorRepo.Read(location.CoordinateId))
+                    Coordinate = AutoMapConfig.getMapper().Map<Coordinate, CoordinateViewModel>(coorRepo.Read(location.CoordinateId.Value))
                 };
         }
     }
@@ -157,7 +157,7 @@ namespace Api
                     Desc = source.Desc,
                     Hits = source.Hits,
                     LocNr = source.LocNr,
-                    Coordinate = AutoMapConfig.getMapper().Map<Coordinate, CoordinateViewModel>(coorRepo.Read(source.CoordinateId)),
+                    Coordinate = AutoMapConfig.getMapper().Map<Coordinate, CoordinateViewModel>(coorRepo.Read(source.CoordinateId.Value)),
                     Type = AutoMapConfig.getMapper().Map<Models.EF.Type, TypeViewModel>(typeRepo.Read(source.TypeId))
                 };
 

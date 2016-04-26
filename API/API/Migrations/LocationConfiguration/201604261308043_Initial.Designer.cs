@@ -7,13 +7,13 @@ namespace Api.Migrations.LocationConfiguration
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.3-40302")]
-    public sealed partial class people : IMigrationMetadata
+    public sealed partial class Initial : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(people));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(Initial));
         
         string IMigrationMetadata.Id
         {
-            get { return "201604130816558_people"; }
+            get { return "201604261308043_Initial"; }
         }
         
         string IMigrationMetadata.Source

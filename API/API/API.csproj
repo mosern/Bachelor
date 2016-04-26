@@ -282,29 +282,9 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\LocationConfiguration\201604051006521_InitialCreate.cs" />
-    <Compile Include="Migrations\LocationConfiguration\201604051006521_InitialCreate.Designer.cs">
-      <DependentUpon>201604051006521_InitialCreate.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\LocationConfiguration\201604130816558_people.cs" />
-    <Compile Include="Migrations\LocationConfiguration\201604130816558_people.Designer.cs">
-      <DependentUpon>201604130816558_people.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\LocationConfiguration\201604210714162_descJobtitle.cs" />
-    <Compile Include="Migrations\LocationConfiguration\201604210714162_descJobtitle.Designer.cs">
-      <DependentUpon>201604210714162_descJobtitle.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\LocationConfiguration\201604251116459_RequireDescJobtitle.cs" />
-    <Compile Include="Migrations\LocationConfiguration\201604251116459_RequireDescJobtitle.Designer.cs">
-      <DependentUpon>201604251116459_RequireDescJobtitle.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\LocationConfiguration\201604251327275_Path.cs" />
-    <Compile Include="Migrations\LocationConfiguration\201604251327275_Path.Designer.cs">
-      <DependentUpon>201604251327275_Path.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\LocationConfiguration\201604251441520_cascade.cs" />
-    <Compile Include="Migrations\LocationConfiguration\201604251441520_cascade.Designer.cs">
-      <DependentUpon>201604251441520_cascade.cs</DependentUpon>
+    <Compile Include="Migrations\LocationConfiguration\201604261308043_Initial.cs" />
+    <Compile Include="Migrations\LocationConfiguration\201604261308043_Initial.Designer.cs">
+      <DependentUpon>201604261308043_Initial.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\LocationConfiguration\Configuration.cs" />
     <Compile Include="Models\Api\AccesspointViewModel.cs" />
@@ -398,27 +378,12 @@
     <Content Include="Scripts\jquery-1.10.2.min.map" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\LocationConfiguration\201604051006521_InitialCreate.resx">
-      <DependentUpon>201604051006521_InitialCreate.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\LocationConfiguration\201604130816558_people.resx">
-      <DependentUpon>201604130816558_people.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\LocationConfiguration\201604210714162_descJobtitle.resx">
-      <DependentUpon>201604210714162_descJobtitle.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\LocationConfiguration\201604251116459_RequireDescJobtitle.resx">
-      <DependentUpon>201604251116459_RequireDescJobtitle.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\LocationConfiguration\201604251327275_Path.resx">
-      <DependentUpon>201604251327275_Path.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\LocationConfiguration\201604251441520_cascade.resx">
-      <DependentUpon>201604251441520_cascade.cs</DependentUpon>
-    </EmbeddedResource>
+    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
-    <WCFMetadata Include="Service References\" />
+    <EmbeddedResource Include="Migrations\LocationConfiguration\201604261308043_Initial.resx">
+      <DependentUpon>201604261308043_Initial.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
