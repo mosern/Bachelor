@@ -1,5 +1,7 @@
 package no.hesa.veiviserenuitnarvik.api;
 
+// TODO: fjern denne klassen
+
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;

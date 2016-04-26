@@ -9,6 +9,8 @@ import java.util.List;
 
 import no.hesa.veiviserenuitnarvik.R;
 
+// TODO: fjern denne klassen
+
 /**
  * Created by thasimon on 10.04.2016.
  */
