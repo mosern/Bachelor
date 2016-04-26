@@ -19,8 +19,10 @@ import java.util.List;
 import com.google.gson.Gson;
 
 
-import no.hesa.veiviserenuitnarvik.api.ActionInterface;
-import no.hesa.veiviserenuitnarvik.api.Api;
+//import no.hesa.veiviserenuitnarvik.api.ActionInterface;
+//import no.hesa.veiviserenuitnarvik.api.Api;
+import no.hesa.positionlibrary.api.ActionInterface;
+import no.hesa.positionlibrary.api.Api;
 import no.hesa.veiviserenuitnarvik.dataclasses.Person;
 
 public class SearchResultsActivity extends Activity implements ActionInterface, SimpleGestureFilter.SimpleGestureListener{

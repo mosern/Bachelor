@@ -154,6 +154,7 @@ public class WifiPosition {
         sensorManager = (SensorManager) c.getSystemService(c.SENSOR_SERVICE);
         sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);;
         sensorManager.registerListener(sensorEventListener, sensor, SensorManager.SENSOR_DELAY_FASTEST);
+
     }
 
     public void unRegisterBroadcast(Context c) {
@@ -262,17 +263,14 @@ public class WifiPosition {
         Point [] values = (Point[]) sortedWifiPointsLocationInf.values().toArray(new Point[sortedWifiPointsLocationInf.size()]);
         ArrayList<Integer> floors = new ArrayList<>(values.length);
         ArrayList<Integer> occurences = new ArrayList<>();
-
         //Fill floors array with floor number corresponding to Wi-Fi access point
         for(int i = 0; i < values.length; i++){
             floors.add(values[i].getFloor());
         }
-
         //Count occurences of every floor
         for(int i = 0; i < 6; i++){
             occurences.add(Collections.frequency(floors, i));
         }
-
         //Get number to the most often occured floor
         int result = occurences.indexOf(Collections.max(occurences));
 

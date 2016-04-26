@@ -59,11 +59,13 @@ import com.squareup.picasso.Target;
 import org.json.JSONObject;
 
 import no.hesa.positionlibrary.PositionLibrary;
-import no.hesa.veiviserenuitnarvik.api.ActionInterface;
-import no.hesa.veiviserenuitnarvik.api.Api;
+import no.hesa.positionlibrary.api.ActionInterface;
+import no.hesa.positionlibrary.api.Api;
+//import no.hesa.veiviserenuitnarvik.api.ActionInterface;
+//import no.hesa.veiviserenuitnarvik.api.Api;
 
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
-public class MapActivity extends AppCompatActivity implements OnMapReadyCallback,ActionInterface{
+public class MapActivity extends AppCompatActivity implements OnMapReadyCallback,ActionInterface {
 
     private static final String TAG = "MapActivity";
     private static final int POLYLINEWIDTH = 4;
