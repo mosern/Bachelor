@@ -5,6 +5,10 @@
     <color name="colorAccent">#FF4081</color>
 
     <color name="blue">#79adde</color>
+    <color name="route_polyline_color">#FFa221b3</color>
+    <color name="route_circle_color">#626dab</color>
+    <color name="route_circle_start_color">#FF3fce8b</color>
+    <color name="route_circle_end_color">#FF00ccff</color>
 
     <color name="transparent">#00000000</color>
 

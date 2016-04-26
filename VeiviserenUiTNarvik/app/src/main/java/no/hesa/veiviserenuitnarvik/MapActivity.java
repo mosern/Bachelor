@@ -11,16 +11,9 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
-import android.hardware.TriggerEvent;
-import android.hardware.TriggerEventListener;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
-import android.preference.PreferenceManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
@@ -41,10 +34,12 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.GroundOverlay;
 import com.google.android.gms.maps.model.GroundOverlayOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.maps.android.SphericalUtil;
 import com.indooratlas.android.sdk.IALocationManager;
 import com.indooratlas.android.sdk.resources.IAFloorPlan;
 import com.indooratlas.android.sdk.resources.IALatLng;
@@ -58,14 +53,18 @@ import com.squareup.picasso.Target;
 
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import no.hesa.positionlibrary.PositionLibrary;
-import no.hesa.positionlibrary.api.ActionInterface;
-import no.hesa.positionlibrary.api.Api;
 //import no.hesa.veiviserenuitnarvik.api.ActionInterface;
 //import no.hesa.veiviserenuitnarvik.api.Api;
+import no.hesa.positionlibrary.api.ActionInterface;
+import no.hesa.positionlibrary.api.Api;
+import no.hesa.veiviserenuitnarvik.dataclasses.Coordinate;
 
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
-public class MapActivity extends AppCompatActivity implements OnMapReadyCallback,ActionInterface {
+public class MapActivity extends AppCompatActivity implements OnMapReadyCallback,ActionInterface{
 
     private static final String TAG = "MapActivity";
     private static final int POLYLINEWIDTH = 4;
@@ -86,9 +85,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private BroadcastReceiver positionLibOutputReceiver = null;
     private BroadcastReceiver searchLocationReceiver = null;
 
-    private LatLng currentPosision = null;
+    private LatLng currentPosition = null;
     private LatLng targetPosition = null;
-    private PolylineOptions po = null;
+
     private Polyline polyline = null;
 
     Menu menuRef = null;
@@ -96,6 +95,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private Circle circleOne;
     private Circle circleTwo;
     private Circle circleThree;
+
+    private LatLngBounds elevationChangeBounds = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,6 +118,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         api.locationById(2,token);
 */
         returnedCoordsFromSearchIntent = getIntent();
+
+
     }
 
     @Override
@@ -187,6 +190,28 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 .radius(0.5)
                 .strokeColor(Color.rgb(49, 146, 225))
                 .fillColor(Color.rgb(49, 146, 225)));
+
+        List<Coordinate> list = new ArrayList<>();
+        list.add(new Coordinate(1, 68.4362723, 17.4353580, 2.0));
+        list.add(new Coordinate(2, 68.4361468, 17.4352132, 2.0));
+        list.add(new Coordinate(3, 68.4361089, 17.4352722, 2.0));
+        list.add(new Coordinate(4, 68.4360255, 17.4351280, 2.0));
+        list.add(new Coordinate(5, 68.4359827, 17.4353097, 2.0));
+
+
+        LatLng endPoint = drawFloorPath(list);
+        if (endPoint != null)
+        {
+            elevationChangeBounds = toBounds(endPoint, 5);
+        }
+    }
+
+    // http://stackoverflow.com/questions/15319431/how-to-convert-a-latlng-and-a-radius-to-a-latlngbounds-in-android-google-maps-ap
+    // http://googlemaps.github.io/android-maps-utils/
+    public LatLngBounds toBounds(LatLng center, double radius) {
+        LatLng southwest = SphericalUtil.computeOffset(center, radius * Math.sqrt(2.0), 225);
+        LatLng northeast = SphericalUtil.computeOffset(center, radius * Math.sqrt(2.0), 45);
+        return new LatLngBounds(southwest, northeast);
     }
 
     private void drawRoute(LatLng a, LatLng b)
@@ -195,13 +220,90 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         if (polyline != null)
             polyline.remove();
 
-        po = new PolylineOptions()
+        PolylineOptions po = new PolylineOptions()
                 .add(a, b)
                 .width(POLYLINEWIDTH)
                 .color(getResources().getColor(R.color.blue))
                 .geodesic(false); // lat/long lines curved by the shape of the planet
 
         polyline = mMap.addPolyline(po);
+    }
+
+    /**
+     * Places markers (circles) with polylines connecting them along provided path.
+     * Colors first and last circle differently.
+     *
+     * @param coordinateList
+     * @return LatLang containing the last point added
+     */
+    private LatLng drawFloorPath(List<Coordinate> coordinateList)
+    {
+        ArrayList<Polyline> polylineList = new ArrayList<Polyline>();
+        ArrayList<LatLng> latLngList = new ArrayList<LatLng>();
+        ArrayList<Circle> circleList = new ArrayList<Circle>();
+        LatLng currentPoint = null;
+        LatLng previousPoint = null;
+
+        final double CIRCLERADIUS = 0.25;
+
+        // mMap.clear(); // clears map of all markers
+
+        for(int i = 0; i < coordinateList.size(); i++)
+        {
+            currentPoint = new LatLng(coordinateList.get(i).getLat(), coordinateList.get(i).getLng());
+            latLngList.add(currentPoint);
+
+            // first point
+            if (latLngList.size() == 1)
+            {
+                CircleOptions co = new CircleOptions()
+                        .center(currentPoint)
+                        .radius(CIRCLERADIUS)
+                        .strokeColor(getResources().getColor(R.color.route_circle_start_color))
+                        .fillColor(getResources().getColor(R.color.route_circle_start_color))
+                        .zIndex(0.7f);
+
+                circleList.add(mMap.addCircle(co));
+            }
+
+            if (latLngList.size() > 1)
+            {
+                previousPoint = new LatLng(coordinateList.get(i - 1).getLat(), coordinateList.get(i - 1).getLng());
+
+                PolylineOptions po = new PolylineOptions()
+                        .add(previousPoint, currentPoint)
+                        .width(POLYLINEWIDTH)
+                        .color(getResources().getColor(R.color.route_polyline_color))
+                        .geodesic(false)
+                        .zIndex(0.4f); // lat/long lines curved by the shape of the planet
+
+                polylineList.add(mMap.addPolyline(po));
+
+                // all points except first and last
+                if (latLngList.size() < coordinateList.size()) {
+                    CircleOptions co = new CircleOptions()
+                            .center(currentPoint)
+                            .radius(CIRCLERADIUS)
+                            .strokeColor(getResources().getColor(R.color.route_circle_color))
+                            .fillColor(getResources().getColor(R.color.route_circle_color))
+                            .zIndex(0.7f);
+
+                    circleList.add(mMap.addCircle(co));
+                }
+                else // last point
+                {
+                    CircleOptions co = new CircleOptions()
+                            .center(currentPoint)
+                            .radius(CIRCLERADIUS)
+                            .strokeColor(getResources().getColor(R.color.route_circle_end_color))
+                            .fillColor(getResources().getColor(R.color.route_circle_end_color))
+                            .zIndex(0.7f);
+
+                    circleList.add(mMap.addCircle(co));
+                }
+            }
+        }
+        return currentPoint;
     }
 
 //region BROADCASTRECEIVERS
@@ -237,9 +339,15 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                         circleThree.setCenter(latLng);
                         circleTwo.setCenter(latLng);
                         circleOne.setCenter(latLng);
-                        currentPosision = latLng;
+                        currentPosition = latLng;
+                        //TODO: remove temp drawroute
                         if (targetPosition != null) {
-                            drawRoute(currentPosision, targetPosition);
+                            drawRoute(currentPosition, targetPosition);
+                        }
+                        //TODO: add code for elevation change upon received position
+                        if(elevationChangeBounds.contains(latLng))
+                        {
+                            // reguest elevation change
                         }
                     }
                     else
@@ -295,7 +403,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             GroundOverlayOptions fpOverlay = new GroundOverlayOptions()
                     .image(bitmapDescriptor)
                     .position(center, floorPlan.getWidthMeters(), floorPlan.getHeightMeters())
-                    .bearing(floorPlan.getBearing());
+                    .bearing(floorPlan.getBearing())
+                    .zIndex(0.1f);
 
             mGroundOverlay = mMap.addGroundOverlay(fpOverlay);
         }
