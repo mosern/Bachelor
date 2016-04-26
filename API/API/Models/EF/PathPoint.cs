@@ -10,6 +10,7 @@ namespace Api.Models.EF
     public class PathPoint : BaseModel
     {
         [Key, ForeignKey("Coordinate")]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public new int Id { get; set; }
 
         public int CoordinateId { get; set; }

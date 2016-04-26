@@ -10,6 +10,7 @@ namespace Api.Models.EF
     public class Accesspoint : BaseModel
     {
         [Key, ForeignKey("Coordinate")]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public new int Id { get; set; }
         [Required]
         public string Desc { get; set; }

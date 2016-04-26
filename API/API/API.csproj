@@ -286,6 +286,10 @@
     <Compile Include="Migrations\LocationConfiguration\201604261308043_Initial.Designer.cs">
       <DependentUpon>201604261308043_Initial.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\LocationConfiguration\201604261546300_Fix.cs" />
+    <Compile Include="Migrations\LocationConfiguration\201604261546300_Fix.Designer.cs">
+      <DependentUpon>201604261546300_Fix.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\LocationConfiguration\Configuration.cs" />
     <Compile Include="Models\Api\AccesspointViewModel.cs" />
     <Compile Include="Models\Api\BaseViewModel.cs" />
@@ -383,6 +387,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\LocationConfiguration\201604261308043_Initial.resx">
       <DependentUpon>201604261308043_Initial.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\LocationConfiguration\201604261546300_Fix.resx">
+      <DependentUpon>201604261546300_Fix.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
