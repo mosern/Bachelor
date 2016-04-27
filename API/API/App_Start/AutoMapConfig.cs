@@ -131,7 +131,8 @@ namespace Api
                     cor = new Coordinate { Id = source.Coordinate.Id.Value };    
                 }
 
-                //source.Id = cor.Id;
+                if(source.Id.Value == 0)
+                source.Id = cor.Id;
 
                 dest = new Location()
                   {
