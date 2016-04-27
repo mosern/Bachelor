@@ -9,7 +9,8 @@ namespace Api.Models.EF
 {
     public class Accesspoint : BaseModel
     {
-        public new int Id { get; set; }
+        [ForeignKey("Coordinate")]
+        public override int Id { get; set; }
         [Required]
         public string Desc { get; set; }
 

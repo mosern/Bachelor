@@ -18,17 +18,17 @@ namespace Api.Classes
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             //modelBuilder.Conventions.Remove<OneToManyCascadeDeleteConvention>();
-            modelBuilder.Entity<Location>()
-                        .HasRequired(l => l.Coordinate)
-                        .WithOptional(c => c.Location);
+            //modelBuilder.Entity<Location>()
+            //            .HasRequired(l => l.Coordinate)
+            //            .WithOptional(c => c.Location);
 
-            modelBuilder.Entity<Accesspoint>()
-                        .HasRequired(l => l.Coordinate)
-                        .WithOptional(c => c.Accesspoint);
+            //modelBuilder.Entity<Accesspoint>()
+            //            .HasRequired(l => l.Coordinate)
+            //            .WithOptional(c => c.Accesspoint);
 
-            modelBuilder.Entity<PathPoint>()
-                        .HasRequired(l => l.Coordinate)
-                        .WithOptional(c => c.PathPoint);
+            //modelBuilder.Entity<PathPoint>()
+            //            .HasRequired(l => l.Coordinate)
+            //            .WithOptional(c => c.PathPoint);
         }
 
         public virtual DbSet<Location> Location { get; set; }

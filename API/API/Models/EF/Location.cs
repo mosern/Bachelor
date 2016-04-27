@@ -9,7 +9,8 @@ namespace Api.Models.EF
 {
     public class Location : BaseModel
     {
-        public new int Id { get; set; }
+        [ForeignKey("Coordinate")]
+        public override int Id { get; set; }
 
         [Required]
         public string Name { get; set; }
@@ -21,7 +22,7 @@ namespace Api.Models.EF
 
         public int Hits { get; set; }
 
-        public int? CoordinateId { get; set; }
+        public int CoordinateId { get; set; }
         public virtual Coordinate Coordinate { get; set; }
 
         public int TypeId { get; set; }

@@ -9,7 +9,8 @@ namespace Api.Models.EF
 {
     public class PathPoint : BaseModel
     {
-        public new int Id { get; set; }
+        [ForeignKey("Coordinate")]
+        public override int Id { get; set; }
 
         public int CoordinateId { get; set; }
         public virtual Coordinate Coordinate { get; set; }

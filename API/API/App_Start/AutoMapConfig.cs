@@ -99,7 +99,7 @@ namespace Api
                     Hits = userLocation.Hits,
                     LocNr = location.LocNr,
                     Type = AutoMapConfig.getMapper().Map<Models.EF.Type, TypeViewModel>(typeRepo.Read(location.TypeId)),
-                    Coordinate = AutoMapConfig.getMapper().Map<Coordinate, CoordinateViewModel>(coorRepo.Read(location.CoordinateId.Value))
+                    Coordinate = AutoMapConfig.getMapper().Map<Coordinate, CoordinateViewModel>(coorRepo.Read(location.CoordinateId))
                 };
         }
     }
@@ -115,25 +115,30 @@ namespace Api
             Location dest;
             using (var repo = new LocationRepository<Coordinate>())
             {
-                if (source.Id.Value == 0)
+                if (source.Coordinate.Id == null)
+                    source.Coordinate.Id = 0;
+
+                if (source.Coordinate.Id.Value == 0)
                 {
                     cor = repo.Create(new Coordinate() { Lat = source.Coordinate.Lat, Lng = source.Coordinate.Lng, Alt = source.Coordinate.Alt });
                 }
                 else
                 {
-                    cor = new Coordinate { Id = source.Id.Value };
+                    cor = new Coordinate { Id = source.Coordinate.Id.Value };    
                 }
 
+                source.Id = cor.Id;
+
                 dest = new Location()
-                {
-                    Id = source.Id.Value,
-                    Name = source.Name,
-                    Hits = source.Hits,
-                    Desc = source.Desc,
-                    LocNr = source.LocNr,
-                    CoordinateId = cor.Id,
-                    TypeId = source.Type.Id.Value,
-                };
+                  {
+                        Id = source.Id.Value,
+                        Name = source.Name,
+                        Hits = source.Hits,
+                        Desc = source.Desc,
+                        LocNr = source.LocNr,
+                        CoordinateId = cor.Id,
+                        TypeId = source.Type.Id.Value,
+                  };
             }
                 
 
@@ -157,7 +162,7 @@ namespace Api
                     Desc = source.Desc,
                     Hits = source.Hits,
                     LocNr = source.LocNr,
-                    Coordinate = AutoMapConfig.getMapper().Map<Coordinate, CoordinateViewModel>(coorRepo.Read(source.CoordinateId.Value)),
+                    Coordinate = AutoMapConfig.getMapper().Map<Coordinate, CoordinateViewModel>(coorRepo.Read(source.CoordinateId)),
                     Type = AutoMapConfig.getMapper().Map<Models.EF.Type, TypeViewModel>(typeRepo.Read(source.TypeId))
                 };
 
@@ -193,7 +198,10 @@ namespace Api
             AccesspointViewModel source = (AccesspointViewModel)context.SourceValue;
             Coordinate cor;
 
-            if(source.Coordinate.Id.Value == 0)
+            if (source.Coordinate.Id == null)
+                source.Coordinate.Id = 0;
+
+            if (source.Coordinate.Id.Value == 0)
             {
                 using (var repo = new LocationRepository<Coordinate>())
                     cor = repo.Create(new Coordinate() { Lat = source.Coordinate.Lat, Lng = source.Coordinate.Lng, Alt = source.Coordinate.Alt });
