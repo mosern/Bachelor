@@ -1,11 +1,13 @@
-package no.wtw.android.dijkstra;
+package no.hesa.positionlibrary.dijkstra;
 
-import no.wtw.android.dijkstra.exception.PathNotFoundException;
-import no.wtw.android.dijkstra.model.Edge;
-import no.wtw.android.dijkstra.model.Graph;
-import no.wtw.android.dijkstra.model.Vertex;
+
 
 import java.util.*;
+
+import no.hesa.positionlibrary.dijkstra.exception.PathNotFoundException;
+import no.hesa.positionlibrary.dijkstra.model.Edge;
+import no.hesa.positionlibrary.dijkstra.model.Graph;
+import no.hesa.positionlibrary.dijkstra.model.Vertex;
 
 public class DijkstraAlgorithm {
 

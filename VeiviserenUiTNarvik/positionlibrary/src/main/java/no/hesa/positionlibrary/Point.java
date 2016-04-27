@@ -16,7 +16,33 @@ public class Point {
         this.floor = floor;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Point)) return false;
+
+        Point point = (Point) o;
+
+        if (Double.compare(point.getLatitude(), getLatitude()) != 0) return false;
+        if (Double.compare(point.getLongitude(), getLongitude()) != 0) return false;
+        return getFloor() == point.getFloor();
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result;
+        long temp;
+        temp = Double.doubleToLongBits(getLatitude());
+        result = (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(getLongitude());
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        result = 31 * result + getFloor();
+        return result;
+    }
+
     public double getLatitude(){
+
         return latitude;
     }
 
@@ -26,22 +52,6 @@ public class Point {
 
     public int getFloor(){
         return floor;
-    }
-
-    @Override
-    public boolean equals(Object object){
-        if(object == null)
-            return false;
-        if (!Point.class.isAssignableFrom(object.getClass()))
-            return false;
-        Point point = (Point) object;
-        if(this.longitude != point.longitude)
-            return false;
-        if(this.latitude != point.latitude)
-            return false;
-        if(this.floor != point.floor)
-            return false;
-        return true;
     }
 
 

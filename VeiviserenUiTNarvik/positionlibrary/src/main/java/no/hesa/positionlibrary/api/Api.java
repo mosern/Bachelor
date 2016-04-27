@@ -15,12 +15,14 @@ public class Api {
     public static final String LOCATION_BY_ID = "LOCATION_BY_ID";
     public static final String NO_TOKEN = "NO_TOKEN";
     public static final String ALL_ACCESS_POINTS = "LOAD_ALL_ACCESS_POINTS";
+    public static final String ALL_PATH_POINTS = "LOAD_ALL_PATH_POINTS";
     //Fields
     private ActionInterface actionInterface;
 
     private final String usersURL = "https://bachelorapi2.azurewebsites.net/api/users";
     private final String locationsURL = "https://bachelorapi2.azurewebsites.net/api/locations";
     private final String accessPointsURL = "https://bachelorapi2.azurewebsites.net/api/accesspoints";
+    private final String pathPointsURL = "https://bachelorapi2.azurewebsites.net/api/pathpoints";
 
     /**
      * Initiate the API repository
@@ -49,6 +51,14 @@ public class Api {
     public void allAccessPoints() {
         List<Pair<String,String>> params = new ArrayList<>();
         callAsyncTask(accessPointsURL,params,ALL_ACCESS_POINTS,"GET");
+    }
+
+    /**
+     * Returns all path points in the API
+     */
+    public void allPathPoints() {
+        List<Pair<String,String>> params = new ArrayList<>();
+        callAsyncTask(pathPointsURL,params,ALL_PATH_POINTS,"GET");
     }
 
     /**

@@ -24,6 +24,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
@@ -32,6 +33,11 @@ import java.util.TreeMap;
 
 import no.hesa.positionlibrary.api.ActionInterface;
 import no.hesa.positionlibrary.api.Api;
+import no.hesa.positionlibrary.dijkstra.DijkstraAlgorithm;
+import no.hesa.positionlibrary.dijkstra.exception.PathNotFoundException;
+import no.hesa.positionlibrary.dijkstra.model.Edge;
+import no.hesa.positionlibrary.dijkstra.model.Graph;
+import no.hesa.positionlibrary.dijkstra.model.Vertex;
 import no.hesa.positionlibrary.trillateration.LinearLeastSquaresSolver;
 import no.hesa.positionlibrary.trillateration.NonLinearLeastSquaresSolver;
 import no.hesa.positionlibrary.trillateration.TrilaterationFunction;
@@ -132,12 +138,15 @@ public class WifiPosition implements ActionInterface {
     private boolean firstSensorChange = true; //Variable that shows if it is first time sensor data was changed
     private double xStartValue = 0; //acceleration on x-axis at the time of first onSensorChanged run
     private double yStartValue = 0; //acceleration on y-axis at the time of first onSensorChanged run
-    private double[] lastSendtPosition = new double[3];
     TreeMap<String, Point> wifiPointsMacGeo = new TreeMap<String, Point>(); //list of MAC addresses to known Wi-Fi access point with corresponding geo coordinates
+
+    private DijkstraAlgorithm da;
+    private Graph graph;
+    private List<Edge> model;
+    private Point lastSendtPosition;
 
     /**
      * Initialize TimerTask to set up continuous scannig for available Wi-Fi access points
-     *
      * @param wifiManager
      */
     public void initializeTimerTask(final WifiManager wifiManager) {
@@ -152,7 +161,10 @@ public class WifiPosition implements ActionInterface {
         };
     }
 
-
+    /**
+     *
+     * @param c
+     */
     public void registerBroadcast(Context c) {
         c.registerReceiver(wifiReceiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
         WifiManager wifiManager = (WifiManager) c.getSystemService(Context.WIFI_SERVICE);
@@ -165,13 +177,22 @@ public class WifiPosition implements ActionInterface {
         Api api = new Api(this);
         //Load list of all mapped wi-fi access points
         api.allAccessPoints();
+        //api.allPathPoints();
     }
 
+    /**
+     *
+     * @param c
+     */
     public void unRegisterBroadcast(Context c) {
         c.unregisterReceiver(wifiReceiver);
         //sensorManager.unregisterListener(sensorEventListener);
     }
 
+    /**
+     *
+     * @param c
+     */
     public void calculateDistances(Context c) {
         if (scanResults != null) {
             HashMap<String, Double> wifiPointsScanInf = new HashMap<>(scanResults.size());//MAC addresses to Wi-Fi access points with corresponding distances
@@ -199,7 +220,8 @@ public class WifiPosition implements ActionInterface {
                     for (int j = 0; j < values.length; j++) {
                         //If wifiPointsLocationInfList already contains geo coordinates with corresponding distance to
                         //one of Wi-Fi access points from new scan
-                        if (newValues[i].getLongitude() == values[j].getLongitude()) {
+                        //if (newValues[i].getLongitude() == values[j].getLongitude()) {
+                        if (newValues[i].equals(values[j])) {
                             //Check distance
                             if (newKeys[i] < keys[j]) {
                                 //If distance from previous scan is bigger than one from new, replace data in wifiPointsLocationInfList
@@ -231,6 +253,10 @@ public class WifiPosition implements ActionInterface {
         }
     }
 
+    /**
+     *
+     * @param c
+     */
     private void findPosition(Context c) {
         //Sorting wifiPointsLocationInfList by distance
         Map<Double, Point> sortedWifiPointsLocationInf = new TreeMap<Double, Point>(wifiPointsLocationInfList);
@@ -253,18 +279,20 @@ public class WifiPosition implements ActionInterface {
             calculatedPosition = calculatePosition(sortedWifiPointsLocationInf);
             floor = findFloor(sortedWifiPointsLocationInf);
         }
+        if(!lastSendtPosition.equals(new Point(calculatedPosition[0], calculatedPosition[1], floor))){
+            lastSendtPosition = new Point(calculatedPosition[0], calculatedPosition[1], floor);
 
-        //Send result to application
-        Intent intent = new Intent();
-        intent.setAction("no.hesa.positionlibrary.Output");
-        intent.putExtra("position", calculatedPosition);
-        intent.putExtra("floor", floor);
-        c.sendBroadcast(intent);
+            //Send result to application
+            Intent intent = new Intent();
+            intent.setAction("no.hesa.positionlibrary.Output");
+            intent.putExtra("position", calculatedPosition);
+            intent.putExtra("floor", floor);
+            c.sendBroadcast(intent);
+        }
     }
 
     /**
      * Find out what floor are user at
-     *
      * @param sortedWifiPointsLocationInf list of distances to three closest Wi-Fi access points with corresponding geo coordinates
      * @return floor number
      */
@@ -299,7 +327,6 @@ public class WifiPosition implements ActionInterface {
 
     /**
      * Calculate the distance to one access point given RSSI in db and frequency in MHz
-     *
      * @param levelInDb RSSI (received signal strength indication) in decibels
      * @param freqInMHz Frequency in MHz
      * @return The distance to the access-point in meters
@@ -365,7 +392,6 @@ public class WifiPosition implements ActionInterface {
 
     /**
      * Match distances to available Wi-Fi access points with corresponding geo coordinates against MAC address
-     *
      * @param wifiPointsScanInf list of MAC addresses to available Wi-Fi access points with corresponding distances
      * @return list of distances to available Wi-Fi access points with corresponding geo coordinates
      */
@@ -437,7 +463,16 @@ public class WifiPosition implements ActionInterface {
                             }
                         }
                     }
-                } catch (JSONException e) {
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                break;
+            case Api.ALL_PATH_POINTS:
+                try {
+                    if(jsonObject != null){
+
+                    }
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
                 break;
@@ -447,5 +482,16 @@ public class WifiPosition implements ActionInterface {
     @Override
     public void onAuthorizationFailed() {
 
+    }
+
+    /**
+     * Generate list with "path points" to plot the route on the map
+     * @param destination geo coordinates of destination point
+     * @return list with "path points" from start to destination
+     * @throws PathNotFoundException
+     */
+    public LinkedList<Vertex> plotRoute(Point destination) throws PathNotFoundException {
+        da.execute(new Vertex<>(lastSendtPosition));
+        return da.getPath(new Vertex<>(destination));
     }
 }

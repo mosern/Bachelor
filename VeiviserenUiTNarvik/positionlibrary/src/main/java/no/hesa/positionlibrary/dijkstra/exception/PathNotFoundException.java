@@ -1,4 +1,4 @@
-package no.wtw.android.dijkstra.exception;
+package no.hesa.positionlibrary.dijkstra.exception;
 
 public class PathNotFoundException extends Exception {
 

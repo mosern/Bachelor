@@ -1,4 +1,4 @@
-package no.wtw.android.dijkstra.model;
+package no.hesa.positionlibrary.dijkstra.model;
 
 import java.util.List;
 
