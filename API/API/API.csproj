@@ -308,6 +308,7 @@
     <Compile Include="Helpers\PaginationHeader.cs" />
     <Compile Include="Models\Api\CoordinateViewModel.cs" />
     <Compile Include="Models\Api\LocationViewModel.cs" />
+    <Compile Include="Models\Api\PathPointViewModel.cs" />
     <Compile Include="Models\Api\PeopleViewModel.cs" />
     <Compile Include="Models\Api\SearchViewModel.cs" />
     <Compile Include="Models\Api\TypeViewModel.cs" />
@@ -316,7 +317,7 @@
     <Compile Include="Models\EF\BaseModel.cs" />
     <Compile Include="Models\EF\Coordinate.cs" />
     <Compile Include="Models\EF\Location.cs" />
-    <Compile Include="Models\EF\PathNeighbours.cs" />
+    <Compile Include="Models\EF\PathNeighbour.cs" />
     <Compile Include="Models\EF\PathPoint.cs" />
     <Compile Include="Models\EF\People.cs" />
     <Compile Include="Models\EF\Type.cs" />

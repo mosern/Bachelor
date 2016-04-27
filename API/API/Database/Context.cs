@@ -38,6 +38,6 @@ namespace Api.Classes
         public virtual DbSet<UserLocation> UserLocation { get; set; }
         public virtual DbSet<People> People { get; set; }
         public virtual DbSet<PathPoint> PathPoint { get; set; }
-        public virtual DbSet<PathNeighbours> PathNeighbours { get; set; }
+        public virtual DbSet<PathNeighbour> PathNeighbours { get; set; }
     }
 }

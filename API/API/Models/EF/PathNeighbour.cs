@@ -7,7 +7,7 @@ using System.Web;
 
 namespace Api.Models.EF
 {
-    public class PathNeighbours : BaseModel
+    public class PathNeighbour : BaseModel
     {
         [Required]
         public int length { get; set; }
