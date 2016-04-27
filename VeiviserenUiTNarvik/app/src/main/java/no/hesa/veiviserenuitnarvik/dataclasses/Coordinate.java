@@ -14,6 +14,14 @@ public class Coordinate{
 
     }
 
+    public Coordinate(int id, double lat, double lng, double alt)
+    {
+        this.id = id;
+        this.lat = lat;
+        this.lng = lng;
+        this.alt = alt;
+    }
+
     @Override
     public String toString()
     {

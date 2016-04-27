@@ -30,7 +30,7 @@ dependencies {
     testCompile 'junit:junit:4.12'
     // Google Play Services Client Library
     // IndoorAtlas
-    // Google Play Services Maps (Viktig! Kun last maps. Ved å laste play-services overskrider man heap size i java. Alle servies lastes da.)
+    // Google Play Services Maps (Viktig! Kun last maps. Ved å laste play-services overskrider man heap size i java. Alle services lastes da.)
     compile 'com.android.support:appcompat-v7:22.2.1'
     compile 'com.android.support:design:22.2.1'
     compile 'com.indooratlas.android:indooratlas-android-sdk:2.0.2-beta@aar'
@@ -40,7 +40,8 @@ dependencies {
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.davemorrissey.labs:subsampling-scale-image-view:3.4.1'
     compile 'com.google.code.gson:gson:2.6.2'
-    compile 'me.imid.swipebacklayout.lib:library:1.0.0' //TODO å fjerne denne skaper problemer
+    compile 'me.imid.swipebacklayout.lib:library:1.0.0' //TODO å fjerne denne skaper problemer, selv om den ikke er i bruk
+    compile 'com.google.maps.android:android-maps-utils:0.3.4'
 }
 
 
