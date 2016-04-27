@@ -9,8 +9,6 @@ namespace Api.Models.EF
 {
     public class Location : BaseModel
     {
-        [Key, ForeignKey("Coordinate")]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public new int Id { get; set; }
 
         [Required]
