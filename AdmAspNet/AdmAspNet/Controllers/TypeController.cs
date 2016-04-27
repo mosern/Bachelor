@@ -40,6 +40,18 @@ namespace AdmAspNet.Controllers
             return View(); 
         }
 
+        [HttpPost]
+        public ActionResult Create([Bind(Include ="Name")] TypeViewModel input)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(input); 
+            }
+            var mapper = mapConfig.CreateMapper();
+            Models.DataContracts.Type data = mapper.Map<Models.DataContracts.Type>(input);
+            return View(); 
+        }
+
         protected override void Initialize(RequestContext requestContext)
         {
             base.Initialize(requestContext);
