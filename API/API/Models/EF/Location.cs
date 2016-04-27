@@ -27,5 +27,8 @@ namespace Api.Models.EF
 
         public int TypeId { get; set; }
         public virtual Type Type { get; set; }
+
+        public int? NeighbourId { get; set; }
+        public virtual PathPoint Neighbour { get; set; }
     }
 }

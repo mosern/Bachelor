@@ -7,13 +7,13 @@ namespace Api.Migrations.LocationConfiguration
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.3-40302")]
-    public sealed partial class Fix4 : IMigrationMetadata
+    public sealed partial class pathChange : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(Fix4));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(pathChange));
         
         string IMigrationMetadata.Id
         {
-            get { return "201604270933036_Fix4"; }
+            get { return "201604271141291_pathChange"; }
         }
         
         string IMigrationMetadata.Source

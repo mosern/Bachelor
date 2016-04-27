@@ -39,6 +39,5 @@ namespace Api.Classes
         public virtual DbSet<People> People { get; set; }
         public virtual DbSet<PathPoint> PathPoint { get; set; }
         public virtual DbSet<PathNeighbours> PathNeighbours { get; set; }
-        public virtual DbSet<LocationPoint> LocationPoint { get; set; }
     }
 }

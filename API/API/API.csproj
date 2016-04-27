@@ -298,9 +298,9 @@
     <Compile Include="Migrations\LocationConfiguration\201604270811537_Fix3.Designer.cs">
       <DependentUpon>201604270811537_Fix3.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\LocationConfiguration\201604270933036_Fix4.cs" />
-    <Compile Include="Migrations\LocationConfiguration\201604270933036_Fix4.Designer.cs">
-      <DependentUpon>201604270933036_Fix4.cs</DependentUpon>
+    <Compile Include="Migrations\LocationConfiguration\201604271141291_pathChange.cs" />
+    <Compile Include="Migrations\LocationConfiguration\201604271141291_pathChange.Designer.cs">
+      <DependentUpon>201604271141291_pathChange.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\LocationConfiguration\Configuration.cs" />
     <Compile Include="Models\Api\AccesspointViewModel.cs" />
@@ -316,7 +316,6 @@
     <Compile Include="Models\EF\BaseModel.cs" />
     <Compile Include="Models\EF\Coordinate.cs" />
     <Compile Include="Models\EF\Location.cs" />
-    <Compile Include="Models\EF\LocationPoint.cs" />
     <Compile Include="Models\EF\PathNeighbours.cs" />
     <Compile Include="Models\EF\PathPoint.cs" />
     <Compile Include="Models\EF\People.cs" />
@@ -409,8 +408,8 @@
     <EmbeddedResource Include="Migrations\LocationConfiguration\201604270811537_Fix3.resx">
       <DependentUpon>201604270811537_Fix3.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\LocationConfiguration\201604270933036_Fix4.resx">
-      <DependentUpon>201604270933036_Fix4.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\LocationConfiguration\201604271141291_pathChange.resx">
+      <DependentUpon>201604271141291_pathChange.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
