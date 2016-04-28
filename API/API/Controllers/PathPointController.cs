@@ -50,138 +50,138 @@ namespace Api.Controllers
 
         }
 
-        ///// <summary>
-        ///// Gets a spesific pathPoint
-        ///// </summary>
-        ///// <param name="id"> id for the pathPoint you want to get</param>
-        ///// <param name="fields">Optional. The fields to include in returned object. Returns all fields if no field is specified</param>
-        ///// <returns>200 ok with processed pathPoint object</returns>
-        //[Route("pathPoints/{id}")]
-        //public IHttpActionResult Get(int id, string fields = null)
-        //{
-        //    PathPoint pathPoint;
-        //    using (var repo = new LocationRepository<PathPoint>())
-        //    {
-        //        type = repo.Read(id);
+        /// <summary>
+        /// Gets a spesific pathPoint
+        /// </summary>
+        /// <param name="id"> id for the pathPoint you want to get</param>
+        /// <param name="fields">Optional. The fields to include in returned object. Returns all fields if no field is specified</param>
+        /// <returns>200 ok with processed pathPoint object</returns>
+        [Route("pathPoints/{id}")]
+        public IHttpActionResult Get(int id, string fields = null)
+        {
+            PathPoint pathPoint;
+            using (var repo = new LocationRepository<PathPoint>())
+            {
+                pathPoint = repo.Read(id);
 
-        //        if (type != null)
-        //        {
-        //            return Ok(ControllerHelper.get<TypeViewModel>(type, fields));
-        //        }
-        //        else
-        //        {
-        //            return BadRequest("No type found");
-        //        }
-        //    }
+                if (pathPoint != null)
+                {
+                    return Ok(ControllerHelper.get<PathPointViewModel>(pathPoint, fields));
+                }
+                else
+                {
+                    return BadRequest("No type found");
+                }
+            }
 
-        //}
+        }
 
-        ///// <summary>
-        ///// Creates new pathPoint
-        ///// </summary>
-        ///// <param name="pathPoint">pathPointViewModel with info about the type to create</param>
-        ///// <returns>201 created with the new object</returns>
-        //[Route("pathPoints")]
-        //public IHttpActionResult Post(TypeViewModel pathPoint)
-        //{
-        //    if (!ModelState.IsValid)
-        //        return BadRequest();
+        /// <summary>
+        /// Creates new pathPoint
+        /// </summary>
+        /// <param name="pathPoint">pathPointViewModel with info about the type to create</param>
+        /// <returns>201 created with the new object</returns>
+        [Route("pathPoints")]
+        public IHttpActionResult Post(PathPointViewModel pathPoint)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest();
 
-        //    try
-        //    {
-        //        return Created("api/pathPoints", ControllerHelper.post<Models.EF.Type, TypeViewModel>(type));
-        //    }
-        //    catch
-        //    {
-        //        return BadRequest();
-        //    }
-        //}
+            try
+            {
+                return Created("api/pathPoints", ControllerHelper.post<PathPoint, PathPointViewModel>(pathPoint));
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
 
-        ///// <summary>
-        ///// Full update of a pathPoint
-        ///// </summary>
-        ///// <param name="pathPoint">All information about the pathPoint to be updated</param>
-        ///// <param name="id">Id of the pathPoint to be updated</param>
-        ///// <returns>200 ok</returns>
-        //[Route("pathPoints/{id}")]
-        //public IHttpActionResult Put(TypeViewModel pathPoint, int id)
-        //{
-        //    if (ModelState.IsValid)
-        //    {
-        //        try
-        //        {
-        //            type.Id = id;
-        //            ControllerHelper.Put<Models.EF.Type>(type);
-        //            return Ok();
-        //        }
-        //        catch
-        //        {
-        //            return InternalServerError();
-        //        }
-        //    }
-        //    else
-        //    {
-        //        return BadRequest();
-        //    }
-        //}
+        /// <summary>
+        /// Full update of a pathPoint
+        /// </summary>
+        /// <param name="pathPoint">All information about the pathPoint to be updated</param>
+        /// <param name="id">Id of the pathPoint to be updated</param>
+        /// <returns>200 ok</returns>
+        [Route("pathPoints/{id}")]
+        public IHttpActionResult Put(PathPointViewModel pathPoint, int id)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    pathPoint.Id = id;
+                    ControllerHelper.Put<PathPoint>(pathPoint);
+                    return Ok();
+                }
+                catch
+                {
+                    return InternalServerError();
+                }
+            }
+            else
+            {
+                return BadRequest();
+            }
+        }
 
-        ///// <summary>
-        ///// Partial update of a pathPoint
-        ///// </summary>
-        ///// <param name="pathPoint">Information about the pathPoint to be updated</param>
-        ///// <param name="id">Id of the pathPoint to be updated</param>
-        ///// <returns>200 ok</returns>
-        //[Route("types/{id}")]
-        //public IHttpActionResult Patch(TypeViewModel pathPoint, int id)
-        //{
-        //    if (type != null)
-        //    {
-        //        try
-        //        {
-        //            type.Id = id;
-        //            ControllerHelper.Patch<Location>(type);
-        //            return Ok();
-        //        }
-        //        catch
-        //        {
-        //            return InternalServerError();
-        //        }
-        //    }
-        //    else
-        //    {
-        //        return BadRequest();
-        //    }
-        //}
+        /// <summary>
+        /// Partial update of a pathPoint
+        /// </summary>
+        /// <param name="pathPoint">Information about the pathPoint to be updated</param>
+        /// <param name="id">Id of the pathPoint to be updated</param>
+        /// <returns>200 ok</returns>
+        [Route("pathPoints/{id}")]
+        public IHttpActionResult Patch(TypeViewModel pathPoint, int id)
+        {
+            if (pathPoint != null)
+            {
+                try
+                {
+                    pathPoint.Id = id;
+                    ControllerHelper.Patch<PathPoint>(pathPoint);
+                    return Ok();
+                }
+                catch
+                {
+                    return InternalServerError();
+                }
+            }
+            else
+            {
+                return BadRequest();
+            }
+        }
 
-        ///// <summary>
-        ///// Removes an pathPoint
-        ///// </summary>
-        ///// <param name="id">Id of the pathPoint to remove</param>
-        ///// <returns>200 ok</returns>
-        //[Route("types/{id}")]
-        //public IHttpActionResult Delete(int id)
-        //{
-        //    try
-        //    {
-        //        using (var repo = new LocationRepository<Location>())
-        //        {
-        //            Location location = repo.Read(id);
+        /// <summary>
+        /// Removes an pathPoint
+        /// </summary>
+        /// <param name="id">Id of the pathPoint to remove</param>
+        /// <returns>200 ok</returns>
+        [Route("pathpoints/{id}")]
+        public IHttpActionResult Delete(int id)
+        {
+            try
+            {
+                using (var repo = new LocationRepository<PathPoint>())
+                {
+                    PathPoint pathPoint = repo.Read(id);
 
-        //            if (location != null)
-        //            {
-        //                ControllerHelper.Delete<Location>(id);
-        //                return Ok();
-        //            }
-        //            else
-        //            {
-        //                return BadRequest();
-        //            }
-        //        }
-        //    }
-        //    catch
-        //    {
-        //        return InternalServerError();
-        //    }
-        //}
+                    if (pathPoint != null)
+                    {
+                        ControllerHelper.Delete<Location>(id);
+                        return Ok();
+                    }
+                    else
+                    {
+                        return BadRequest();
+                    }
+                }
+            }
+            catch
+            {
+                return InternalServerError();
+            }
+        }
     }
 }

@@ -141,7 +141,7 @@ namespace Api.Controllers
                 try
                 {
                     type.Id = id;
-                    ControllerHelper.Patch<Location>(type);
+                    ControllerHelper.Patch<Models.EF.Type>(type);
                     return Ok();
                 }
                 catch
@@ -165,13 +165,13 @@ namespace Api.Controllers
         {
             try
             {
-                using (var repo = new LocationRepository<Location>())
+                using (var repo = new LocationRepository<Models.EF.Type>())
                 {
-                    Location location = repo.Read(id);
+                    Models.EF.Type type = repo.Read(id);
 
-                    if (location != null)
+                    if (type != null)
                     {
-                        ControllerHelper.Delete<Location>(id);
+                        ControllerHelper.Delete<Models.EF.Type>(id);
                         return Ok();
                     }
                     else

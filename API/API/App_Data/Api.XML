@@ -486,6 +486,18 @@
             </summary>
             <param name="documentPath">The physical path to XML document.</param>
         </member>
+        <member name="M:Api.Controllers.PathPointController.Get(System.String,System.String,System.Nullable{System.Int32},System.Int32,System.Boolean,System.String)">
+            <summary>
+            Gets a list of PathPoints
+            </summary>
+            <param name="fields">Optional. The fields to include in returned object. Returns all fields if no field is specified</param>
+            <param name="sort">Optional, sorts accending by id if not set. The fields to sort by, use "," to serparate fields. Use "-" in fornt of field name to sort decending. Sorts accesnding by id as default</param>
+            <param name="page">Optional. The page you want</param>
+            <param name="pageSize">Optional, standard value is 5. The size you want your pages to be</param>
+            <param name="asObject">Optional, standard value is true. Spesify if you want a collection or a object with the collection as a property</param>
+            <param name="objPropName">Optional, standard value is "PathPoints". Name of object if asObject is true</param>
+            <returns>200 ok with processed list of all pathPoints in the database</returns>
+        </member>
         <member name="T:Api.Controllers.TypeController">
             <summary>
             Controller that handels crud for Types
