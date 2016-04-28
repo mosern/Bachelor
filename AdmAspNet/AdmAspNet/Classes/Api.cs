@@ -127,6 +127,30 @@ namespace AdmAspNet.Classes
             List<Models.DataContracts.Type> returnList = CallApi<List<Models.DataContracts.Type>>(url);
             return returnList; 
         }
+
+        public bool PostType(Models.DataContracts.Type data)
+        {
+            string url = ConfigurationManager.AppSettings["apiTypes"];
+            return PostApi(url, data); 
+        }
+
+        public Models.DataContracts.Type GetTypeById(int id)
+        {
+            string url = ConfigurationManager.AppSettings["apiTypes"] + "/" + id;
+            return CallApi<Models.DataContracts.Type>(url); 
+        }
+
+        public bool UpdateType(int id, Models.DataContracts.Type data)
+        {
+            string url = ConfigurationManager.AppSettings["apiTypes"] + "/" + id;
+            return PutApi(url, data); 
+        }
+
+        public bool DeleteType(int id)
+        {
+            string url = ConfigurationManager.AppSettings["apiTypes"] + "/" + id;
+            return DeleteObject(url); 
+        }
         #endregion
 
         #region AccessPointMethods

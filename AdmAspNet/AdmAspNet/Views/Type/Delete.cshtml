@@ -1,0 +1,42 @@
+﻿@model AdmAspNet.Models.ViewModels.TypeViewModel
+
+@{
+    ViewBag.Title = "Slett type";
+}
+@section sidebar {
+    @Html.Partial("_SidebarPartial")
+}
+<h2>Slett</h2>
+
+<h3>Er du sikker på at du vil slette?</h3>
+<div>
+    <h4>Type</h4>
+    @if (ViewBag.SuccessMessage != null)
+    {
+        Html.RenderPartial("_SuccessPartial");
+    }
+    @if (ViewBag.ErrorMessage != null)
+    {
+        Html.RenderPartial("_ErrorPartial");
+    }
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+
+    </dl>
+
+    @using (Html.BeginForm()) {
+        @Html.AntiForgeryToken()
+
+        <div class="form-actions no-color">
+            <input type="submit" value="Slett" class="btn btn-default" /> |
+            @Html.ActionLink("Tilbake til overisikt", "Index")
+        </div>
+    }
+</div>

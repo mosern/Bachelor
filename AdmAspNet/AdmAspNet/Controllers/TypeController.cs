@@ -49,7 +49,95 @@ namespace AdmAspNet.Controllers
             }
             var mapper = mapConfig.CreateMapper();
             Models.DataContracts.Type data = mapper.Map<Models.DataContracts.Type>(input);
+           if (api.PostType(data))
+            {
+                ViewBag.SuccessMessage = "Typen ble opprettet";
+            }
+           else
+            {
+                ViewBag.ErrorMessage = "En feil oppstod, kontakt en systemadministrator"; 
+            }
             return View(); 
+        }
+
+        public ActionResult Edit(int? id)
+        {
+            if (id == null)
+            {
+                ViewBag.ErrorMessage = "Du må spesifisere en ID";
+                return View("ErrorView"); 
+            }
+            Models.DataContracts.Type data; 
+            if ((data = api.GetTypeById(id.Value)) == null)
+            {
+                ViewBag.ErrorMessage = "Kan ikke finne typen du forespurte";
+                return View("ErrorView"); 
+            }
+            var mapper = mapConfig.CreateMapper();
+            TypeViewModel viewModel = mapper.Map<TypeViewModel>(data); 
+            return View(viewModel); 
+        }
+
+        [HttpPost]
+        public ActionResult Edit(int id, [Bind(Include ="Name")] TypeViewModel input)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(input);
+            }
+            var mapper = mapConfig.CreateMapper();
+            Models.DataContracts.Type type = mapper.Map<Models.DataContracts.Type>(input); 
+            if (api.UpdateType(id,type))
+            {
+                ViewBag.SuccessMessage = "Typen ble oppdatert"; 
+            }
+            else
+            {
+                ViewBag.ErrorMessage = "En feil oppstod, kontakt en systemadministrator"; 
+            }
+            return View(input); 
+
+        }
+
+        public ActionResult Delete(int? id)
+        {
+            if (id == null)
+            {
+                ViewBag.ErrorMessage = "Du må spesifisere en id";
+                return View("ErrorView"); 
+            }
+            Models.DataContracts.Type data; 
+            if ((data = api.GetTypeById(id.Value)) == null)
+            {
+                ViewBag.ErrorMessage = "Typen du forespurte finnes ikke";
+                return View("ErrorView"); 
+            }
+            var mapper = mapConfig.CreateMapper();
+            TypeViewModel viewModel = mapper.Map<TypeViewModel>(data);
+            return View(viewModel); 
+        }
+
+        [HttpPost]
+        public ActionResult Delete(int id)
+        {
+            Models.DataContracts.Type data; 
+            if ((data = api.GetTypeById(id)) == null)
+            {
+                ViewBag.ErrorMessage = "Typen du forespurte finnes ikke";
+                return View("ErrorView"); 
+            }
+            
+            if (api.DeleteType(id))
+            {
+                ViewBag.SuccessMessage = "Typen ble slettet"; 
+            }
+            else
+            {
+                ViewBag.ErrorMessage = "En feil oppstod, kontakt systemadministrator"; 
+            }
+            var mapper = mapConfig.CreateMapper();
+            TypeViewModel viewModel = mapper.Map<TypeViewModel>(data);
+            return View(viewModel); 
         }
 
         protected override void Initialize(RequestContext requestContext)
