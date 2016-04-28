@@ -10,7 +10,7 @@ public class Point {
     private double longitude;
     private int floor;
 
-    Point (double latitude, double longitude, int floor){
+    public Point (double latitude, double longitude, int floor){
         this.latitude = latitude;
         this.longitude = longitude;
         this.floor = floor;

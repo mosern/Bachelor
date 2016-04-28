@@ -10,6 +10,11 @@
     <color name="route_circle_start_color">#FF3fce8b</color>
     <color name="route_circle_end_color">#FF00ccff</color>
 
+    <!-- user location -->
+    <color name="user_location_outer_ring">#CAE3F7</color>
+    <color name="user_location_middle_ring">#97C8F0</color>
+    <color name="user_location_inner_ring">#3192E1</color>
+
     <color name="transparent">#00000000</color>
 
     <color name="radiusfillcolor">#84b166</color>

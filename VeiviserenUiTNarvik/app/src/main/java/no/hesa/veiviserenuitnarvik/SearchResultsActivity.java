@@ -18,7 +18,6 @@ import java.util.HashMap;
 import java.util.List;
 import com.google.gson.Gson;
 
-
 //import no.hesa.veiviserenuitnarvik.api.ActionInterface;
 //import no.hesa.veiviserenuitnarvik.api.Api;
 import no.hesa.positionlibrary.api.ActionInterface;

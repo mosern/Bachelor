@@ -13,7 +13,7 @@ public class Coordinate{
     public Coordinate() {
 
     }
-
+/*
     public Coordinate(int id, double lat, double lng, double alt)
     {
         this.id = id;
@@ -21,7 +21,7 @@ public class Coordinate{
         this.lng = lng;
         this.alt = alt;
     }
-
+*/
     @Override
     public String toString()
     {

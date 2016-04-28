@@ -203,18 +203,18 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         intent.setAction("no.hesa.veiviserennarvik.LAT_LNG_RETURN");
         intent.putExtra("lat", location.getCoordinate().getLat());
         intent.putExtra("lng", location.getCoordinate().getLng());
+        intent.putExtra("floor", location.getCoordinate().getAlt());
         _context.startActivity(intent);
 //        ((Activity) _context).finish();
     }
 
     private void sendPersonDestination(final Person person)
     {
-        // TODO: Mangler coordinates for persons
-
         Intent intent = new Intent(_context,MapActivity.class);
         intent.setAction("no.hesa.veiviserennarvik.LAT_LNG_RETURN");
         intent.putExtra("lat", person.getLocation().getCoordinate().getLat());
         intent.putExtra("lng", person.getLocation().getCoordinate().getLng());
+        intent.putExtra("floor", person.getLocation().getCoordinate().getAlt());
         _context.startActivity(intent);
     }
 

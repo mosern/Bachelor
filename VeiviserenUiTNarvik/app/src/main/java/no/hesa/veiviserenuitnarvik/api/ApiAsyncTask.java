@@ -21,6 +21,7 @@ import java.util.List;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import no.hesa.positionlibrary.api.ActionInterface;
 import no.hesa.veiviserenuitnarvik.MainActivity;
 import no.hesa.veiviserenuitnarvik.MapActivity;
 import no.hesa.veiviserenuitnarvik.SearchResultsActivity;

@@ -14,6 +14,8 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
@@ -21,6 +23,8 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -56,6 +60,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import no.hesa.positionlibrary.Point;
 import no.hesa.positionlibrary.PositionLibrary;
 //import no.hesa.veiviserenuitnarvik.api.ActionInterface;
 //import no.hesa.veiviserenuitnarvik.api.Api;
@@ -90,13 +95,15 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     private Polyline polyline = null;
 
-    Menu menuRef = null;
-
-    private Circle circleOne;
-    private Circle circleTwo;
-    private Circle circleThree;
+    private Menu menuRef = null;
 
     private LatLngBounds elevationChangeBounds = null;
+
+    private String currentFloorPlan;
+    private int currentFloor;
+    private ArrayList<ArrayList<Point>> receivedPath = null;
+
+    private ProgressBar fetch_map_spinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,6 +116,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        fetch_map_spinner = (ProgressBar)findViewById(R.id.fetch_map_progress_bar);
+
+        registerButtonListeners();
 
         //Api api = new Api(this, getApplicationContext().getResources());
         Api api = new Api(this);
@@ -119,8 +129,33 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         api.locationById(2,token);
 */
         returnedCoordsFromSearchIntent = getIntent();
+    }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
 
+        if (mMap != null) {
+            SharedPreferences.Editor sharedPreferences = getSharedPreferences("MapActivityPrefs", MODE_PRIVATE).edit();
+
+            float zoomLevel = mMap.getCameraPosition().zoom;
+            sharedPreferences.putFloat("ZoomLevel", zoomLevel);
+
+            if (currentPosition != null) {
+                float lat = (float) currentPosition.latitude;
+                float lng = (float) currentPosition.longitude;
+
+                sharedPreferences.putFloat("CurrentLat", lat);
+                sharedPreferences.putFloat("CurrentLng", lng);
+            }
+
+            if (!currentFloorPlan.isEmpty())
+            {
+                sharedPreferences.putString("CurrentFloorPlan", currentFloorPlan);
+            }
+
+            sharedPreferences.commit();
+        }
     }
 
     @Override
@@ -130,8 +165,16 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        fetchFloorPlan(getResources().getString(R.string.indooratlas_floor_1_floorplanid)); // 1 etg
-     //   fetchFloorPlan(getResources().getString(R.string.indooratlas_floor_2_floorplanid)); // 2 etg
+        // TODO: check if first run, make sure floorplan is set etc
+
+        //currentFloorPlan = getResources().getString(R.string.indooratlas_floor_1_floorplanid);// 1 etg
+        //currentFloorPlan = getResources().getString(R.string.indooratlas_floor_2_floorplanid);// 2 etg
+
+        // TODO: check for sharedpreference
+        SharedPreferences sharedPreferences = getSharedPreferences("MapActivityPrefs",MODE_PRIVATE);
+
+        currentFloorPlan = sharedPreferences.getString("CurrentFloorPlan", getResources().getString(R.string.indooratlas_floor_2_floorplanid));
+        fetchFloorPlan(currentFloorPlan);
     }
 
     @Override
@@ -151,19 +194,25 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         mMap = googleMap;
 
         mMap.getUiSettings().setMapToolbarEnabled(false); // disable map toolbar:
+        mMap.getUiSettings().setIndoorLevelPickerEnabled(true);
 
-        // Add a marker in Narvik and move the camera
-        LatLng hin = new LatLng(68.436135, 17.434950);
-        mMap.addMarker(new MarkerOptions().position(hin).title("UiT Narvik"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(hin, 17));
+        SharedPreferences sharedPreferences = getSharedPreferences("MapActivityPrefs",MODE_PRIVATE);
 
+        float zoomLevel = sharedPreferences.getFloat("ZoomLevel", 17.0f);
+        float lat = sharedPreferences.getFloat("CurrentLat", 68.436135f);
+        float lng = sharedPreferences.getFloat("CurrentLng", 17.434950f);
+
+        // TODO: 28/04/2016 first run only, maybe change to users position via GPS
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lng), zoomLevel));
 
         if (returnedCoordsFromSearchIntent != null) {
             if (returnedCoordsFromSearchIntent.getAction() != null) {
                 if (returnedCoordsFromSearchIntent.getAction().equals("no.hesa.veiviserennarvik.LAT_LNG_RETURN")) {
-                    LatLng latLng = new LatLng(returnedCoordsFromSearchIntent.getDoubleExtra("lng",0),returnedCoordsFromSearchIntent.getDoubleExtra("lat",0));
+                    LatLng latLng = new LatLng(returnedCoordsFromSearchIntent.getDoubleExtra("lat",0),returnedCoordsFromSearchIntent.getDoubleExtra("lng",0));
+                    double floor = returnedCoordsFromSearchIntent.getDoubleExtra("floor", 1.0);
+                    changeFloor((int)floor);
                     mMap.addMarker(new MarkerOptions().position(latLng).title("TestLoc2"));
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoomLevel));
                     targetPosition = latLng;
                 }
             }
@@ -171,64 +220,38 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         registerOnMapClickReceiver();
 //        registerPositionReceiver();
-        registerSearchLocationReceiver();
-
-        //Painting position marker
-        circleThree = mMap.addCircle(new CircleOptions()
-                .center(hin)
-                .radius(3)
-                .strokeColor(Color.rgb(202, 227, 247))
-                .fillColor(Color.rgb(202, 227, 247)));
-
-        circleTwo = mMap.addCircle(new CircleOptions()
-                .center(hin)
-                .radius(1.5)
-                .strokeColor(Color.rgb(151, 200, 240))
-                .fillColor(Color.rgb(151, 200, 240)));
-
-        circleOne = mMap.addCircle(new CircleOptions()
-                .center(hin)
-                .radius(0.5)
-                .strokeColor(Color.rgb(49, 146, 225))
-                .fillColor(Color.rgb(49, 146, 225)));
-
-        List<Coordinate> list = new ArrayList<>();
-        list.add(new Coordinate(1, 68.4362723, 17.4353580, 2.0));
-        list.add(new Coordinate(2, 68.4361468, 17.4352132, 2.0));
-        list.add(new Coordinate(3, 68.4361089, 17.4352722, 2.0));
-        list.add(new Coordinate(4, 68.4360255, 17.4351280, 2.0));
-        list.add(new Coordinate(5, 68.4359827, 17.4353097, 2.0));
+//        registerSearchLocationReceiver();
 
 
-        LatLng endPoint = drawFloorPath(list);
-        if (endPoint != null)
-        {
-            elevationChangeBounds = toBounds(endPoint, 5);
+//region RECEIVEDPATH PLACEHOLDER
+        receivedPath = new ArrayList<ArrayList<Point>>();
+        ArrayList<Point> andreetg = new ArrayList<>();
+        andreetg.add(new Point(68.4362723, 17.4353580, 2));
+        andreetg.add(new Point(68.4361468, 17.4352132, 2));
+        andreetg.add(new Point(68.4361089, 17.4352722, 2));
+        andreetg.add(new Point(68.4360255, 17.4351280, 2));
+        andreetg.add(new Point(68.4359827, 17.4353097, 2));
+
+        ArrayList<Point> forstetg = new ArrayList<>();
+        forstetg.add(new Point(68.4361723, 17.4353580, 1));
+        forstetg.add(new Point(68.4360468, 17.4352132, 1));
+        forstetg.add(new Point(68.4360089, 17.4352722, 1));
+        forstetg.add(new Point(68.4359255, 17.4351280, 1));
+        forstetg.add(new Point(68.4358827, 17.4353097, 1));
+
+        receivedPath.add(andreetg);
+        receivedPath.add(forstetg);
+//endregion
+
+        // order of floor traversal
+        if (receivedPath != null) {
+        //    drawNextFloor();
         }
+
+        // TODO: add button to change floor after a path has been drawn
     }
 
-    // http://stackoverflow.com/questions/15319431/how-to-convert-a-latlng-and-a-radius-to-a-latlngbounds-in-android-google-maps-ap
-    // http://googlemaps.github.io/android-maps-utils/
-    public LatLngBounds toBounds(LatLng center, double radius) {
-        LatLng southwest = SphericalUtil.computeOffset(center, radius * Math.sqrt(2.0), 225);
-        LatLng northeast = SphericalUtil.computeOffset(center, radius * Math.sqrt(2.0), 45);
-        return new LatLngBounds(southwest, northeast);
-    }
 
-    private void drawRoute(LatLng a, LatLng b)
-    {
-        // draws a line between point a and point b
-        if (polyline != null)
-            polyline.remove();
-
-        PolylineOptions po = new PolylineOptions()
-                .add(a, b)
-                .width(POLYLINEWIDTH)
-                .color(getResources().getColor(R.color.blue))
-                .geodesic(false); // lat/long lines curved by the shape of the planet
-
-        polyline = mMap.addPolyline(po);
-    }
 
     /**
      * Places markers (circles) with polylines connecting them along provided path.
@@ -237,7 +260,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
      * @param coordinateList
      * @return LatLang containing the last point added
      */
-    private LatLng drawFloorPath(List<Coordinate> coordinateList)
+    private LatLng drawFloorPath(List<Point> coordinateList)
     {
         ArrayList<Polyline> polylineList = new ArrayList<Polyline>();
         ArrayList<LatLng> latLngList = new ArrayList<LatLng>();
@@ -245,13 +268,15 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         LatLng currentPoint = null;
         LatLng previousPoint = null;
 
+        currentFloor = coordinateList.get(0).getFloor(); // all points will be on the same floor
+
         final double CIRCLERADIUS = 0.25;
 
         // mMap.clear(); // clears map of all markers
 
         for(int i = 0; i < coordinateList.size(); i++)
         {
-            currentPoint = new LatLng(coordinateList.get(i).getLat(), coordinateList.get(i).getLng());
+            currentPoint = new LatLng(coordinateList.get(i).getLatitude(), coordinateList.get(i).getLongitude());
             latLngList.add(currentPoint);
 
             // first point
@@ -269,7 +294,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
             if (latLngList.size() > 1)
             {
-                previousPoint = new LatLng(coordinateList.get(i - 1).getLat(), coordinateList.get(i - 1).getLng());
+                previousPoint = new LatLng(coordinateList.get(i - 1).getLatitude(), coordinateList.get(i - 1).getLongitude());
 
                 PolylineOptions po = new PolylineOptions()
                         .add(previousPoint, currentPoint)
@@ -307,6 +332,120 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         return currentPoint;
     }
 
+    private void drawNextFloor()
+    {
+        if (receivedPath.get(0) != null) {
+ //           changeFloor(receivedPath.get(0).get(0).getFloor()); // downloads the floorplan
+
+            LatLng endPoint = drawFloorPath(receivedPath.get(0)); // draws path
+            receivedPath.remove(0); // removes the floor the path has already been drawn on
+
+            if (endPoint != null) {
+                elevationChangeBounds = toBounds(endPoint, 5); // registers a position + radius for elevationChangeBounds
+            }
+        }
+        else {
+            Toast.makeText(MapActivity.this, "You have arrived at your destination", Toast.LENGTH_SHORT).show();
+            elevationChangeBounds = null; // unregister listener
+        }
+    }
+
+    private void drawUserPosition(LatLng currentPosition)
+    {
+        //Painting position marker
+        Circle circleThree = mMap.addCircle(new CircleOptions()
+                .center(currentPosition)
+                .radius(3)
+                .strokeColor(getResources().getColor(R.color.user_location_outer_ring))
+                .fillColor(getResources().getColor(R.color.user_location_outer_ring))
+                .zIndex(50));
+
+        Circle circleTwo = mMap.addCircle(new CircleOptions()
+                .center(currentPosition)
+                .radius(1.5)
+                .strokeColor(getResources().getColor(R.color.user_location_middle_ring))
+                .fillColor(getResources().getColor(R.color.user_location_middle_ring))
+                .zIndex(51));
+
+        Circle circleOne = mMap.addCircle(new CircleOptions()
+                .center(currentPosition)
+                .radius(0.5)
+                .strokeColor(getResources().getColor(R.color.user_location_inner_ring))
+                .fillColor(getResources().getColor(R.color.user_location_inner_ring))
+                .zIndex(52));
+
+        circleThree.setCenter(currentPosition);
+        circleTwo.setCenter(currentPosition);
+        circleOne.setCenter(currentPosition);
+    }
+
+    private void changeFloor(int floor)
+    {
+        switch (floor) {
+            case 0:
+                break;
+            case 1:
+                fetchFloorPlan(getResources().getString(R.string.indooratlas_floor_1_floorplanid));
+                currentFloorPlan = getResources().getString(R.string.indooratlas_floor_1_floorplanid);
+                break;
+            case 2:
+                fetchFloorPlan(getResources().getString(R.string.indooratlas_floor_2_floorplanid));
+                currentFloorPlan = getResources().getString(R.string.indooratlas_floor_2_floorplanid);
+                break;
+            case 3:
+                break;
+            case 4:
+                break;
+            case 5:
+                break;
+            default:
+                break;
+        }
+    }
+
+    // http://stackoverflow.com/questions/15319431/how-to-convert-a-latlng-and-a-radius-to-a-latlngbounds-in-android-google-maps-ap
+    // http://googlemaps.github.io/android-maps-utils/
+    public LatLngBounds toBounds(LatLng center, double radius) {
+        LatLng southwest = SphericalUtil.computeOffset(center, radius * Math.sqrt(2.0), 225);
+        LatLng northeast = SphericalUtil.computeOffset(center, radius * Math.sqrt(2.0), 45);
+        return new LatLngBounds(southwest, northeast);
+    }
+//region BUTTON LISTENERS
+    //// TODO: 28/04/2016 hardcoded floor values when changing floor with buttons 
+    private void registerButtonListeners()
+    {
+        FloatingActionButton floor_up_fab = (FloatingActionButton) findViewById(R.id.floor_up);
+        floor_up_fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {                
+                if (currentFloorPlan.compareTo(getResources().getString(R.string.indooratlas_floor_1_floorplanid)) == 0) {
+                    changeFloor(2);
+                    mMap.clear();
+                }
+                /*
+                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+                        */
+            }
+        });
+
+        FloatingActionButton floor_down_fab = (FloatingActionButton) findViewById(R.id.floor_down);
+        floor_down_fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (currentFloorPlan.compareTo(getResources().getString(R.string.indooratlas_floor_2_floorplanid)) == 0) {
+                    changeFloor(1);
+                    mMap.clear();
+                }
+                /*
+                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+                        */
+            }
+        });
+    }
+//endregion
+
 //region BROADCASTRECEIVERS
     private void registerOnMapClickReceiver()
     {
@@ -336,19 +475,15 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     if (pos[0] != 0 && pos[1] != 0)
                     {
                         LatLng latLng = new LatLng(pos[0], pos[1]);
-                        //Move position marker
-                        circleThree.setCenter(latLng);
-                        circleTwo.setCenter(latLng);
-                        circleOne.setCenter(latLng);
+
                         currentPosition = latLng;
-                        //TODO: remove temp drawroute
-                        if (targetPosition != null) {
-                            drawRoute(currentPosition, targetPosition);
-                        }
-                        //TODO: add code for elevation change upon received position
-                        if(elevationChangeBounds.contains(latLng))
-                        {
-                            // reguest elevation change
+
+                        drawUserPosition(currentPosition);
+
+                        if (elevationChangeBounds != null) {
+                            if (elevationChangeBounds.contains(latLng)) {
+                                drawNextFloor(); // loads the next map and draws the path when end point is reached
+                            }
                         }
                     }
                     else
@@ -363,7 +498,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         positionLibrary.wifiPosition.registerBroadcast(this);
         registerReceiver(positionLibOutputReceiver, new IntentFilter("no.hesa.positionlibrary.Output"));
     }
-
+/*
     private void registerSearchLocationReceiver()
     {
      //   searchLocationReceiver = new BroadcastReceiver() {
@@ -383,6 +518,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         searchLocationReceiver = new SearchLocationReceiver();
         registerReceiver(searchLocationReceiver, new IntentFilter("no.hesa.veiviserennarvik.LAT_LNG_RETURN"));
     }
+    */
 //endregion
 
 //region INDOORATLAS METHODS
@@ -408,6 +544,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     .zIndex(0.1f);
 
             mGroundOverlay = mMap.addGroundOverlay(fpOverlay);
+            fetch_map_spinner.setVisibility(View.GONE);
         }
     }
 
@@ -441,6 +578,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 {
                     Toast.makeText(MapActivity.this, "Failed to load bitmap",
                             Toast.LENGTH_SHORT).show();
+                    fetch_map_spinner.setVisibility(View.GONE);
                 }
             };
         }
@@ -466,6 +604,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
      * Fetches floor plan data from IndoorAtlas server.
      */
     private void fetchFloorPlan(String id) {
+        fetch_map_spinner.setVisibility(View.VISIBLE);
 
         // if there is already running task, cancel it
         cancelPendingNetworkCalls();

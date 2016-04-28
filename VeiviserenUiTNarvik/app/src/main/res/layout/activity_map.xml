@@ -27,7 +27,49 @@
             android:layout_height="match_parent"
             android:id="@+id/map"
             tools:context=".MainActivity"
-            android:name="com.google.android.gms.maps.SupportMapFragment" />
+            android:name="com.google.android.gms.maps.SupportMapFragment">
+
+            <ProgressBar
+                android:id="@+id/fetch_map_progress_bar"
+                style="?android:attr/progressBarStyleLarge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_centerInParent="true"/>
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/floor_up"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|end"
+                app:fabSize="mini"
+                android:layout_marginTop="@dimen/fab_margin"
+                android:layout_marginLeft="@dimen/fab_margin"
+                android:layout_marginRight="@dimen/fab_margin"
+                android:layout_marginBottom="75dp"
+                app:backgroundTint="@color/colorPrimary"
+                android:src="@drawable/ic_add_circle_outline_white_24dp"
+                app:layout_anchor="@id/floor_up"
+                app:layout_anchorGravity="top"/>
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/floor_down"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|end"
+                app:fabSize="mini"
+                android:layout_marginTop="@dimen/fab_margin"
+                android:layout_marginLeft="@dimen/fab_margin"
+                android:layout_marginRight="@dimen/fab_margin"
+                android:layout_marginBottom="25dp"
+                app:backgroundTint="@color/colorPrimary"
+                android:src="@drawable/ic_remove_circle_outline_white_24dp"
+                app:layout_anchor="@id/floor_down"
+                app:layout_anchorGravity="top"/>
+        </fragment>
+
+
+
 
     </android.support.design.widget.AppBarLayout>
 
