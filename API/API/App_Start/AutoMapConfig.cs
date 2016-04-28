@@ -216,6 +216,9 @@ namespace Api
                 cor = new Coordinate { Id = source.Id.Value };
             }
 
+            if (source.Id.Value == 0)
+                source.Id = cor.Id;
+
             Accesspoint dest = new Accesspoint()
             {
                 Id = source.Id.Value,
