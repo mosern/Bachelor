@@ -9,6 +9,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.location.Location;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.os.Build;
@@ -18,10 +19,10 @@ import org.apache.commons.math3.fitting.leastsquares.LeastSquaresOptimizer;
 import org.apache.commons.math3.fitting.leastsquares.LevenbergMarquardtOptimizer;
 import org.apache.commons.math3.linear.RealVector;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -142,8 +143,9 @@ public class WifiPosition implements ActionInterface {
 
     private DijkstraAlgorithm da;
     private Graph graph;
-    private List<Edge> model;
-    private Point lastSendtPosition;
+    private List<Edge> model = new ArrayList<Edge>();
+    private List<Point> allPathPoints= new ArrayList<Point>();
+    private Point lastSentPosition;
 
     /**
      * Initialize TimerTask to set up continuous scannig for available Wi-Fi access points
@@ -279,8 +281,8 @@ public class WifiPosition implements ActionInterface {
             calculatedPosition = calculatePosition(sortedWifiPointsLocationInf);
             floor = findFloor(sortedWifiPointsLocationInf);
         }
-        if(!lastSendtPosition.equals(new Point(calculatedPosition[0], calculatedPosition[1], floor))){
-            lastSendtPosition = new Point(calculatedPosition[0], calculatedPosition[1], floor);
+        if(!lastSentPosition.equals(new Point(calculatedPosition[0], calculatedPosition[1], floor))){
+            lastSentPosition = new Point(calculatedPosition[0], calculatedPosition[1], floor);
 
             //Send result to application
             Intent intent = new Intent();
@@ -453,13 +455,13 @@ public class WifiPosition implements ActionInterface {
             case Api.ALL_ACCESS_POINTS:
                 try {
                     if (jsonObject != null) {
-                        JSONArray jsonArray = jsonObject.getJSONArray("accesspoints");
-                        for (int i = 0; i < jsonArray.length(); i++) {
-                            if (jsonArray.get(i) != null) {
-                                JSONObject jObject = jsonArray.getJSONObject(i);
-                                JSONObject coordinate = jObject.getJSONObject("coordinate");
+                        JSONArray jsonArrayWiFi = jsonObject.getJSONArray("accesspoints");
+                        for (int i = 0; i < jsonArrayWiFi.length(); i++) {
+                            if (jsonArrayWiFi.get(i) != null) {
+                                JSONObject jObjectWiFi = jsonArrayWiFi.getJSONObject(i);
+                                JSONObject coordinate = jObjectWiFi.getJSONObject("coordinate");
                                 //Fill list with information on wi-fi access points with data we get from API
-                                wifiPointsMacGeo.put(jObject.getString("macAddress"), new Point(coordinate.getDouble("lng"), coordinate.getDouble("lat"), coordinate.getInt("alt")));
+                                wifiPointsMacGeo.put(jObjectWiFi.getString("macAddress"), new Point(coordinate.getDouble("lng"), coordinate.getDouble("lat"), coordinate.getInt("alt")));
                             }
                         }
                     }
@@ -470,7 +472,22 @@ public class WifiPosition implements ActionInterface {
             case Api.ALL_PATH_POINTS:
                 try {
                     if(jsonObject != null){
+                        JSONArray jsonArrayPath = jsonObject.getJSONArray("pathpoints");
+                        //Traverse first level
+                        for(int i = 0; i < jsonArrayPath.length(); i++){
+                            //Save firstPoint in array
+                            JSONObject firstPoint = jsonArrayPath.getJSONObject(i).getJSONObject("firstPoint");
+                            Vertex<Point> firstVertex = new Vertex<>(new Point(firstPoint.getDouble("lng"), firstPoint.getDouble("lat"), firstPoint.getInt("alt")));
+                            allPathPoints.add(new Point(firstPoint.getDouble("lng"), firstPoint.getDouble("lat"), firstPoint.getInt("alt")));
 
+                            JSONArray jsonArrayNeighbours = jsonArrayPath.getJSONObject(i).getJSONArray("noods");
+                            //Traverse second level
+                            for(int j = 0; j < jsonArrayNeighbours.length(); j++){
+                                JSONObject secondPoint = jsonArrayPath.getJSONObject(i).getJSONObject("neighbour");
+                                Vertex<Point> secondVertex = new Vertex<>(new Point(secondPoint.getDouble("lng"), secondPoint.getDouble("lat"), secondPoint.getInt("alt")));
+                                model.add(new Edge(firstVertex, secondVertex, secondPoint.getInt("distance")));
+                            }
+                        }
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -491,7 +508,36 @@ public class WifiPosition implements ActionInterface {
      * @throws PathNotFoundException
      */
     public LinkedList<Vertex> plotRoute(Point destination) throws PathNotFoundException {
-        da.execute(new Vertex<>(lastSendtPosition));
+        HashMap<Point, Double> closestPathPoint = findClosestPathPoint(lastSentPosition);
+        Point[] point = (Point[]) closestPathPoint.keySet().toArray(new Point[closestPathPoint.size()]);
+        Double[] distance = (Double[]) closestPathPoint.values().toArray(new Double[closestPathPoint.size()]);
+        //Add new node
+        model.add(new Edge(new Vertex(lastSentPosition), new Vertex(point[0]), distance[0].intValue()));
+
+        graph = new Graph(model);
+        da = new DijkstraAlgorithm(graph);
+
+        da.execute(new Vertex<>(lastSentPosition));
         return da.getPath(new Vertex<>(destination));
+    }
+
+    /**
+     * Find closest path point to users current position
+     * @param position current position
+     * @return Closest path point and distance to it
+     */
+    public HashMap<Point, Double> findClosestPathPoint(Point position){
+        List<Float> distances = new ArrayList<>();
+        HashMap<Point, Double> result = new HashMap<Point, Double>();
+
+        for(int i = 0; i < allPathPoints.size(); i++){
+            float [] dist = new float[1];
+            Location.distanceBetween(position.getLatitude(), position.getLongitude(), allPathPoints.get(i).getLatitude(), allPathPoints.get(i).getLongitude(), dist);
+            distances.add(dist[0]);
+        }
+        Double minDist = Double.valueOf(Collections.min(distances));
+        result.put(allPathPoints.get(distances.indexOf(minDist)), minDist);
+
+        return result;
     }
 }
