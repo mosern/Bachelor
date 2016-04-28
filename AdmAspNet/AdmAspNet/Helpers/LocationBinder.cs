@@ -1,6 +1,7 @@
 ﻿using AdmAspNet.Models.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -19,15 +20,15 @@ namespace AdmAspNet.Helpers
                 string desc = request.Form.Get("Desc"); 
                 //Gather everything necessary 
                 double lng,lat,alt;
-                if (!double.TryParse(request.Form.Get("Coordinate.Lng"), out lng))
+                if (!double.TryParse(request.Form.Get("Coordinate.Lng"),NumberStyles.Any,CultureInfo.GetCultureInfo("no-nb"),out lng))
                 {
                     bindingContext.ModelState.AddModelError("Coordinate.Lng", "Breddegrad må være en gyldig double"); 
                 }
-                if (!double.TryParse(request.Form.Get("Coordinate.Lat"), out lat))
+                if (!double.TryParse(request.Form.Get("Coordinate.Lat"),NumberStyles.Any,CultureInfo.GetCultureInfo("no-nb"),out lat))
                 {
                     bindingContext.ModelState.AddModelError("Coordinate.Lat", "Lengdegrad må være en gyldig double"); 
                 }
-                if (!double.TryParse(request.Form.Get("Coordinate.Alt"), out alt))
+                if (!double.TryParse(request.Form.Get("Coordinate.Alt"),NumberStyles.Any,CultureInfo.GetCultureInfo("no-nb"),out alt))
                 {
                     bindingContext.ModelState.AddModelError("Coordinate.Alt", "Høyde må være en gyldig double"); 
                 }
