@@ -15,8 +15,15 @@ namespace Api.Factories
     public class ShapeFactory<X> where X : BaseViewModel
     {
         //TODO Using generic type?
-        public static object Shape(X obj, List<string> fields)
+        public static object Shape(X obj, List<string> rawFields)
         {
+            List<string> fields = new List<string>();
+
+            foreach(string field in rawFields)
+            {
+                fields.Add(field.ToLower());
+            }
+
             ExpandoObject toReturn = new ExpandoObject();
 
             var properties = obj.GetType().GetProperties();
@@ -35,14 +42,38 @@ namespace Api.Factories
                     object value;
                     if (new BaseViewModel().GetType().IsInstanceOfType(o))
                     {
-                        value = ShapeFactory<BaseViewModel>.Shape((BaseViewModel)o, fields);
+                        
+                        if (fields.Contains(property.Name.ToLower()))
+                        {
+                            value = o;
+                        }
+                        else
+                        {
+                            value = ShapeFactory<BaseViewModel>.Shape((BaseViewModel)o, fields);
+                        }
+                        
                     }
                     else
                     {
-                        value = ShapeFactory<BaseViewModel>.ShapeList((IEnumerable<BaseViewModel>)o, fields);
+                        if (o != null)
+                        {
+                            value = ShapeFactory<BaseViewModel>.ShapeList((IEnumerable<BaseViewModel>)o, fields);
+                        }
+                        else
+                        {
+                            value = null;
+                        }
                     }
 
-                    ((IDictionary<string, object>)toReturn).Add(property.Name, value);
+                    if (fields.Contains(property.Name.ToLower()))
+                    {
+                        ((IDictionary<string, object>)toReturn).Add(property.Name.ToLower(), value);
+                        fields.Remove(property.Name.ToLower());
+                    }
+                    else if(ContainsField(property, fields))
+                    {
+                        ((IDictionary<string, object>)toReturn).Add(property.Name.ToLower(), value);
+                    }
 
                 }
             }
@@ -73,6 +104,19 @@ namespace Api.Factories
             }
 
             return objs.AsEnumerable();
+        }
+
+        private static bool ContainsField(PropertyInfo property, List<string> fields)
+        {
+            var properties = property.PropertyType.GetProperties().Select(p => p.Name);
+
+            foreach(var prop in properties)
+            {
+                if (fields.Contains(prop.ToLower()))
+                    return true;
+            }
+
+            return false;
         }
     }
 }
