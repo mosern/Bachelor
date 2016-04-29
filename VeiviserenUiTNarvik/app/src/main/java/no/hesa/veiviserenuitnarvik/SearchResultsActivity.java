@@ -39,7 +39,7 @@ public class SearchResultsActivity extends Activity implements ActionInterface, 
     HashMap<String, List<? extends Object>> listDataChild;
 
     private SimpleGestureFilter detector;
-    //private ProgressBar search_spinner;
+    private ProgressBar search_spinner;
 
 
 
@@ -51,7 +51,7 @@ public class SearchResultsActivity extends Activity implements ActionInterface, 
 
         // Detect touched area
         detector = new SimpleGestureFilter(this,this);
-        //search_spinner = (ProgressBar)findViewById(R.id.search_progress_bar);
+        search_spinner = (ProgressBar)findViewById(R.id.search_progress_bar);
         handleIntent(getIntent());
         expListView = (ExpandableListView) findViewById(R.id.exlv_search_results);
 
@@ -102,17 +102,15 @@ public class SearchResultsActivity extends Activity implements ActionInterface, 
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String query = intent.getStringExtra(SearchManager.QUERY);
             Api api = new Api(this);
-             // search_spinner.setVisibility(View.VISIBLE);
+            search_spinner.setVisibility(View.VISIBLE);
             api.doSearch(query);
         }
     }
 
     @Override
     public void onCompletedAction(JSONObject jsonObject, String actionString) {
-
         switch (actionString) {
             case Api.DO_SEARCH:
-                // search_spinner.setVisibility(View.GONE);
                 try {
                     listDataHeader = new ArrayList<String>();
                     int countDataHeaderInsertions = 0;
@@ -160,6 +158,7 @@ public class SearchResultsActivity extends Activity implements ActionInterface, 
                         this.finish();
                     }
 
+                    search_spinner.setVisibility(View.GONE);
                     listAdapter = new ExpandableListAdapter(this, listDataHeader, listDataChild, orderOfClassTypes);
                     expListView.setAdapter(listAdapter);// setting list adapter
                     startExtvListeners();
@@ -206,10 +205,8 @@ public class SearchResultsActivity extends Activity implements ActionInterface, 
                 finish();
                 break;
             case SimpleGestureFilter.SWIPE_DOWN :  str = "Swipe Down";
-
                 break;
             case SimpleGestureFilter.SWIPE_UP :    str = "Swipe Up";
-
                 break;
 
         }

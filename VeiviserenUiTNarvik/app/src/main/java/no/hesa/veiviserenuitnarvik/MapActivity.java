@@ -706,7 +706,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         // Retrieve the SearchView and plug it into SearchManager
         final SearchView searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
-        searchView.setIconifiedByDefault(false); // autoexpands the search field
+        //searchView.setIconifiedByDefault(false); // autoexpands the search field
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName("no.hesa.veiviserenuitnarvik","no.hesa.veiviserenuitnarvik.SearchResultsActivity")));
 

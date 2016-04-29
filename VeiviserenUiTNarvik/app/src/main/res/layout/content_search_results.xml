@@ -14,8 +14,8 @@
         android:indeterminateDrawable="@drawable/spinning_progress_bar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:layout_gravity="center_horizontal" />
+        android:layout_gravity="center"
+        android:layout_centerInParent="true"/>
 
     <ExpandableListView
         android:id="@+id/exlv_search_results"

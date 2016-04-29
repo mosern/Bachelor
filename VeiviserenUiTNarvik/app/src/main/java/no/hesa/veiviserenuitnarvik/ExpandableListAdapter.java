@@ -69,7 +69,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
             if (passedClass.get(groupPosition).compareTo("location") == 0) {
                 final Location location;
                 location = (Location) child;
-                childText = location.getName() + "\n" + location.getLocNr() + "\n" + location.getType().getName();
+                childText = location.getLocNr();
                 convertView = setupLocationButton(convertView, groupPosition, location);
             }
         }
