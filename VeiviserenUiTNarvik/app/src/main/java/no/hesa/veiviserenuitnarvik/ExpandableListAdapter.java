@@ -17,6 +17,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import no.hesa.positionlibrary.PositionLibrary;
 import no.hesa.veiviserenuitnarvik.dataclasses.Location;
 import no.hesa.veiviserenuitnarvik.dataclasses.Person;
 
@@ -95,7 +96,10 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
             public void onClick(View v) {
                 try {
                     // REDIRECT WITH ROUTE HERE
+                    //TODO: change Location to Point?
                     sendLocationDestination(location);
+                    //PositionLibrary positionLibrary = new PositionLibrary();
+                    //positionLibrary.wifiPosition.plotRoute(location);
                 }
                 catch (Exception ex) {
                     ex.printStackTrace();
