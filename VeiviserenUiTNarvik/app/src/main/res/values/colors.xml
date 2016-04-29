@@ -22,7 +22,7 @@
 
     <color name="search_results_list_color">#3F51B5</color>
 
-    <color name="search_results_listroot_color">#444445</color>
+    <color name="search_results_listroot_color">#3F51B5</color>
     <color name="search_results_listroot_textcolor">#ffffff</color>
 
     <color name="search_results_list_border_color">#ff0000</color>

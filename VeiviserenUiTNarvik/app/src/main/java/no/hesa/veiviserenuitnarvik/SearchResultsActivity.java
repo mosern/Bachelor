@@ -7,7 +7,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
+import android.view.View;
 import android.widget.ExpandableListView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -37,7 +39,8 @@ public class SearchResultsActivity extends Activity implements ActionInterface, 
     HashMap<String, List<? extends Object>> listDataChild;
 
     private SimpleGestureFilter detector;
-    private ProgressDialog progressDialog;
+    //private ProgressBar search_spinner;
+
 
 
     @Override
@@ -48,10 +51,10 @@ public class SearchResultsActivity extends Activity implements ActionInterface, 
 
         // Detect touched area
         detector = new SimpleGestureFilter(this,this);
-
+        //search_spinner = (ProgressBar)findViewById(R.id.search_progress_bar);
         handleIntent(getIntent());
-
         expListView = (ExpandableListView) findViewById(R.id.exlv_search_results);
+
     }
 
     @Override
@@ -98,16 +101,18 @@ public class SearchResultsActivity extends Activity implements ActionInterface, 
     private void handleIntent(Intent intent) {
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String query = intent.getStringExtra(SearchManager.QUERY);
-            //Api api = new Api(this,getResources());
             Api api = new Api(this);
+             // search_spinner.setVisibility(View.VISIBLE);
             api.doSearch(query);
         }
     }
 
     @Override
     public void onCompletedAction(JSONObject jsonObject, String actionString) {
+
         switch (actionString) {
             case Api.DO_SEARCH:
+                // search_spinner.setVisibility(View.GONE);
                 try {
                     listDataHeader = new ArrayList<String>();
                     int countDataHeaderInsertions = 0;
@@ -154,6 +159,7 @@ public class SearchResultsActivity extends Activity implements ActionInterface, 
                         Toast.makeText(getApplicationContext(), "No results, please try another search", Toast.LENGTH_LONG).show();
                         this.finish();
                     }
+
                     listAdapter = new ExpandableListAdapter(this, listDataHeader, listDataChild, orderOfClassTypes);
                     expListView.setAdapter(listAdapter);// setting list adapter
                     startExtvListeners();

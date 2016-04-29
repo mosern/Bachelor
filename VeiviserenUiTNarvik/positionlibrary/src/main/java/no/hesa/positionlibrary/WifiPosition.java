@@ -279,16 +279,12 @@ public class WifiPosition implements ActionInterface {
             calculatedPosition = calculatePosition(sortedWifiPointsLocationInf);
             floor = findFloor(sortedWifiPointsLocationInf);
         }
-        if(!lastSendtPosition.equals(new Point(calculatedPosition[0], calculatedPosition[1], floor))){
-            lastSendtPosition = new Point(calculatedPosition[0], calculatedPosition[1], floor);
-
-            //Send result to application
-            Intent intent = new Intent();
-            intent.setAction("no.hesa.positionlibrary.Output");
-            intent.putExtra("position", calculatedPosition);
-            intent.putExtra("floor", floor);
-            c.sendBroadcast(intent);
-        }
+       //Send result to application
+        Intent intent = new Intent();
+        intent.setAction("no.hesa.positionlibrary.Output");
+        intent.putExtra("position", calculatedPosition);
+        intent.putExtra("floor", floor);
+        c.sendBroadcast(intent);
     }
 
     /**

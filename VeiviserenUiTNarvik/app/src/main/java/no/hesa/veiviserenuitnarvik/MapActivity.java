@@ -73,6 +73,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     private static final String TAG = "MapActivity";
     private static final int POLYLINEWIDTH = 4;
+    private static String DEFAULT_FLOORPLAN;
 
     /* used to decide when bitmap should be downscaled */
     private static final int MAX_DIMENSION = 2048;
@@ -88,6 +89,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private PositionLibrary positionLibrary = null;
 
     private BroadcastReceiver positionLibOutputReceiver = null;
+    private BroadcastReceiver pathPositionLibReceiver = null;
     private BroadcastReceiver searchLocationReceiver = null;
 
     private LatLng currentPosition = null;
@@ -110,6 +112,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
 
+        DEFAULT_FLOORPLAN = getResources().getString(R.string.indooratlas_floor_2_floorplanid);
+
         // instantiate IALocationManager and IAResourceManager
         mIALocationManager = IALocationManager.create(this);
         mResourceManager = IAResourceManager.create(this);
@@ -117,7 +121,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         fetch_map_spinner = (ProgressBar)findViewById(R.id.fetch_map_progress_bar);
-
+        positionLibrary = new PositionLibrary();
         registerButtonListeners();
 
         //Api api = new Api(this, getApplicationContext().getResources());
@@ -164,16 +168,16 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         // get map fragment reference
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+    }
 
-        // TODO: check if first run, make sure floorplan is set etc
-
-        //currentFloorPlan = getResources().getString(R.string.indooratlas_floor_1_floorplanid);// 1 etg
-        //currentFloorPlan = getResources().getString(R.string.indooratlas_floor_2_floorplanid);// 2 etg
-
+    @Override
+    protected void onStart()
+    {
+        super.onStart();
         // TODO: check for sharedpreference
         SharedPreferences sharedPreferences = getSharedPreferences("MapActivityPrefs",MODE_PRIVATE);
 
-        currentFloorPlan = sharedPreferences.getString("CurrentFloorPlan", getResources().getString(R.string.indooratlas_floor_2_floorplanid));
+        currentFloorPlan = sharedPreferences.getString("CurrentFloorPlan", DEFAULT_FLOORPLAN);
         fetchFloorPlan(currentFloorPlan);
     }
 
@@ -181,12 +185,22 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     protected void onStop()
     {
         super.onStop();
-        if (positionLibrary != null)
+        /*
+        if (positionLibrary != null) {
             positionLibrary.wifiPosition.unRegisterBroadcast(this);
-
-        if (positionLibOutputReceiver != null)
+        }
+*/
+        if (positionLibOutputReceiver != null) {
             unregisterReceiver(positionLibOutputReceiver);
-        //unregisterReceiver(searchLocationReceiver);
+        }
+
+        if (pathPositionLibReceiver != null) {
+            unregisterReceiver(pathPositionLibReceiver);
+        }
+
+        if (searchLocationReceiver != null) {
+            unregisterReceiver(searchLocationReceiver);
+        }
     }
 
     @Override
@@ -219,7 +233,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
 
         registerOnMapClickReceiver();
-//        registerPositionReceiver();
+        registerPositionReceiver();
+//        registerPathReceiver();
 //        registerSearchLocationReceiver();
 
 
@@ -331,7 +346,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
         return currentPoint;
     }
-
+/*
     private void drawNextFloor()
     {
         if (receivedPath.get(0) != null) {
@@ -349,7 +364,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             elevationChangeBounds = null; // unregister listener
         }
     }
-
+*/
     private void drawUserPosition(LatLng currentPosition)
     {
         //Painting position marker
@@ -387,10 +402,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             case 1:
                 fetchFloorPlan(getResources().getString(R.string.indooratlas_floor_1_floorplanid));
                 currentFloorPlan = getResources().getString(R.string.indooratlas_floor_1_floorplanid);
+                currentFloor = 1;
                 break;
             case 2:
                 fetchFloorPlan(getResources().getString(R.string.indooratlas_floor_2_floorplanid));
                 currentFloorPlan = getResources().getString(R.string.indooratlas_floor_2_floorplanid);
+                currentFloor = 2;
                 break;
             case 3:
                 break;
@@ -402,7 +419,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 break;
         }
     }
-
+/*
     // http://stackoverflow.com/questions/15319431/how-to-convert-a-latlng-and-a-radius-to-a-latlngbounds-in-android-google-maps-ap
     // http://googlemaps.github.io/android-maps-utils/
     public LatLngBounds toBounds(LatLng center, double radius) {
@@ -410,6 +427,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         LatLng northeast = SphericalUtil.computeOffset(center, radius * Math.sqrt(2.0), 45);
         return new LatLngBounds(southwest, northeast);
     }
+    */
 //region BUTTON LISTENERS
     //// TODO: 28/04/2016 hardcoded floor values when changing floor with buttons 
     private void registerButtonListeners()
@@ -422,10 +440,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     changeFloor(2);
                     mMap.clear();
                 }
-                /*
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-                        */
             }
         });
 
@@ -437,10 +451,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     changeFloor(1);
                     mMap.clear();
                 }
-                /*
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-                        */
             }
         });
     }
@@ -480,11 +490,17 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
                         drawUserPosition(currentPosition);
 
+                        if (floor != currentFloor) {
+                            changeFloor(floor);
+                            mMap.clear();
+                        }
+/*
                         if (elevationChangeBounds != null) {
                             if (elevationChangeBounds.contains(latLng)) {
                                 drawNextFloor(); // loads the next map and draws the path when end point is reached
                             }
                         }
+*/
                     }
                     else
                     {
@@ -494,9 +510,24 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             }
         };
 
-        positionLibrary = new PositionLibrary();
         positionLibrary.wifiPosition.registerBroadcast(this);
         registerReceiver(positionLibOutputReceiver, new IntentFilter("no.hesa.positionlibrary.Output"));
+    }
+
+    private void registerPathReceiver()
+    {
+        pathPositionLibReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (intent.getAction().equals("no.hesa.positionlibrary.Output")) { // change
+
+                }
+            }
+        };
+
+
+        positionLibrary.wifiPosition.registerBroadcast(this);
+        registerReceiver(pathPositionLibReceiver, new IntentFilter("no.hesa.positionlibrary.Output")); // change
     }
 /*
     private void registerSearchLocationReceiver()
@@ -675,7 +706,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         // Retrieve the SearchView and plug it into SearchManager
         final SearchView searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
-        //searchView.setIconifiedByDefault(false); // autoexpands the search field
+        searchView.setIconifiedByDefault(false); // autoexpands the search field
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName("no.hesa.veiviserenuitnarvik","no.hesa.veiviserenuitnarvik.SearchResultsActivity")));
 

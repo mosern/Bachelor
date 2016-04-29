@@ -7,14 +7,21 @@
     android:orientation="vertical"
     tools:context="no.hesa.veiviserenuitnarvik.SearchResultsActivity"
     tools:showIn="@layout/activity_search_results">
-
+<!--
+    <ProgressBar
+        android:id="@+id/search_progress_bar"
+        style="?android:attr/progressBarStyleLarge"
+        android:progressDrawable="@drawable/spinning_progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:layout_gravity="center_horizontal" />
+-->
     <ExpandableListView
         android:id="@+id/exlv_search_results"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/search_results_list_color"
-        android:padding="5dp"
-        android:groupIndicator="@null"
-        />
+        android:layout_gravity="center"
+        android:groupIndicator="@null"/>
 
 </LinearLayout>

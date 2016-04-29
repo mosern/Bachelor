@@ -10,6 +10,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.webkit.SslErrorHandler;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -19,18 +20,21 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 
 
-public class AuthenticationActivity extends Activity {
+public class AuthenticationActivity extends Activity implements SimpleGestureFilter.SimpleGestureListener {
 
     private static String CLIENT_ID = "and";
     private static String REDIRECT_URI = "http://localhost:123";
     private static String OAUTH_URL = "https://bacheloridsrv3.azurewebsites.net/identity/connect/authorize";
     private static String OAUTH_SCOPE = "api roles openid";
     private SharedPreferences pref;
+    private SimpleGestureFilter detector;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_authentication);
+
+        detector = new SimpleGestureFilter(this,this);
         WebView web = (WebView) findViewById(R.id.webv);
         web.getSettings().setJavaScriptEnabled(true);
         String nonceString = generateNonce();
@@ -112,5 +116,41 @@ public class AuthenticationActivity extends Activity {
     private static String generateNonce() {
         SecureRandom random = new SecureRandom();
         return new BigInteger(130,random).toString(32);
+    }
+
+    @Override
+    public void onSwipe(int direction) {
+        String str = "";
+
+        switch (direction) {
+            case SimpleGestureFilter.SWIPE_RIGHT :
+                str = "Swipe Right";
+                //Toast.makeText(this, str, Toast.LENGTH_SHORT).show();
+                finish();
+                break;
+            case SimpleGestureFilter.SWIPE_LEFT :
+                str = "Swipe Left";
+                finish();
+                break;
+            case SimpleGestureFilter.SWIPE_DOWN :
+                str = "Swipe Down";
+                break;
+            case SimpleGestureFilter.SWIPE_UP :
+                str = "Swipe Up";
+                break;
+
+        }
+    }
+
+    @Override
+    public void onDoubleTap() {
+
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent me) {
+        // Call onTouchEvent of SimpleGestureFilter class
+        this.detector.onTouchEvent(me);
+        return super.dispatchTouchEvent(me);
     }
 }

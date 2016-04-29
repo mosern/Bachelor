@@ -32,6 +32,7 @@
             <ProgressBar
                 android:id="@+id/fetch_map_progress_bar"
                 style="?android:attr/progressBarStyleLarge"
+                android:indeterminateDrawable="@drawable/spinning_progress_bar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
