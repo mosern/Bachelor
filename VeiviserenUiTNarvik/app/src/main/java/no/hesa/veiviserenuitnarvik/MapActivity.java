@@ -233,7 +233,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
 
         registerOnMapClickReceiver();
-        registerPositionReceiver();
+//        registerPositionReceiver();
 //        registerPathReceiver();
 //        registerSearchLocationReceiver();
 
