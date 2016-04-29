@@ -143,7 +143,7 @@ public class WifiPosition implements ActionInterface {
 
     private DijkstraAlgorithm da;
     private Graph graph;
-    private List<Edge> model = new ArrayList<Edge>();
+    private List<Edge> model;
     private List<Point> allPathPoints= new ArrayList<Point>();
     private Point lastSentPosition;
 
@@ -179,7 +179,7 @@ public class WifiPosition implements ActionInterface {
         Api api = new Api(this);
         //Load list of all mapped wi-fi access points
         api.allAccessPoints();
-        //api.allPathPoints();
+        api.allPathPoints();
     }
 
     /**
@@ -281,12 +281,16 @@ public class WifiPosition implements ActionInterface {
             calculatedPosition = calculatePosition(sortedWifiPointsLocationInf);
             floor = findFloor(sortedWifiPointsLocationInf);
         }
-        //Send result to application
-        Intent intent = new Intent();
-        intent.setAction("no.hesa.positionlibrary.Output");
-        intent.putExtra("position", calculatedPosition);
-        intent.putExtra("floor", floor);
-        c.sendBroadcast(intent);
+        if(lastSentPosition == null || !lastSentPosition.equals(new Point(calculatedPosition[0], calculatedPosition[1], floor))){
+            lastSentPosition = new Point(calculatedPosition[0], calculatedPosition[1], floor);
+
+            //Send result to application
+            Intent intent = new Intent();
+            intent.setAction("no.hesa.positionlibrary.Output");
+            intent.putExtra("position", calculatedPosition);
+            intent.putExtra("floor", floor);
+            c.sendBroadcast(intent);
+        }
     }
 
     /**
@@ -468,20 +472,21 @@ public class WifiPosition implements ActionInterface {
             case Api.ALL_PATH_POINTS:
                 try {
                     if(jsonObject != null){
-                        JSONArray jsonArrayPath = jsonObject.getJSONArray("pathpoints");
+                        model = new ArrayList<Edge>();
+                        JSONArray jsonArrayPath = jsonObject.getJSONArray("pathPoints");
                         //Traverse first level
                         for(int i = 0; i < jsonArrayPath.length(); i++){
                             //Save firstPoint in array
-                            JSONObject firstPoint = jsonArrayPath.getJSONObject(i).getJSONObject("firstPoint");
+                            JSONObject firstPoint = jsonArrayPath.getJSONObject(i).getJSONObject("coordinate");
                             Vertex<Point> firstVertex = new Vertex<>(new Point(firstPoint.getDouble("lng"), firstPoint.getDouble("lat"), firstPoint.getInt("alt")));
                             allPathPoints.add(new Point(firstPoint.getDouble("lng"), firstPoint.getDouble("lat"), firstPoint.getInt("alt")));
 
-                            JSONArray jsonArrayNeighbours = jsonArrayPath.getJSONObject(i).getJSONArray("noods");
+                            JSONArray jsonArrayNeighbours = jsonArrayPath.getJSONObject(i).getJSONArray("neighbours");
                             //Traverse second level
                             for(int j = 0; j < jsonArrayNeighbours.length(); j++){
-                                JSONObject secondPoint = jsonArrayPath.getJSONObject(i).getJSONObject("neighbour");
+                                JSONObject secondPoint = jsonArrayPath.getJSONObject(i).getJSONObject("coordinate");
                                 Vertex<Point> secondVertex = new Vertex<>(new Point(secondPoint.getDouble("lng"), secondPoint.getDouble("lat"), secondPoint.getInt("alt")));
-                                model.add(new Edge(firstVertex, secondVertex, secondPoint.getInt("distance")));
+                                model.add(new Edge(firstVertex, secondVertex, jsonArrayNeighbours.getJSONObject(j).getInt("distance")));
                             }
                         }
                     }
