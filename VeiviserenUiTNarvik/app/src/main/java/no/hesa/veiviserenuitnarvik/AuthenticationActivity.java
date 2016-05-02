@@ -104,12 +104,6 @@ public class AuthenticationActivity extends Activity implements SimpleGestureFil
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -120,25 +114,17 @@ public class AuthenticationActivity extends Activity implements SimpleGestureFil
 
     @Override
     public void onSwipe(int direction) {
-        String str = "";
-
         switch (direction) {
             case SimpleGestureFilter.SWIPE_RIGHT :
-                str = "Swipe Right";
-                //Toast.makeText(this, str, Toast.LENGTH_SHORT).show();
                 finish();
                 break;
             case SimpleGestureFilter.SWIPE_LEFT :
-                str = "Swipe Left";
                 finish();
                 break;
             case SimpleGestureFilter.SWIPE_DOWN :
-                str = "Swipe Down";
                 break;
             case SimpleGestureFilter.SWIPE_UP :
-                str = "Swipe Up";
                 break;
-
         }
     }
 
