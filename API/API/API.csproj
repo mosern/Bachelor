@@ -309,7 +309,9 @@
     <Compile Include="Helpers\PaginationHeader.cs" />
     <Compile Include="Models\Api\CoordinateViewModel.cs" />
     <Compile Include="Models\Api\LocationViewModel.cs" />
-    <Compile Include="Models\Api\PathPointViewModel.cs" />
+    <Compile Include="Models\Api\NeighbourViewModel.cs" />
+    <Compile Include="Models\Api\PathPointNeighbourViewModel.cs" />
+    <Compile Include="Models\Api\PathPointViewModels.cs" />
     <Compile Include="Models\Api\PeopleViewModel.cs" />
     <Compile Include="Models\Api\SearchViewModel.cs" />
     <Compile Include="Models\Api\TypeViewModel.cs" />

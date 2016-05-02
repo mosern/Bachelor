@@ -41,7 +41,12 @@ namespace Api
                 c.CreateMap<PathPoint, PathPointViewModel>().ConvertUsing<PathPointTypeConverter>();
                 c.CreateMap<PathPointViewModel, PathPoint>().ConvertUsing<PathPointViewTypeConverter>();
 
+                c.CreateMap<PathNeighbour, NeighbourViewModel>().ConvertUsing<PathNeighbourTypeConverter>();
+                c.CreateMap<NeighbourViewModel, PathNeighbour>();
+
                 c.CreateMap<UserLocation, LocationViewModel>().ConvertUsing<UserLocationTypeConverter>();
+                c.CreateMap<PathPoint, IEnumerable<NeighbourViewModel>>().ConvertUsing<NeighbourTypeConverter>();
+                c.CreateMap<PathPoint, PathPointNeighbourViewModel>().ConvertUsing<PathPointNeighbourTypeConverter>();
                 //c.CreateMap<PathPointViewModel, PathNeighbour>().ConvertUsing<PathNeighbourTypeConverter>();
 
                 c.CreateMap<SearchViewModel, IEnumerable<object>>().ConvertUsing<SearchTypeConverter>();
@@ -231,45 +236,105 @@ namespace Api
         }
     }
 
+    public class PathPointNeighbourTypeConverter : ITypeConverter<PathPoint, PathPointNeighbourViewModel>
+    {
+        public PathPointNeighbourViewModel Convert(ResolutionContext context)
+        {
+            PathPoint source = (PathPoint)context.SourceValue;
+            PathPointNeighbourViewModel dest;
+
+            List<object> neighbours = new List<object>();
+
+            using (var pointRepo = new LocationRepository<PathPoint>())
+            using (var pathRepo = new LocationRepository<PathNeighbour>())
+            {
+                var temp = pathRepo.List().Where(p => p.PathPointId1 == source.Id || p.PathPointId2 == source.Id).ToList();
+
+                foreach (PathNeighbour path in temp)
+                {
+                    if (path.PathPointId1 == source.Id)
+                    {
+                        var point = pointRepo.Read(path.PathPointId2.Value);
+                        neighbours.Add(new { ID = point.Id, Distance = path.length, Coordinate = AutoMapConfig.getMapper().Map<Coordinate, CoordinateViewModel>(point.Coordinate) });
+                    }
+                    else
+                    {
+                        var point = pointRepo.Read(path.PathPointId1.Value);
+                        neighbours.Add(new { ID = point.Id, Distance = path.length, Coordinate = AutoMapConfig.getMapper().Map<Coordinate, CoordinateViewModel>(point.Coordinate) });
+                    }
+                }
+            }
+
+            dest = new PathPointNeighbourViewModel()
+            {
+                Id = source.Id,
+                Neighbours = neighbours,
+                Coordinate = AutoMapConfig.getMapper().Map<Coordinate, CoordinateViewModel>(source.Coordinate)
+            };
+
+            return dest;
+
+        }
+    }
+
+    public class PathNeighbourTypeConverter : ITypeConverter<PathNeighbour, NeighbourViewModel>
+    {
+        public NeighbourViewModel Convert(ResolutionContext context)
+        {
+            PathNeighbour source = (PathNeighbour)context.SourceValue;
+
+            NeighbourViewModel dest = new NeighbourViewModel
+            {
+                Id = source.Id,
+                Distance = source.length,
+                pathPoint1 = AutoMapConfig.getMapper().Map<PathPoint, PathPointViewModel>(source.PathPoint1),
+                pathPoint2 = AutoMapConfig.getMapper().Map<PathPoint, PathPointViewModel>(source.PathPoint2),
+            };
+
+            return dest;
+        }
+    }
+
+    public class NeighbourTypeConverter : ITypeConverter<PathPoint, IEnumerable<NeighbourViewModel>>
+    {
+        public IEnumerable<NeighbourViewModel> Convert(ResolutionContext context)
+        {
+            PathPoint source = (PathPoint)context.SourceValue;
+
+
+            List<NeighbourViewModel> dest = new List<NeighbourViewModel>();
+
+            List<PathPointViewModel> neighbours = new List<PathPointViewModel>();
+
+            using (var pointRepo = new LocationRepository<PathPoint>())
+            using (var pathRepo = new LocationRepository<PathNeighbour>())
+            {
+                var temp = pathRepo.List().Where(p => p.PathPointId1 == source.Id || p.PathPointId2 == source.Id).ToList();
+
+                foreach (PathNeighbour path in temp)
+                {
+                    dest.Add(AutoMapConfig.getMapper().Map<PathNeighbour, NeighbourViewModel>(path));
+                }
+            }
+
+            return dest;
+        }
+    }
+
     public class PathPointTypeConverter : ITypeConverter<PathPoint, PathPointViewModel>
     {
         public PathPointViewModel Convert(ResolutionContext context)
         {
             PathPoint source = (PathPoint)context.SourceValue;
 
+
             PathPointViewModel dest = new PathPointViewModel();
-
-            List<PathPointViewModel> neighbours = new List<PathPointViewModel>();
-
-            using(var pointRepo = new LocationRepository<PathPoint>())
-            using(var pathRepo = new LocationRepository<PathNeighbour>())
-            {
-                var temp = pathRepo.List().Where(p => p.PathPointId1 == source.Id || p.PathPointId2 == source.Id).ToList();
-
-                foreach(PathNeighbour path in temp)
-                {
-                    if(path.PathPointId1 == source.Id)
-                    {
-                        var point = pointRepo.Read(path.PathPointId2.Value);
-                        neighbours.Add(new PathPointViewModel { Id = point.Id, Distance = path.length, Coordinate = AutoMapConfig.getMapper().Map<Coordinate, CoordinateViewModel>(point.Coordinate) });
-                    }
-                    else
-                    {
-                        var point = pointRepo.Read(path.PathPointId1.Value);
-                        neighbours.Add(new PathPointViewModel { Id = point.Id, Distance = path.length, Coordinate = AutoMapConfig.getMapper().Map<Coordinate, CoordinateViewModel>(point.Coordinate) });
-                    }
-                }
-            }
-
 
             using (var repo = new LocationRepository<Coordinate>())
                 dest = new PathPointViewModel()
                 {
                     Id = source.Id,
-                    Distance = 0,
                     Coordinate = AutoMapConfig.getMapper().Map<Coordinate, CoordinateViewModel>(repo.Read(source.CoordinateId)),
-                    Neighbours = neighbours
-
                 };
 
             return dest;
@@ -282,11 +347,31 @@ namespace Api
         {
             PathPointViewModel source = (PathPointViewModel)context.SourceValue;
             PathPoint dest;
+            Coordinate cor;
+
+            if (source.Id == null)
+                source.Id = 0;
+
+            if (source.Coordinate.Id == null)
+                source.Coordinate.Id = 0;
+
+            if (source.Coordinate.Id.Value == 0)
+            {
+                using (var repo = new LocationRepository<Coordinate>())
+                    cor = repo.Create(new Coordinate() { Lat = source.Coordinate.Lat, Lng = source.Coordinate.Lng, Alt = source.Coordinate.Alt });
+            }
+            else
+            {
+                cor = new Coordinate { Id = source.Id.Value };
+            }
+
+            if (source.Id.Value == 0)
+                source.Id = cor.Id;
 
             dest = new PathPoint()
             {
                 Id = source.Id.Value,
-                CoordinateId = source.Coordinate.Id.Value,
+                CoordinateId = cor.Id,
             };
 
             return dest;

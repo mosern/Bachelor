@@ -36,7 +36,7 @@ namespace Api.Controllers
             {
                 pathPoints = repo.List();
 
-                toReturn = ControllerHelper.get<PathPointViewModel>(pathPoints, HttpContext.Current, Request, "pathPoints", asObject, objPropName, fields, sort, page, pageSize);
+                toReturn = ControllerHelper.get<PathPointNeighbourViewModel>(pathPoints, HttpContext.Current, Request, "pathPoints", asObject, objPropName, fields, sort, page, pageSize);
             }
 
             if (toReturn != null)
@@ -66,11 +66,11 @@ namespace Api.Controllers
 
                 if (pathPoint != null)
                 {
-                    return Ok(ControllerHelper.get<PathPointViewModel>(pathPoint, fields));
+                    return Ok(ControllerHelper.get<PathPointNeighbourViewModel>(pathPoint, fields));
                 }
                 else
                 {
-                    return BadRequest("No type found");
+                    return BadRequest("No pathPoint found");
                 }
             }
 
