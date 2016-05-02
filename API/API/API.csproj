@@ -264,6 +264,7 @@
     <Compile Include="Areas\HelpPage\SampleGeneration\SampleDirection.cs" />
     <Compile Include="Areas\HelpPage\SampleGeneration\TextSample.cs" />
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
+    <Compile Include="Controllers\NeighbourController.cs" />
     <Compile Include="Controllers\PathPointController.cs" />
     <Compile Include="Controllers\TypeController.cs" />
     <Compile Include="Factories\ShapeFactory.cs" />
@@ -302,6 +303,10 @@
     <Compile Include="Migrations\LocationConfiguration\201604271141291_pathChange.cs" />
     <Compile Include="Migrations\LocationConfiguration\201604271141291_pathChange.Designer.cs">
       <DependentUpon>201604271141291_pathChange.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\LocationConfiguration\201605021603254_lenghtToDistance.cs" />
+    <Compile Include="Migrations\LocationConfiguration\201605021603254_lenghtToDistance.Designer.cs">
+      <DependentUpon>201605021603254_lenghtToDistance.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\LocationConfiguration\Configuration.cs" />
     <Compile Include="Models\Api\AccesspointViewModel.cs" />
@@ -414,6 +419,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\LocationConfiguration\201604271141291_pathChange.resx">
       <DependentUpon>201604271141291_pathChange.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\LocationConfiguration\201605021603254_lenghtToDistance.resx">
+      <DependentUpon>201605021603254_lenghtToDistance.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

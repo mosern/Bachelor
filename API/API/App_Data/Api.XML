@@ -486,6 +486,56 @@
             </summary>
             <param name="documentPath">The physical path to XML document.</param>
         </member>
+        <member name="M:Api.Controllers.NeighbourController.Get(System.String,System.String,System.Nullable{System.Int32},System.Int32,System.Boolean,System.String)">
+            <summary>
+            Gets a list of Neighbours
+            </summary>
+            <param name="fields">Optional. The fields to include in returned object. Returns all fields if no field is specified</param>
+            <param name="sort">Optional, sorts accending by id if not set. The fields to sort by, use "," to serparate fields. Use "-" in fornt of field name to sort decending. Sorts accesnding by id as default</param>
+            <param name="page">Optional. The page you want</param>
+            <param name="pageSize">Optional, standard value is 5. The size you want your pages to be</param>
+            <param name="asObject">Optional, standard value is true. Spesify if you want a collection or a object with the collection as a property</param>
+            <param name="objPropName">Optional, standard value is "neighbours". Name of object if asObject is true</param>
+            <returns>200 ok with processed list of all neighbours in the database</returns>
+        </member>
+        <member name="M:Api.Controllers.NeighbourController.Get(System.Int32,System.String)">
+            <summary>
+            Gets a spesific neighbour
+            </summary>
+            <param name="id"> id for the neighbour you want to get</param>
+            <param name="fields">Optional. The fields to include in returned object. Returns all fields if no field is specified</param>
+            <returns>200 ok with processed neighbour object</returns>
+        </member>
+        <member name="M:Api.Controllers.NeighbourController.Post(Api.Models.Api.NeighbourViewModel)">
+            <summary>
+            Creates new neighbour
+            </summary>
+            <param name="neighbour">neighbourViewModel with info about the neighbour to create</param>
+            <returns>201 created with the new object</returns>
+        </member>
+        <member name="M:Api.Controllers.NeighbourController.Put(Api.Models.Api.NeighbourViewModel,System.Int32)">
+            <summary>
+            Full update of a neighbour
+            </summary>
+            <param name="neighbour">All information about the neighbour to be updated</param>
+            <param name="id">Id of the neighbour to be updated</param>
+            <returns>200 ok</returns>
+        </member>
+        <member name="M:Api.Controllers.NeighbourController.Patch(Api.Models.Api.NeighbourViewModel,System.Int32)">
+            <summary>
+            Partial update of a neighbour
+            </summary>
+            <param name="neighbour">Information about the neighbour to be updated</param>
+            <param name="id">Id of the neighbour to be updated</param>
+            <returns>200 ok</returns>
+        </member>
+        <member name="M:Api.Controllers.NeighbourController.Delete(System.Int32)">
+            <summary>
+            Removes an neighbour
+            </summary>
+            <param name="id">Id of the neighbour to remove</param>
+            <returns>200 ok</returns>
+        </member>
         <member name="M:Api.Controllers.PathPointController.Get(System.String,System.String,System.Nullable{System.Int32},System.Int32,System.Boolean,System.String)">
             <summary>
             Gets a list of PathPoints
@@ -510,7 +560,7 @@
             <summary>
             Creates new pathPoint
             </summary>
-            <param name="pathPoint">pathPointViewModel with info about the type to create</param>
+            <param name="pathPoint">pathPointViewModel with info about the pathPoint to create</param>
             <returns>201 created with the new object</returns>
         </member>
         <member name="M:Api.Controllers.PathPointController.Put(Api.Models.Api.PathPointViewModel,System.Int32)">
@@ -521,7 +571,7 @@
             <param name="id">Id of the pathPoint to be updated</param>
             <returns>200 ok</returns>
         </member>
-        <member name="M:Api.Controllers.PathPointController.Patch(Api.Models.Api.TypeViewModel,System.Int32)">
+        <member name="M:Api.Controllers.PathPointController.Patch(Api.Models.Api.PathPointViewModel,System.Int32)">
             <summary>
             Partial update of a pathPoint
             </summary>

@@ -10,7 +10,7 @@ namespace Api.Models.EF
     public class PathNeighbour : BaseModel
     {
         [Required]
-        public int length { get; set; }
+        public double Distance { get; set; }
 
         [ForeignKey("PathPoint1")]
         public int? PathPointId1 { get; set; }
