@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorPrimary">#5592ce</color>
+    <color name="colorPrimaryDark">#2b7ccc</color>
     <color name="colorAccent">#FF4081</color>
 
     <color name="blue">#79adde</color>
@@ -20,13 +20,18 @@
     <color name="radiusfillcolor">#84b166</color>
     <color name="radiusstrokecolor">#413333</color>
 
-    <color name="search_results_list_color">#3F51B5</color>
+    <color name="search_results_list_color">#5592ce</color>
 
-    <color name="search_results_listroot_color">#303F9F</color>
+    <color name="search_results_listroot_color">#5592ce</color>
     <color name="search_results_listroot_textcolor">#ffffff</color>
 
     <color name="search_results_list_border_color">#ff0000</color>
 
-    <color name="search_results_child_item_color">#f7f7f7</color>
+    <color name="search_results_child_item_color">#ffffff</color>
     <color name="search_results_child_item_textcolor">#000000</color>
+
+    <color name="my_location_fab_color">#ffffff</color>
+    <color name="my_location_fab_border_color">#5592ce</color>
+
+    <color name="automatic_positioning_fab_color">#5592ce</color>
 </resources>

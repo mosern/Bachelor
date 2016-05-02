@@ -9,13 +9,12 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
@@ -24,6 +23,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -43,7 +43,6 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
-import com.google.maps.android.SphericalUtil;
 import com.indooratlas.android.sdk.IALocationManager;
 import com.indooratlas.android.sdk.resources.IAFloorPlan;
 import com.indooratlas.android.sdk.resources.IALatLng;
@@ -66,7 +65,6 @@ import no.hesa.positionlibrary.PositionLibrary;
 //import no.hesa.veiviserenuitnarvik.api.Api;
 import no.hesa.positionlibrary.api.ActionInterface;
 import no.hesa.positionlibrary.api.Api;
-import no.hesa.veiviserenuitnarvik.dataclasses.Coordinate;
 
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback,ActionInterface{
@@ -105,11 +103,14 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private int currentFloor;
     private ArrayList<ArrayList<Point>> receivedPath = null;
 
-    private ProgressBar fetch_map_spinner;
+    private ProgressBar fetchMapSpinner;
+    private boolean positioningEnabled = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        requestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_map);
 
         DEFAULT_FLOORPLAN = getResources().getString(R.string.indooratlas_floor_2_floorplanid);
@@ -120,7 +121,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        fetch_map_spinner = (ProgressBar)findViewById(R.id.fetch_map_progress_bar);
+        //getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+        fetchMapSpinner = (ProgressBar)findViewById(R.id.fetch_map_progress_bar);
         positionLibrary = new PositionLibrary();
         registerButtonListeners();
 
@@ -144,6 +147,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
             float zoomLevel = mMap.getCameraPosition().zoom;
             sharedPreferences.putFloat("ZoomLevel", zoomLevel);
+
 
             if (currentPosition != null) {
                 float lat = (float) currentPosition.latitude;
@@ -215,6 +219,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         float zoomLevel = sharedPreferences.getFloat("ZoomLevel", 17.0f);
         float lat = sharedPreferences.getFloat("CurrentLat", 68.436135f);
         float lng = sharedPreferences.getFloat("CurrentLng", 17.434950f);
+
+        positioningEnabled = sharedPreferences.getBoolean("PositioningEnabled", false);
+        enablePositioning(positioningEnabled);
 
         // TODO: 28/04/2016 first run only, maybe change to users position via GPS
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lng), zoomLevel));
@@ -432,8 +439,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     //// TODO: 28/04/2016 hardcoded floor values when changing floor with buttons 
     private void registerButtonListeners()
     {
-        FloatingActionButton floor_up_fab = (FloatingActionButton) findViewById(R.id.floor_up);
-        floor_up_fab.setOnClickListener(new View.OnClickListener() {
+        FloatingActionButton floorUpFab = (FloatingActionButton) findViewById(R.id.floor_up);
+        floorUpFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {                
                 if (currentFloorPlan.compareTo(getResources().getString(R.string.indooratlas_floor_1_floorplanid)) == 0) {
@@ -443,8 +450,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             }
         });
 
-        FloatingActionButton floor_down_fab = (FloatingActionButton) findViewById(R.id.floor_down);
-        floor_down_fab.setOnClickListener(new View.OnClickListener() {
+        FloatingActionButton floorDownFab = (FloatingActionButton) findViewById(R.id.floor_down);
+        floorDownFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (currentFloorPlan.compareTo(getResources().getString(R.string.indooratlas_floor_2_floorplanid)) == 0) {
@@ -453,8 +460,54 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 }
             }
         });
+
+        FloatingActionButton automaticPositioningFab = (FloatingActionButton) findViewById(R.id.fab_automatic_positioning);
+        automaticPositioningFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                enablePositioning(positioningEnabled);
+            }
+        });
+
+        FloatingActionButton myLocationFab = (FloatingActionButton) findViewById(R.id.fab_my_location);
+        myLocationFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (currentPosition != null) {
+                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentPosition, 20));
+                }
+            }
+        });
     }
 //endregion
+
+    private void enablePositioning(boolean positioningEnabled)
+    {
+        SharedPreferences.Editor sharedPreferences = getSharedPreferences("MapActivityPrefs", MODE_PRIVATE).edit();
+        if (!positioningEnabled) // turn on
+        {
+            FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_automatic_positioning);
+            fab.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_location_on_white_24dp));
+            this.positioningEnabled = true;
+            sharedPreferences.putBoolean("PositioningEnabled", positioningEnabled);
+
+            Toast.makeText(getApplicationContext(), "Automatic Positioning ON", Toast.LENGTH_SHORT).show();
+            registerPositionReceiver();
+        }
+        else // turn off
+        {
+            FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_automatic_positioning);
+            fab.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_location_off_white_24dp));
+            this.positioningEnabled = false;
+            sharedPreferences.putBoolean("PositioningEnabled", positioningEnabled);
+
+            if (positionLibOutputReceiver != null) {
+                unregisterReceiver(positionLibOutputReceiver);
+                Toast.makeText(getApplicationContext(), "Automatic Positioning OFF", Toast.LENGTH_SHORT).show();
+            }
+        }
+        sharedPreferences.commit();
+    }
 
 //region BROADCASTRECEIVERS
     private void registerOnMapClickReceiver()
@@ -470,6 +523,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 mMarker = mMap.addMarker(new MarkerOptions().position(point).title("Lat: " + point.latitude + " Lng: " + point.longitude));
                 mMarker.setDraggable(true);
                 mMarker.showInfoWindow();
+                currentPosition = new LatLng(point.latitude, point.longitude);
             }
         });
     }
@@ -504,7 +558,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     }
                     else
                     {
-                        Toast.makeText(MapActivity.this, "Sorry, can´t find your position.", Toast.LENGTH_LONG).show();
+                        Toast.makeText(MapActivity.this, getResources().getString(R.string.positioning_unable_to_locate_user), Toast.LENGTH_SHORT).show();
                     }
                 }
             }
@@ -575,7 +629,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     .zIndex(0.1f);
 
             mGroundOverlay = mMap.addGroundOverlay(fpOverlay);
-            fetch_map_spinner.setVisibility(View.GONE);
+            fetchMapSpinner.setVisibility(View.GONE);
         }
     }
 
@@ -609,7 +663,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 {
                     Toast.makeText(MapActivity.this, "Failed to load bitmap",
                             Toast.LENGTH_SHORT).show();
-                    fetch_map_spinner.setVisibility(View.GONE);
+                    fetchMapSpinner.setVisibility(View.GONE);
                 }
             };
         }
@@ -635,7 +689,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
      * Fetches floor plan data from IndoorAtlas server.
      */
     private void fetchFloorPlan(String id) {
-        fetch_map_spinner.setVisibility(View.VISIBLE);
+        fetchMapSpinner.setVisibility(View.VISIBLE);
 
         // if there is already running task, cancel it
         cancelPendingNetworkCalls();
@@ -756,16 +810,14 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 menuRef.findItem(R.id.action_login).setVisible(true); // logIN menu item
                 menuRef.findItem(R.id.action_logout).setVisible(false); // logOUT menu item
                 break;
+            /*
             case R.id.action_settings:
 
                 break;
             case R.id.action_measurement:
                 startActivity(new Intent(getApplicationContext(), MeasurementActivity.class));
                 break;
-            case R.id.action_register_location_receiver:
-                Toast.makeText(getApplicationContext(), "Listening for updates from positioning library", Toast.LENGTH_LONG).show();
-                registerPositionReceiver();
-                break;
+                */
             default:
                 break;
         }

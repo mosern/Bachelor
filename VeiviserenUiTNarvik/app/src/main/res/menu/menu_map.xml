@@ -4,7 +4,7 @@
     tools:context="no.hesa.veiviserenuitnarvik.MapActivity">
 
     <item android:id="@+id/action_search"
-        android:orderInCategory="92"
+        android:orderInCategory="80"
         android:title="@string/search_default_text"
         android:icon="@drawable/abc_ic_search_api_mtrl_alpha"
         app:showAsAction="always"
@@ -23,7 +23,7 @@
         android:title="@string/action_log_out"
         android:icon="@drawable/ic_cloud_done_white_24dp"
         app:showAsAction="ifRoom"/>
-
+<!--
     <item
         android:id="@+id/action_settings"
         android:orderInCategory="95"
@@ -37,12 +37,5 @@
         android:title="@string/action_measure"
         android:icon="@android:drawable/ic_menu_agenda"
         app:showAsAction="ifRoom"/>
-
-    <item
-        android:id="@+id/action_register_location_receiver"
-        android:orderInCategory="100"
-        android:title="@string/action_register_location_receiver"
-        android:icon="@android:drawable/ic_menu_add"
-        app:showAsAction="ifRoom"/>
-
+        -->
 </menu>

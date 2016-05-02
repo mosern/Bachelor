@@ -5,20 +5,22 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
+    android:background="@android:color/transparent"
     tools:context="no.hesa.veiviserenuitnarvik.MapActivity">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.AppBarOverlay">
+        android:theme="@style/AppTheme.AppBarOverlay"
+        android:background="@android:color/transparent">
+
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:popupTheme="@style/AppTheme.PopupOverlay"
-            />
+            android:background="@color/colorPrimary"
+            app:theme="@style/Toolbar.Transparent"/>
 
         <fragment
             xmlns:android="http://schemas.android.com/apk/res/android"
@@ -42,12 +44,12 @@
                 android:id="@+id/floor_up"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="bottom|end"
+                android:layout_gravity="top|end"
                 app:fabSize="mini"
-                android:layout_marginTop="@dimen/fab_margin"
+                android:layout_marginBottom="@dimen/fab_margin"
                 android:layout_marginLeft="@dimen/fab_margin"
                 android:layout_marginRight="@dimen/fab_margin"
-                android:layout_marginBottom="75dp"
+                android:layout_marginTop="25dp"
                 app:backgroundTint="@color/colorPrimary"
                 android:src="@drawable/ic_add_circle_outline_white_24dp"
                 app:layout_anchor="@id/floor_up"
@@ -57,20 +59,45 @@
                 android:id="@+id/floor_down"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="bottom|end"
+                android:layout_gravity="top|end"
                 app:fabSize="mini"
-                android:layout_marginTop="@dimen/fab_margin"
+                android:layout_marginBottom="@dimen/fab_margin"
                 android:layout_marginLeft="@dimen/fab_margin"
                 android:layout_marginRight="@dimen/fab_margin"
-                android:layout_marginBottom="25dp"
+                android:layout_marginTop="75dp"
                 app:backgroundTint="@color/colorPrimary"
                 android:src="@drawable/ic_remove_circle_outline_white_24dp"
                 app:layout_anchor="@id/floor_down"
                 app:layout_anchorGravity="top"/>
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/fab_my_location"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|end"
+                android:layout_marginTop="@dimen/fab_margin"
+                android:layout_marginLeft="@dimen/fab_margin"
+                android:layout_marginRight="@dimen/fab_margin"
+                android:layout_marginBottom="90dp"
+                app:backgroundTint="@color/my_location_fab_color"
+                android:src="@drawable/ic_my_location_blue_24dp"
+                app:layout_anchor="@id/floor_down"
+                app:layout_anchorGravity="top"/>
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/fab_automatic_positioning"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|end"
+                android:layout_marginTop="@dimen/fab_margin"
+                android:layout_marginLeft="@dimen/fab_margin"
+                android:layout_marginRight="@dimen/fab_margin"
+                android:layout_marginBottom="20dp"
+                app:backgroundTint="@color/automatic_positioning_fab_color"
+                android:src="@drawable/ic_location_off_white_24dp"
+                app:layout_anchor="@id/floor_up"
+                app:layout_anchorGravity="top"/>
         </fragment>
-
-
-
 
     </android.support.design.widget.AppBarLayout>
 

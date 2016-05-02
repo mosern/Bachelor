@@ -29,4 +29,13 @@
         <item name="android:windowEnterAnimation">@null</item>
         <item name="android:windowExitAnimation">@null</item>
     </style>
+
+    <!-- ToolBar -->
+    <style name="Toolbar.Transparent" parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+        <item name="android:windowActionBarOverlay">true</item>
+
+        <!-- Support Library compability -->
+        <item name="windowActionBarOverlay">true</item>
+    </style>
 </resources>
+

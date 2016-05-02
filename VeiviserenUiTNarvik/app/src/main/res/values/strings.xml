@@ -22,7 +22,10 @@
     <string name="title_activity_search_results">SearchResultsActivity</string>
 
     <string name="search_default_text">Search for person or room</string>
+
+    <!-- ERRORS -->
     <string name="search_no_results_error">No results, please try another search</string>
+    <string name="positioning_unable_to_locate_user">Unable to determine location automatically</string>
 
     <!-- -->
     <string name="sms_selection_descriptor">Send SMS with...</string>
@@ -33,5 +36,7 @@
 
     <string name="email_selection_descriptor">Send email with...</string>
     <string name="email_no_email_apps_installed">No installed email clients could be found</string>
+
+
 
 </resources>

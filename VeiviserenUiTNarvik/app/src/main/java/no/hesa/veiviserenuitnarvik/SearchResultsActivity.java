@@ -193,24 +193,18 @@ public class SearchResultsActivity extends Activity implements ActionInterface, 
 
     @Override
     public void onSwipe(int direction) {
-        String str = "";
-
         switch (direction) {
-
-            case SimpleGestureFilter.SWIPE_RIGHT : str = "Swipe Right";
-                //Toast.makeText(this, str, Toast.LENGTH_SHORT).show();
+            case SimpleGestureFilter.SWIPE_RIGHT :
                 finish();
                 break;
-            case SimpleGestureFilter.SWIPE_LEFT :  str = "Swipe Left";
+            case SimpleGestureFilter.SWIPE_LEFT :
                 finish();
                 break;
-            case SimpleGestureFilter.SWIPE_DOWN :  str = "Swipe Down";
+            case SimpleGestureFilter.SWIPE_DOWN :
                 break;
-            case SimpleGestureFilter.SWIPE_UP :    str = "Swipe Up";
+            case SimpleGestureFilter.SWIPE_UP :
                 break;
-
         }
-      //  Toast.makeText(this, str, Toast.LENGTH_SHORT).show();
     }
 
     @Override
