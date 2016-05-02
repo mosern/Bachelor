@@ -2,23 +2,32 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_height="wrap_content"
     android:layout_width="fill_parent"
-    android:orientation="vertical"
+    android:orientation="horizontal"
     android:paddingTop="8dp"
     android:paddingBottom="8dp"
     android:background="@color/search_results_listroot_color"
     >
 
+    <ImageView
+        android:id="@+id/iv_listroot_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
+        android:paddingRight="0dp"
+        android:paddingLeft="10dp" />
+
     <TextView
-        android:id="@+id/lblListHeader"
+        android:id="@+id/tv_list_header"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:paddingLeft="?android:attr/expandableListPreferredItemPaddingLeft"
-        android:typeface="serif"
-        android:paddingTop="10dp"
+        android:typeface="normal"
+        android:paddingTop="4dp"
         android:paddingBottom="4dp"
         android:paddingRight="4dp"
         android:textSize="17dp"
         android:textColor="@color/search_results_listroot_textcolor"
-        android:textAlignment="viewEnd"/>
+        android:textAlignment="textStart"/>
 
 </LinearLayout>

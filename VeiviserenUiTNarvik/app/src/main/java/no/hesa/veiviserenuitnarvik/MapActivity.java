@@ -106,6 +106,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private ProgressBar fetchMapSpinner;
     private boolean positioningEnabled = false;
 
+    private long lastPress;
+
+    private Circle circleThree;
+    private Circle circleTwo;
+    private Circle circleOne;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         requestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
@@ -374,22 +380,31 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 */
     private void drawUserPosition(LatLng currentPosition)
     {
+        if (circleOne != null)
+            circleOne.remove();
+
+        if (circleTwo != null)
+            circleTwo.remove();
+
+        if (circleThree != null)
+            circleThree.remove();
+
         //Painting position marker
-        Circle circleThree = mMap.addCircle(new CircleOptions()
+        circleThree = mMap.addCircle(new CircleOptions()
                 .center(currentPosition)
                 .radius(3)
                 .strokeColor(getResources().getColor(R.color.user_location_outer_ring))
                 .fillColor(getResources().getColor(R.color.user_location_outer_ring))
                 .zIndex(50));
 
-        Circle circleTwo = mMap.addCircle(new CircleOptions()
+        circleTwo = mMap.addCircle(new CircleOptions()
                 .center(currentPosition)
                 .radius(1.5)
                 .strokeColor(getResources().getColor(R.color.user_location_middle_ring))
                 .fillColor(getResources().getColor(R.color.user_location_middle_ring))
                 .zIndex(51));
 
-        Circle circleOne = mMap.addCircle(new CircleOptions()
+        circleOne = mMap.addCircle(new CircleOptions()
                 .center(currentPosition)
                 .radius(0.5)
                 .strokeColor(getResources().getColor(R.color.user_location_inner_ring))
@@ -548,6 +563,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                         currentPosition = latLng;
 
                         drawUserPosition(currentPosition);
+                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentPosition, 20));
 
                         if (floor != currentFloor) {
                             changeFloor(floor);
@@ -568,7 +584,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 }
             }
         };
-
         positionLibrary.wifiPosition.registerBroadcast(this);
         registerReceiver(positionLibOutputReceiver, new IntentFilter("no.hesa.positionlibrary.Output"));
     }
@@ -851,6 +866,18 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         if (sharedPreferences.getBoolean("LoggedInThisSession", true)) {
             Intent startAuthorization = new Intent(this, AuthenticationActivity.class);
             startActivity(startAuthorization);
+        }
+    }
+
+    // http://stackoverflow.com/questions/14006461/android-confirm-app-exit-with-toast/18654014#18654014
+    @Override
+    public void onBackPressed() {
+        long currentTime = System.currentTimeMillis();
+        if(currentTime - lastPress > 5000){
+            Toast.makeText(getBaseContext(), getResources().getString(R.string.close_mapactivity_backpress_confirmation), Toast.LENGTH_LONG).show();
+            lastPress = currentTime;
+        }else{
+            super.onBackPressed();
         }
     }
 }

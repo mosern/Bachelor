@@ -10,7 +10,7 @@
         android:id="@+id/tv_child_info"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:typeface="serif"
+        android:typeface="normal"
         android:textSize="17dip"
         android:textColor="@color/search_results_child_item_textcolor"
         android:paddingLeft="?android:attr/expandableListPreferredChildPaddingLeft" />
@@ -29,6 +29,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_textsms_24dp"
+            android:backgroundTint="@color/white"
             android:layout_row="0"
             android:layout_columnWeight="0.2"
             android:layout_column="0" />
@@ -38,6 +39,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_phonelink_ring_24dp"
+            android:backgroundTint="@color/white"
             android:layout_row="0"
             android:layout_columnWeight="0.2"
             android:layout_column="1" />
@@ -47,6 +49,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_call_24dp"
+            android:backgroundTint="@color/white"
             android:layout_row="0"
             android:layout_columnWeight="0.2"
             android:layout_column="2" />
@@ -56,6 +59,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_email_24dp"
+            android:backgroundTint="@color/white"
             android:layout_row="0"
             android:layout_columnWeight="0.2"
             android:layout_column="3" />

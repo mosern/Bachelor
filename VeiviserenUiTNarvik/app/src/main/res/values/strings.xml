@@ -20,6 +20,7 @@
     <!-- ALERTS -->
     <string name="positioning_automatic_on">Automatic Positioning ON</string>
     <string name="positioning_automatic_off">Automatic Positioning OFF</string>
+    <string name="close_mapactivity_backpress_confirmation">Press back again to exit</string>
 
     <!-- ERRORS -->
     <string name="search_no_results_error">No results, please try another search</string>

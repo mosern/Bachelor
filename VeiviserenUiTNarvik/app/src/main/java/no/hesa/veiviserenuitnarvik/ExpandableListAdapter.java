@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,6 +29,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     // child data in format of header title, child title
     private HashMap<String, List<? extends Object>> _listDataChild;
     private List<String> passedClass;
+    private String icon;
 
     public ExpandableListAdapter(Context context, List<String> listDataHeader, HashMap<String, List<? extends Object>> listChildData, List<String> passedClass) {
         this._context = context;
@@ -51,17 +53,35 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     public View getChildView(final int groupPosition, final int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
         Object child = getChild(groupPosition, childPosition);
 
+
         if (convertView == null) {
             LayoutInflater infalInflater = (LayoutInflater) this._context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = infalInflater.inflate(R.layout.search_results_child_item, null);
         }
 
+
+
+
+        LayoutInflater infalInflater = (LayoutInflater) this._context
+                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View rowView = infalInflater.inflate(R.layout.search_results_listroot, parent, false);
+
+
         String childText = "";
         if (passedClass != null) {
             if (passedClass.get(groupPosition).compareTo("person") == 0) {
                 final Person person;
                 person = (Person) child;
+                icon = "person";
+//                ImageView image = (ImageView) rowView.findViewById(R.id.iv_listroot_icon);
+//                if (image != null) {
+//                    image.setImageResource(R.drawable.ic_person_white_24dp);
+//                }
+//                else {
+//                    Toast.makeText(_context, person.getName() + " was null", Toast.LENGTH_SHORT).show();
+//                }
+
                 childText = person.getName() + "\n" + person.getLocation().getLocNr() + "\n" + person.getEmail();
                 convertView = setupPersonButtons(convertView, groupPosition, person);
             }
@@ -69,6 +89,15 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
             if (passedClass.get(groupPosition).compareTo("location") == 0) {
                 final Location location;
                 location = (Location) child;
+                icon = "location";
+//                ImageView image = (ImageView) rowView.findViewById(R.id.iv_listroot_icon);
+//                if (image != null) {
+//                    image.setImageResource(R.drawable.ic_gps_not_fixed_white_24dp);
+//                }
+//                else {
+//                    Toast.makeText(_context, location.getLocNr() + " was null", Toast.LENGTH_SHORT).show();
+//                }
+
                 childText = location.getLocNr();
                 convertView = setupLocationButton(convertView, groupPosition, location);
             }
@@ -191,6 +220,8 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
                 try {
                     // REDIRECT WITH ROUTE HERE
                     sendPersonDestination(person);
+                    PositionLibrary positionLibrary = new PositionLibrary();
+                    //positionLibrary.wifiPosition.plotRoute();
                 }
                 catch (Exception ex) {
                     ex.printStackTrace();
@@ -296,8 +327,19 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
             convertView = infalInflater.inflate(R.layout.search_results_listroot, null);
         }
 
-        TextView lblListHeader = (TextView) convertView.findViewById(R.id.lblListHeader);
-        lblListHeader.setTypeface(null, Typeface.BOLD);
+        ImageView image = (ImageView) convertView.findViewById(R.id.iv_listroot_icon);
+        if (image != null) {
+            if (passedClass.get(groupPosition).compareTo("person") == 0) {
+                image.setImageResource(R.drawable.ic_person_white_24dp);
+            }
+
+            if (passedClass.get(groupPosition).compareTo("location") == 0) {
+                image.setImageResource(R.drawable.ic_gps_not_fixed_white_24dp);
+            }
+        }
+
+        TextView lblListHeader = (TextView) convertView.findViewById(R.id.tv_list_header);
+        //lblListHeader.setTypeface(null, Typeface.BOLD);
         lblListHeader.setText(headerTitle);
 
         return convertView;
