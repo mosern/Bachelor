@@ -221,7 +221,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         float lng = sharedPreferences.getFloat("CurrentLng", 17.434950f);
 
         positioningEnabled = sharedPreferences.getBoolean("PositioningEnabled", false);
-        enablePositioning(positioningEnabled);
+        enablePositioning(positioningEnabled, false);
 
         // TODO: 28/04/2016 first run only, maybe change to users position via GPS
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lng), zoomLevel));
@@ -465,7 +465,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         automaticPositioningFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                enablePositioning(positioningEnabled);
+                enablePositioning(positioningEnabled, true);
             }
         });
 
@@ -481,7 +481,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 //endregion
 
-    private void enablePositioning(boolean positioningEnabled)
+    private void enablePositioning(boolean positioningEnabled, boolean showToast)
     {
         SharedPreferences.Editor sharedPreferences = getSharedPreferences("MapActivityPrefs", MODE_PRIVATE).edit();
         if (!positioningEnabled) // turn on
@@ -491,7 +491,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             this.positioningEnabled = true;
             sharedPreferences.putBoolean("PositioningEnabled", positioningEnabled);
 
-            Toast.makeText(getApplicationContext(), "Automatic Positioning ON", Toast.LENGTH_SHORT).show();
+            if (showToast) {
+                Toast.makeText(getApplicationContext(), getResources().getString(R.string.positioning_automatic_on), Toast.LENGTH_SHORT).show();
+            }
             registerPositionReceiver();
         }
         else // turn off
@@ -503,7 +505,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
             if (positionLibOutputReceiver != null) {
                 unregisterReceiver(positionLibOutputReceiver);
-                Toast.makeText(getApplicationContext(), "Automatic Positioning OFF", Toast.LENGTH_SHORT).show();
+                positionLibOutputReceiver = null;
+                if (showToast) {
+                    Toast.makeText(getApplicationContext(), getResources().getString(R.string.positioning_automatic_off), Toast.LENGTH_SHORT).show();
+                }
             }
         }
         sharedPreferences.commit();

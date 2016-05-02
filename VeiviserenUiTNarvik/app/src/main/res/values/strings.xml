@@ -7,7 +7,6 @@
     <string name="action_measure">Measure</string>
     <string name="action_register_location_receiver">Start location listener</string>
 
-
     <!-- TEMP -->
     <string name="content_text">Dette er content_main.xml, loads fra activity_main.xml</string>
     <string name="title_activity_maps">Map</string>
@@ -23,9 +22,13 @@
 
     <string name="search_default_text">Search for person or room</string>
 
+    <!-- ALERTS -->
+    <string name="positioning_automatic_on">Automatic Positioning ON</string>
+    <string name="positioning_automatic_off">Automatic Positioning OFF</string>
+
     <!-- ERRORS -->
     <string name="search_no_results_error">No results, please try another search</string>
-    <string name="positioning_unable_to_locate_user">Unable to determine location automatically</string>
+    <string name="positioning_unable_to_locate_user">Location could not be determined automatically. Not enough WiFi-accesspoints within range.</string>
 
     <!-- -->
     <string name="sms_selection_descriptor">Send SMS with...</string>
