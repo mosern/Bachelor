@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.net.http.SslError;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
@@ -20,7 +21,7 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 
 
-public class AuthenticationActivity extends Activity implements SimpleGestureFilter.SimpleGestureListener {
+public class AuthenticationActivity extends AppCompatActivity implements SimpleGestureFilter.SimpleGestureListener {
 
     private static String CLIENT_ID = "and";
     private static String REDIRECT_URI = "http://localhost:123";
