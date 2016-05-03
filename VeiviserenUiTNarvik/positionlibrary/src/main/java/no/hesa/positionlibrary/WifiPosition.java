@@ -461,7 +461,7 @@ public class WifiPosition implements ActionInterface {
                                 JSONObject jObjectWiFi = jsonArrayWiFi.getJSONObject(i);
                                 JSONObject coordinate = jObjectWiFi.getJSONObject("coordinate");
                                 //Fill list with information on wi-fi access points with data we get from API
-                                wifiPointsMacGeo.put(jObjectWiFi.getString("macAddress"), new Point(coordinate.getDouble("lng"), coordinate.getDouble("lat"), coordinate.getInt("alt")));
+                                wifiPointsMacGeo.put(jObjectWiFi.getString("macAddress"), new Point(coordinate.getDouble("lat"), coordinate.getDouble("lng"), coordinate.getInt("alt")));
                             }
                         }
                     }
