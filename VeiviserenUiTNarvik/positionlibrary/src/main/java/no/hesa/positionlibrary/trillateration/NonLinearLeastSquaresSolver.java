@@ -1,5 +1,13 @@
 package no.hesa.positionlibrary.trillateration;
 
+/***********************************************************************************
+ * Author: Scott Wiedemann
+ * Date: 11.11.2015
+ * Title: Trilateration
+ * (Version 1.0.0) [Computer program]
+ * Available at https://github.com/lemmingapex/Trilateration (Accessed 7 March 2016)
+ **********************************************************************************/
+
 import org.apache.commons.math3.fitting.leastsquares.LeastSquaresFactory;
 import org.apache.commons.math3.fitting.leastsquares.LeastSquaresOptimizer;
 import org.apache.commons.math3.fitting.leastsquares.LeastSquaresOptimizer.Optimum;
