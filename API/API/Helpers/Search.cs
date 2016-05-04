@@ -5,6 +5,7 @@ using Api.Models.EF;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Security.Principal;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -58,7 +59,8 @@ namespace Api.Classes
                     using(var userRepo = new Repository<User>())     
                     using (var repo = new LocationRepository<UserLocation>())
                     {
-                        var dbUser = userRepo.List().Where(u => u.Username == user.Identity.Name).FirstOrDefault();
+                        var userC = user as ClaimsPrincipal;
+                        var dbUser = userRepo.List().Where(u => u.Username == userC.Identity.Name).FirstOrDefault();
                         var userLoc = repo.List().Where(u => u.LocationId == loc.Id && u.User.Id == dbUser.Id).FirstOrDefault();
 
                         if (userLoc == null)
