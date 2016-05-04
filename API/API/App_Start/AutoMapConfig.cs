@@ -252,8 +252,17 @@ namespace Api
                     LocNr = source.LocNr,
                     Coordinate = AutoMapConfig.getMapper().Map<Coordinate, CoordinateViewModel>(coorRepo.Read(source.CoordinateId)),
                     Type = AutoMapConfig.getMapper().Map<Models.EF.Type, TypeViewModel>(typeRepo.Read(source.TypeId)),
-                    NeighbourId = source.NeighbourId.Value
                 };
+
+            if (source.NeighbourId == null)
+            {
+                dest.NeighbourId = 0;
+            }
+            else
+            {
+                dest.NeighbourId = source.NeighbourId.Value;
+            }
+                
 
             return dest;
         }
