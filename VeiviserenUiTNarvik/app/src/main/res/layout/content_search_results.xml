@@ -20,7 +20,7 @@
     <ExpandableListView
         android:id="@+id/exlv_search_results"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:scrollbars="none"
         android:groupIndicator="@null"/>

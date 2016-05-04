@@ -15,7 +15,7 @@
     <string name="title_activity_map">MapActivity</string>
     <string name="title_activity_search_results">SearchResultsActivity</string>
 
-    <string name="search_default_text">Search for person or room</string>
+    <string name="search_default_text">Search for person/room</string>
 
     <!-- ALERTS -->
     <string name="positioning_automatic_on">Automatic Positioning ON</string>

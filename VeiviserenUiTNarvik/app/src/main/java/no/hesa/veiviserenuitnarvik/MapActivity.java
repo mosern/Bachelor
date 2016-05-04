@@ -563,6 +563,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                         currentPosition = latLng;
 
                         drawUserPosition(currentPosition);
+                        //TODO: set to current zoom level, but have the first update zoom to 20
                         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentPosition, 20));
 
                         if (floor != currentFloor) {
@@ -780,7 +781,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         // Retrieve the SearchView and plug it into SearchManager
         final SearchView searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
-        //searchView.setIconifiedByDefault(false); // autoexpands the search field
+        searchView.setIconifiedByDefault(false); // autoexpands the search field
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName("no.hesa.veiviserenuitnarvik","no.hesa.veiviserenuitnarvik.SearchResultsActivity")));
 

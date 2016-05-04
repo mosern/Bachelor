@@ -1,10 +1,10 @@
 package no.hesa.veiviserenuitnarvik;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.Intent;
 import android.os.Bundle;
+
 import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -20,28 +20,23 @@ import java.util.HashMap;
 import java.util.List;
 import com.google.gson.Gson;
 
-//import no.hesa.veiviserenuitnarvik.api.ActionInterface;
-//import no.hesa.veiviserenuitnarvik.api.Api;
 import no.hesa.positionlibrary.api.ActionInterface;
 import no.hesa.positionlibrary.api.Api;
 import no.hesa.veiviserenuitnarvik.dataclasses.Person;
 
-public class SearchResultsActivity extends Activity implements ActionInterface, SimpleGestureFilter.SimpleGestureListener{
+public class SearchResultsActivity extends AppCompatActivity implements ActionInterface, SimpleGestureFilter.SimpleGestureListener{
 
     // http://www.androidhive.info/2013/07/android-expandable-list-view-tutorial/
 
-
     private JSONArray jsonArray = null;
 
-    ExpandableListAdapter listAdapter;
-    ExpandableListView expListView;
-    List<String> listDataHeader;
-    HashMap<String, List<? extends Object>> listDataChild;
+    private ExpandableListAdapter listAdapter;
+    private ExpandableListView expListView;
+    private List<String> listDataHeader;
+    private HashMap<String, List<? extends Object>> listDataChild;
 
     private SimpleGestureFilter detector;
     private ProgressBar search_spinner;
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -128,8 +123,7 @@ public class SearchResultsActivity extends Activity implements ActionInterface, 
                                         listDataHeader.add(jObject.getString("name"));
                                         countDataHeaderInsertions++;
 
-                                        if (i == 0) //first array, contains locations
-                                        {
+                                        if (i == 0) { //first array, contains locations
                                             List<no.hesa.veiviserenuitnarvik.dataclasses.Location> objDetails = new ArrayList<>();
                                             Gson gson = new Gson();
                                             no.hesa.veiviserenuitnarvik.dataclasses.Location obj = gson.fromJson(jObject.toString(), no.hesa.veiviserenuitnarvik.dataclasses.Location.class); // convert
@@ -138,8 +132,7 @@ public class SearchResultsActivity extends Activity implements ActionInterface, 
                                             orderOfClassTypes.add("location");
                                         }
 
-                                        if (i == 1) // second array, contains persons
-                                        {
+                                        if (i == 1) { // second array, contains persons
                                             List<Person> objDetails = new ArrayList<>();
                                             Gson gson = new Gson();
                                             Person obj = gson.fromJson(jObject.toString(), Person.class); // convert
@@ -163,12 +156,12 @@ public class SearchResultsActivity extends Activity implements ActionInterface, 
                     expListView.setAdapter(listAdapter);// setting list adapter
                     startExtvListeners();
 
+                    // expands groups for
                     if (countDataHeaderInsertions <= 3) {
                         for (int i = 0; i < 3; i++) {
                             expListView.expandGroup(i);
                         }
                     }
-
                 }
                 catch (Exception ex) {
                     ex.printStackTrace();

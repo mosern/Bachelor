@@ -20,57 +20,60 @@
         android:layout_height="match_parent"
         android:rowCount="1"
         android:columnCount="5"
+        android:paddingLeft="2dp"
+        android:paddingBottom="2dp"
+        android:paddingRight="2dp"
         android:alignmentMode="alignBounds"
         android:layout_weight="1.0"
         android:layout_gravity="left"
         >
         <ImageButton
             android:id="@+id/btn_child_item_sms"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:src="@drawable/ic_textsms_24dp"
-            android:backgroundTint="@color/white"
+            android:background="@drawable/comm_button_background"
             android:layout_row="0"
             android:layout_columnWeight="0.2"
             android:layout_column="0" />
 
         <ImageButton
             android:id="@+id/btn_child_item_tlfMobile"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:src="@drawable/ic_phonelink_ring_24dp"
-            android:backgroundTint="@color/white"
+            android:background="@drawable/comm_button_background"
             android:layout_row="0"
             android:layout_columnWeight="0.2"
             android:layout_column="1" />
 
         <ImageButton
             android:id="@+id/btn_child_item_tlfOffice"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:src="@drawable/ic_call_24dp"
-            android:backgroundTint="@color/white"
+            android:background="@drawable/comm_button_background"
             android:layout_row="0"
             android:layout_columnWeight="0.2"
             android:layout_column="2" />
 
         <ImageButton
             android:id="@+id/btn_child_item_email"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:src="@drawable/ic_email_24dp"
-            android:backgroundTint="@color/white"
+            android:background="@drawable/comm_button_background"
             android:layout_row="0"
             android:layout_columnWeight="0.2"
             android:layout_column="3" />
 
         <ImageButton
             android:id="@+id/btn_child_item_routeto"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:src="@drawable/ic_my_location_24dp"
             android:layout_row="0"
-            android:backgroundTint="@color/colorPrimary"
+            android:background="@drawable/route_button_background"
             android:layout_columnWeight="0.2"
             android:layout_column="4" />
     </GridLayout>
