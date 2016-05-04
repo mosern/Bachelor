@@ -52,7 +52,7 @@ namespace AdmAspNet.Helpers
                     LocNr = locNr,
                     Desc = desc,
                     NeighbourId = neighbourId,
-                    Distance = distance
+                    Distance = distance,
                     Coordinate = new CoordinateViewModel {Lng = lng,Lat = lat, Alt = alt},
                     Type = new TypeViewModel { Id = typeId}
                 }; 
