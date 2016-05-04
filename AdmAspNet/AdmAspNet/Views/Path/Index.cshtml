@@ -1,0 +1,40 @@
+﻿@model IEnumerable<AdmAspNet.Models.ViewModels.PathPointViewModel>
+
+@{
+    ViewBag.Title = "Rutepunkt";
+}
+@section sidebar {
+    @Html.Partial("_SidebarPartial")
+}
+<h2>Rutepunkt</h2>
+
+<p>
+    @Html.ActionLink("Opprett ny", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Coordinate.Lng)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Coordinate.Lat)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.Coordinate.Lng)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Coordinate.Lat)
+        </td>
+        <td>
+            @Html.ActionLink("Rediger", "Edit", new {  id=item.Id  }) |
+            @Html.ActionLink("Slett", "Delete", new { id = item.Id })
+        </td>
+    </tr>
+}
+
+</table>
