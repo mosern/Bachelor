@@ -112,6 +112,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private Circle circleTwo;
     private Circle circleOne;
 
+    private int mapType;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         requestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
@@ -153,7 +155,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
             float zoomLevel = mMap.getCameraPosition().zoom;
             sharedPreferences.putFloat("ZoomLevel", zoomLevel);
-
+            sharedPreferences.putInt("Maptype", mapType);
 
             if (currentPosition != null) {
                 float lat = (float) currentPosition.latitude;
@@ -217,17 +219,20 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        mMap.getUiSettings().setMapToolbarEnabled(false); // disable map toolbar:
-        mMap.getUiSettings().setIndoorLevelPickerEnabled(true);
+//        mMap.getUiSettings().setMapToolbarEnabled(false); // disable map toolbar:
+//        mMap.getUiSettings().setIndoorLevelPickerEnabled(false);
 
         SharedPreferences sharedPreferences = getSharedPreferences("MapActivityPrefs",MODE_PRIVATE);
 
+        mapType = sharedPreferences.getInt("MapType", googleMap.MAP_TYPE_NONE);
         float zoomLevel = sharedPreferences.getFloat("ZoomLevel", 17.0f);
         float lat = sharedPreferences.getFloat("CurrentLat", 68.436135f);
         float lng = sharedPreferences.getFloat("CurrentLng", 17.434950f);
 
         positioningEnabled = sharedPreferences.getBoolean("PositioningEnabled", false);
         enablePositioning(positioningEnabled, false);
+
+        mMap.setMapType(mapType);
 
         // TODO: 28/04/2016 first run only, maybe change to users position via GPS
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lng), zoomLevel));
@@ -491,6 +496,24 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 if (currentPosition != null) {
                     mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentPosition, 20));
                 }
+            }
+        });
+
+        FloatingActionButton switchMapTypeFab = (FloatingActionButton) findViewById(R.id.fab_switch_map_type);
+        switchMapTypeFab.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                FloatingActionButton switchMapTypeFab = (FloatingActionButton) findViewById(R.id.fab_switch_map_type);
+
+                if (mapType == mMap.MAP_TYPE_NORMAL) {
+                    switchMapTypeFab.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_location_city_white_24dp));
+                    mapType = mMap.MAP_TYPE_NONE;
+                }
+                else {
+                    switchMapTypeFab.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_language_white_24dp));
+                    mapType = mMap.MAP_TYPE_NORMAL;
+                }
+                mMap.setMapType(mapType);
             }
         });
     }

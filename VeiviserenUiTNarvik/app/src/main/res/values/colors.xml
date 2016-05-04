@@ -36,4 +36,5 @@
     <color name="my_location_fab_border_color">#5592ce</color>
 
     <color name="automatic_positioning_fab_color">#5592ce</color>
+    <color name="switch_map_type_fab_color">#5592ce</color>
 </resources>

@@ -97,6 +97,20 @@
                 android:src="@drawable/ic_location_off_white_24dp"
                 app:layout_anchor="@id/floor_up"
                 app:layout_anchorGravity="top"/>
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/fab_switch_map_type"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|start"
+                android:layout_marginTop="@dimen/fab_margin"
+                android:layout_marginLeft="@dimen/fab_margin"
+                android:layout_marginRight="@dimen/fab_margin"
+                android:layout_marginBottom="20dp"
+                app:backgroundTint="@color/switch_map_type_fab_color"
+                android:src="@drawable/ic_location_city_white_24dp"
+                app:layout_anchor="@id/floor_up"
+                app:layout_anchorGravity="bottom|left"/>
         </fragment>
 
     </android.support.design.widget.AppBarLayout>
