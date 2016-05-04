@@ -10,6 +10,8 @@ public class Location extends Object {
     private String locNr;
     private int hits;
     private int id;
+    private int neighbourId;
+    private double distance;
 
     public Location()
     {
@@ -68,5 +70,21 @@ public class Location extends Object {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public int getNeighbourId() {
+        return neighbourId;
+    }
+
+    public void setNeighbourId(int neighbourId) {
+        this.neighbourId = neighbourId;
+    }
+
+    public double getDistance() {
+        return distance;
+    }
+
+    public void setDistance(double distance) {
+        this.distance = distance;
     }
 }
