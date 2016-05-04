@@ -970,7 +970,7 @@
             Handles search fuctionality
             </summary>
         </member>
-        <member name="M:Api.Classes.Search.Location(System.String)">
+        <member name="M:Api.Classes.Search.Location(System.String,System.Security.Principal.IPrincipal)">
             <summary>
             Takes a search stirng and returns the result
             </summary>

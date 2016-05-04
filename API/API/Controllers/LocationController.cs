@@ -41,7 +41,7 @@ namespace Api.Controllers
             if (search != null)
             {
                 name = "results";
-                result = Search.Location(search);
+                result = Search.Location(search, User);
                 if (page != null)
                 {
                     result.LocationViewModel = result.LocationViewModel.ApplySort(sort).Skip(pageSize * (page.Value - 1)).Take(pageSize);

@@ -169,12 +169,6 @@ namespace Api
             Coordinate cor;
             Location dest;
 
-            if(source.Id != null)
-            {
-                using (var repo = new LocationRepository<Location>())
-                    return repo.Read(source.Id.Value);
-            }
-
             using (var repo = new LocationRepository<Coordinate>())
             {
                 if (source.Coordinate == null)
@@ -191,6 +185,33 @@ namespace Api
 
                 if(source.Id.Value == 0)
                 source.Id = cor.Id;
+
+                if (source.Id != null)
+                {
+                    Location toReturn;
+                    using (var locRepo = new LocationRepository<Location>())
+                        toReturn = locRepo.Read(source.Id.Value);
+
+                    if (source.Name != null)
+                        toReturn.Name = source.Name;
+
+                    if (source.LocNr != null)
+                        toReturn.LocNr = source.LocNr;
+
+                    if (source.Hits != 0)
+                        toReturn.Hits = source.Hits;
+
+                    if (source.Desc != null)
+                        toReturn.Desc = source.Desc;
+
+                    if (source.Type != null)
+                        toReturn.TypeId = source.Type.Id.Value;
+
+                    toReturn.CoordinateId = cor.Id;
+
+                    return toReturn;
+                }
+
 
                 dest = new Location()
                   {

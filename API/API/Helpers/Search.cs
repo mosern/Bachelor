@@ -5,9 +5,11 @@ using Api.Models.EF;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Principal;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
+using UserDB;
 
 namespace Api.Classes
 {
@@ -21,17 +23,57 @@ namespace Api.Classes
         /// </summary>
         /// <param name="searchString"></param>
         /// <returns>SearchViewModel, contains the result in form of a list LocationViewModel and a list of PeopleViewModel</returns>
-        public static SearchViewModel Location(string searchString)
+        public static SearchViewModel Location(string searchString, IPrincipal user)
         {
             SearchViewModel result = new SearchViewModel();
-            IQueryable<LocationViewModel> locations = null;
+            List<LocationViewModel> locations = new List<LocationViewModel>();
             IQueryable<PeopleViewModel> people = null;
 
-            switch (getTypeLocation(searchString))
+            //switch (getTypeLocation(searchString))
+            //{
+            //    case 0 : locations = new List<LocationViewModel>().AsQueryable(); break;
+            //    case 1 : locations = locationByLocNr(searchString); break;
+            //    case 2 : locations = locationByName(searchString); break;
+            //}
+
+            locations.AddRange(locationByLocNr(searchString));
+
+            var byName = locationByName(searchString);
+
+            foreach(LocationViewModel loc in byName)
             {
-                case 0 : locations = new List<LocationViewModel>().AsQueryable(); break;
-                case 1 : locations = locationByLocNr(searchString); break;
-                case 2 : locations = locationByName(searchString); break;
+                if (!locations.Contains(loc))
+                    locations.Add(loc);
+            }
+
+            if(locations.Count == 1)
+            {
+                var loc = locations.First();
+                loc.Hits += 1;
+                using (var repo = new LocationRepository<Location>())
+                    repo.Update(AutoMapConfig.getMapper().Map<LocationViewModel, Location>(loc));
+
+                if (user.Identity.IsAuthenticated)
+                {   
+                    using(var userRepo = new Repository<User>())     
+                    using (var repo = new LocationRepository<UserLocation>())
+                    {
+                        var dbUser = userRepo.List().Where(u => u.Username == user.Identity.Name).FirstOrDefault();
+                        var userLoc = repo.List().Where(u => u.LocationId == loc.Id && u.User.Id == dbUser.Id).FirstOrDefault();
+
+                        if (userLoc == null)
+                        {
+                            repo.Create(new UserLocation { LocationId = loc.Id.Value, UserId = dbUser.Id, Hits = 1 });
+                        }
+                        else
+                        {
+                            userLoc.Hits += 1;
+                            repo.Update(userLoc);
+                        }
+                            
+                    }
+
+                }
             }
 
             switch (getTypePeople(searchString))
@@ -40,70 +82,7 @@ namespace Api.Classes
                 case 1: people = peopleByName(searchString); break;
             }
 
-            //TODO Clean this up!
-            //List<int> locid = new List<int>();
-
-            //foreach(PeopleViewModel peo in people)
-            //{
-            //    Location tempLoc;
-            //    using(var repo = new LocationRepository<Location>())
-            //        tempLoc = repo.List().Where(l => l.Id == peo.Location.Id).FirstOrDefault();
-
-            //    LocationViewModel loc = null;
-
-            //    if(tempLoc != null)
-            //    {
-            //        loc = AutoMapConfig.getMapper().Map<Location, LocationViewModel>(tempLoc);
-            //    }
-            //    else
-            //    {
-            //        break;
-            //    }
-
-            //    locid.Add(loc.Id.Value);
-
-               
-
-            //    if (!locations.Contains(loc, new CompareEF<LocationViewModel>()))
-            //    {
-            //        var temp = locations.ToList();
-            //        temp.Add(loc);
-
-            //        locations = temp.AsQueryable();
-            //    }
-            //}
-
-            //foreach (LocationViewModel loc in locations)
-            //{
-            //    if (!locid.Contains(loc.Id.Value))
-            //    {
-            //        People tempPeo;
-            //        using (var repo = new LocationRepository<People>())
-            //            tempPeo = repo.List().Where(p => p.LocationId == loc.Id).FirstOrDefault();
-
-            //        PeopleViewModel peo = null;
-
-            //        if (tempPeo != null)
-            //        {
-            //            peo = AutoMapConfig.getMapper().Map<People, PeopleViewModel>(tempPeo);
-            //        }
-            //        else
-            //        {
-            //            break;
-            //        }
-
-            //        if (!people.Contains(peo))
-            //        {
-            //            var temp = people.ToList();
-            //            temp.Add(peo);
-
-            //            people = temp.AsQueryable();
-            //        }
-            //    }
-            //}
-
-
-            result.LocationViewModel = locations;
+            result.LocationViewModel = locations.AsQueryable();
             result.PeopleViewModel = people;
 
             return result;
@@ -259,7 +238,8 @@ namespace Api.Classes
             IEnumerable<People> peo;
             using (var repo = new LocationRepository<People>())
             {
-                peo = repo.List().Where(p => p.Name.Contains(name)).ToList();
+                //peo = repo.List().Where(p => p.Name.Contains(name)).ToList();
+                peo = repo.List().Where(p => p.Name.StartsWith(name)).ToList();
 
                 if (peo != null)
                 {
@@ -306,7 +286,8 @@ namespace Api.Classes
             IEnumerable<Location> loc;
             using (var repo = new LocationRepository<Location>())
             {
-                loc = repo.List().Where(l => l.Name.Contains(name));
+                //loc = repo.List().Where(l => l.Name.Contains(name));
+                loc = repo.List().Where(l => l.Name.StartsWith(name));
 
                 if (loc != null)
                 {
