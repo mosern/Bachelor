@@ -314,6 +314,8 @@
     <Content Include="Views\Neighbour\Edit.cshtml" />
     <Content Include="Views\People\Index.cshtml" />
     <Content Include="Views\Access\Delete.cshtml" />
+    <Content Include="Views\People\Create.cshtml" />
+    <Content Include="Views\People\Edit.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

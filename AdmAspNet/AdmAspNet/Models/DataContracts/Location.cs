@@ -29,5 +29,8 @@ namespace AdmAspNet.Models.DataContracts
 
         [DataMember(Name ="hits")]
         public int Hits { get; set; }
+
+        [DataMember(Name="neighbourId")]
+        public int NeighbourId { get; set; }
     }
 }

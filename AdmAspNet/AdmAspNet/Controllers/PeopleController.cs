@@ -40,6 +40,64 @@ namespace AdmAspNet.Controllers
             return View(viewModel);
         }
 
+        public ActionResult Create()
+        {
+            PeopleViewModel model = new PeopleViewModel(); 
+            List<Location> listLocation = api.GetAllLocations(); 
+            if (listLocation.Count == 0)
+            {
+                model.DropDown = new SelectList(listLocation); 
+            }
+            else
+            {
+                var ordered = listLocation.OrderBy(x => x.LocNr); 
+                model.DropDown = new SelectList(ordered, "Id", "LocNr", ordered.First().Id); 
+            }
+            return View(model); 
+        }
+
+        [HttpPost]
+        public ActionResult Create(PeopleViewModel input)
+        {
+            List<Location> listLocation = api.GetAllLocations();
+            if (listLocation.Count == 0)
+            {
+                input.DropDown = new SelectList(listLocation);
+
+            }
+            else
+            {
+                var ordered = listLocation.OrderBy(x => x.LocNr); 
+                input.DropDown = new SelectList(ordered, "Id", "LocNr", ordered.First().Id);
+            }
+            if (!ModelState.IsValid)
+            {
+                return View(input); 
+            }
+            var mapper = mapConfig.CreateMapper();
+            People people = mapper.Map<People>(input); 
+            if (api.PostPeople(people))
+            {
+                ViewBag.SuccessMessage = "Personen ble opprettet"; 
+            }
+            else
+            {
+                ViewBag.ErrorMessage = "En feil oppstod, kontakt en systemadministrator"; 
+            }
+            PeopleViewModel baseModel = new PeopleViewModel();
+            baseModel.DropDown = input.DropDown;
+            return View(baseModel); 
+        }
+
+        public ActionResult Edit(int? id)
+        {
+            if (id == null)
+            {
+                ViewBag.ErrorMessage = "Du må spesifisere en ID";
+                return View("ErrorView"); 
+            }
+
+        }
         protected override void Initialize(RequestContext requestContext)
         {
             base.Initialize(requestContext);

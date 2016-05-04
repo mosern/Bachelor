@@ -1,9 +1,11 @@
 ﻿@model AdmAspNet.Models.ViewModels.AccessPointViewModel
 
 @{
-    ViewBag.Title = "Delete";
+    ViewBag.Title = "Slett aksesspunkt";
 }
-
+@section sidebar {
+    @Html.Partial("_SidebarPartial")
+}
 <h2>Slett</h2>
 
 <h3>Er du sikker på at du vil slette ett aksesspunkt?</h3>

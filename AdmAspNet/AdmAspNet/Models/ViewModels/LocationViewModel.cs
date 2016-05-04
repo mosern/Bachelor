@@ -30,6 +30,9 @@ namespace AdmAspNet.Models.ViewModels
         [Display(Name ="Type")]
         public TypeViewModel Type { get; set; }
 
+        [Display(Name="Naboid")]
+        public int NeighbourId { get; set; }
+
         public virtual List<TypeViewModel> Types { get; set; }
 
         public SelectList DropDown { get; set; }

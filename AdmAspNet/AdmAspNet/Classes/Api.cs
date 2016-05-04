@@ -272,6 +272,12 @@ namespace AdmAspNet.Classes
             string url = ConfigurationManager.AppSettings["apiPeople"] + "/?asObject=false";
             return CallApi<List<People>>(url); 
         }
+
+        public bool PostPeople(People data)
+        {
+            string url = ConfigurationManager.AppSettings["apiPeople"];
+            return PostApi(url, data); 
+        }
         #endregion
 
         #region HelperMethods

@@ -1,13 +1,15 @@
 ﻿@model IEnumerable<AdmAspNet.Models.ViewModels.PeopleViewModel>
 
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "Personer";
 }
-
-<h2>Index</h2>
+@section sidebar {
+    @Html.Partial("_SidebarPartial")
+}
+<h2>Personer</h2>
 
 <p>
-    @Html.ActionLink("Create New", "Create")
+    @Html.ActionLink("Opprett ny", "Create")
 </p>
 <table class="table">
     <tr>
@@ -41,9 +43,9 @@
             @Html.DisplayFor(modelItem => item.TlfMobile)
         </td>
         <td>
-            @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
-            @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
-            @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
+            @Html.ActionLink("Rediger", "Edit", new { id=item.Id }) |
+            @Html.ActionLink("Detaljer", "Details", new {  id=item.Id }) |
+            @Html.ActionLink("Slett", "Delete", new { id=item.Id })
         </td>
     </tr>
 }
