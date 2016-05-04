@@ -33,9 +33,13 @@ namespace AdmAspNet.Helpers
                     bindingContext.ModelState.AddModelError("Coordinate.Alt", "Høyde må være en gyldig double"); 
                 }
 
-                int typeId; 
+                int typeId, neighbourId; 
                 if (!int.TryParse(request.Form.Get("Type.Id"), out typeId)) {
                     bindingContext.ModelState.AddModelError("Type.Id", "ID må være ett tall"); 
+                }
+                if (!int.TryParse(request.Form.Get("NeighbourId"),out neighbourId)) 
+                {
+                    bindingContext.ModelState.AddModelError("NeighbourId", "NeighbourId må være ett tall"); 
                 }
                 return new LocationViewModel
                 {
