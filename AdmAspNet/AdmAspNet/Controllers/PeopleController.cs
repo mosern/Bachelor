@@ -96,7 +96,7 @@ namespace AdmAspNet.Controllers
                 ViewBag.ErrorMessage = "Du må spesifisere en ID";
                 return View("ErrorView"); 
             }
-
+            return View();  
         }
         protected override void Initialize(RequestContext requestContext)
         {
