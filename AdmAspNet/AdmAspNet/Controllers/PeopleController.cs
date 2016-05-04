@@ -34,7 +34,10 @@ namespace AdmAspNet.Controllers
         // GET: Person
         public ActionResult Index()
         {
-            return View();
+            List<People> peopleList = api.GetAllPeople();
+            var mapper = mapConfig.CreateMapper();
+            List<PeopleViewModel> viewModel = mapper.Map<List<PeopleViewModel>>(peopleList); 
+            return View(viewModel);
         }
 
         protected override void Initialize(RequestContext requestContext)

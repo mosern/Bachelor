@@ -169,6 +169,7 @@ namespace AdmAspNet.Controllers
             return View(viewModel); 
         }
 
+        [HttpPost]
         public ActionResult Delete(int id)
         {
             AccessPoint accessPoint;
