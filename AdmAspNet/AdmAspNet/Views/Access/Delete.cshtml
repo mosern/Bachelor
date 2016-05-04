@@ -1,0 +1,48 @@
+﻿@model AdmAspNet.Models.ViewModels.AccessPointViewModel
+
+@{
+    ViewBag.Title = "Delete";
+}
+
+<h2>Slett</h2>
+
+<h3>Er du sikker på at du vil slette ett aksesspunkt?</h3>
+<div>
+    <h4>Aksesspunkt</h4>
+    @if (ViewBag.SuccessMessage != null)
+    {
+        Html.RenderPartial("_SuccessPartial");
+    }
+    @if (ViewBag.ErrorMessage != null)
+    {
+        Html.RenderPartial("_ErrorPartial");
+    }
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Desc)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Desc)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.MacAddress)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.MacAddress)
+        </dd>
+
+    </dl>
+
+    @using (Html.BeginForm()) {
+        @Html.AntiForgeryToken()
+
+        <div class="form-actions no-color">
+            <input type="submit" value="Delete" class="btn btn-default" /> |
+            @Html.ActionLink("Back to List", "Index")
+        </div>
+    }
+</div>

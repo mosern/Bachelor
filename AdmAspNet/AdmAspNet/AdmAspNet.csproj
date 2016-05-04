@@ -214,7 +214,7 @@
     <Compile Include="Controllers\LocationController.cs" />
     <Compile Include="Controllers\NeighbourController.cs" />
     <Compile Include="Controllers\PathController.cs" />
-    <Compile Include="Controllers\PersonController.cs" />
+    <Compile Include="Controllers\PeopleController.cs" />
     <Compile Include="Controllers\TypeController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -312,10 +312,11 @@
     <Content Include="Views\Path\Edit.cshtml" />
     <Content Include="Views\Path\Delete.cshtml" />
     <Content Include="Views\Neighbour\Edit.cshtml" />
+    <Content Include="Views\People\Index.cshtml" />
+    <Content Include="Views\Access\Delete.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Views\Person\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />

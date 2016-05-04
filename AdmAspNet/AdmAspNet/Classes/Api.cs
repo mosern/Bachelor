@@ -267,6 +267,11 @@ namespace AdmAspNet.Classes
         #endregion
 
         #region PersonMethods
+        public List<People> GetAllPeople()
+        {
+            string url = ConfigurationManager.AppSettings["apiPeople"] + "/?asObject=false";
+            return CallApi<List<People>>(url); 
+        }
         #endregion
 
         #region HelperMethods

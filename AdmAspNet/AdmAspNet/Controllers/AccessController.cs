@@ -140,7 +140,7 @@ namespace AdmAspNet.Controllers
             }
             var mapper = mapConfig.CreateMapper();
             AccessPoint data = mapper.Map<AccessPoint>(input); 
-            if (api.PostAccessPoint(data))
+            if (api.UpdateAccessPoint(id,data))
             {
                 ViewBag.SuccessMessage = "Aksesspunktet ble endret"; 
             }
@@ -168,6 +168,29 @@ namespace AdmAspNet.Controllers
             AccessPointViewModel viewModel = mapper.Map<AccessPointViewModel>(accessPoint);
             return View(viewModel); 
         }
+
+        public ActionResult Delete(int id)
+        {
+            AccessPoint accessPoint;
+            if ((accessPoint = api.GetAccessPointById(id)) == null)
+            {
+                ViewBag.ErrorMessage = "Kan ikke finne aksesspunktet du spurte etter";
+                return View("ErrorView");
+            }
+
+            if (api.DeleteAccessPoint(id))
+            {
+                ViewBag.SuccessMessage = "Aksesspunktet ble slettet";
+            }
+            else
+            {
+                ViewBag.ErrorMessage = "En feil oppstod, kontakt en systemadministrator"; 
+            }
+            var mapper = mapConfig.CreateMapper();
+            AccessPointViewModel viewModel = mapper.Map<AccessPointViewModel>(accessPoint);
+            return View(viewModel); 
+        }
+
         protected override void Initialize(RequestContext requestContext)
         {
             base.Initialize(requestContext);
