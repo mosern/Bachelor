@@ -154,7 +154,8 @@ namespace Api
                     Hits = userLocation.Hits,
                     LocNr = location.LocNr,
                     Type = AutoMapConfig.getMapper().Map<Models.EF.Type, TypeViewModel>(typeRepo.Read(location.TypeId)),
-                    Coordinate = AutoMapConfig.getMapper().Map<Coordinate, CoordinateViewModel>(coorRepo.Read(location.CoordinateId))
+                    Coordinate = AutoMapConfig.getMapper().Map<Coordinate, CoordinateViewModel>(coorRepo.Read(location.CoordinateId)),
+                    NeighbourId = userLocation.LocationId
                 };
         }
     }
@@ -207,6 +208,9 @@ namespace Api
                     if (source.Type != null)
                         toReturn.TypeId = source.Type.Id.Value;
 
+                    if (source.NeighbourId != 0)
+                        toReturn.NeighbourId = source.NeighbourId;
+
                     toReturn.CoordinateId = cor.Id;
 
                     return toReturn;
@@ -222,6 +226,7 @@ namespace Api
                         LocNr = source.LocNr,
                         CoordinateId = cor.Id,
                         TypeId = source.Type.Id.Value,
+                        NeighbourId = source.NeighbourId
                   };
             }
                 

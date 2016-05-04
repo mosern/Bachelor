@@ -21,5 +21,7 @@ namespace Api.Models.Api
         public CoordinateViewModel Coordinate { get; set; }
         [Required]
         public TypeViewModel Type { get; set; }
+        [Required]
+        public int NeighbourId { get; set; }
     }
 }
