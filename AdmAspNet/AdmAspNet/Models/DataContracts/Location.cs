@@ -32,5 +32,8 @@ namespace AdmAspNet.Models.DataContracts
 
         [DataMember(Name="neighbourId")]
         public int NeighbourId { get; set; }
+
+        [DataMember(Name ="distance")]
+        public double Distance { get; set; }
     }
 }

@@ -33,6 +33,9 @@ namespace AdmAspNet.Models.ViewModels
         [Display(Name="Naboid")]
         public int NeighbourId { get; set; }
 
+        [Display(Name ="Distanse")]
+        public double Distance { get; set; }
+
         public virtual List<TypeViewModel> Types { get; set; }
 
         public SelectList DropDown { get; set; }

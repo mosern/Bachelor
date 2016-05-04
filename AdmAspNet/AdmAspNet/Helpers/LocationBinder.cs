@@ -33,7 +33,8 @@ namespace AdmAspNet.Helpers
                     bindingContext.ModelState.AddModelError("Coordinate.Alt", "Høyde må være en gyldig double"); 
                 }
 
-                int typeId, neighbourId; 
+                int typeId, neighbourId;
+                double distance;  
                 if (!int.TryParse(request.Form.Get("Type.Id"), out typeId)) {
                     bindingContext.ModelState.AddModelError("Type.Id", "ID må være ett tall"); 
                 }
@@ -41,11 +42,17 @@ namespace AdmAspNet.Helpers
                 {
                     bindingContext.ModelState.AddModelError("NeighbourId", "NeighbourId må være ett tall"); 
                 }
+                if (!double.TryParse(request.Form.Get("Distance"),NumberStyles.Any,CultureInfo.GetCultureInfo("nb-NO"),out distance))
+                {
+                    bindingContext.ModelState.AddModelError("Distance", "Distance må være ett tall"); 
+                }
                 return new LocationViewModel
                 {
                     Name = name,
                     LocNr = locNr,
                     Desc = desc,
+                    NeighbourId = neighbourId,
+                    Distance = distance
                     Coordinate = new CoordinateViewModel {Lng = lng,Lat = lat, Alt = alt},
                     Type = new TypeViewModel { Id = typeId}
                 }; 
