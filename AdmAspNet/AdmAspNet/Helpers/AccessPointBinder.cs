@@ -19,15 +19,15 @@ namespace AdmAspNet.Helpers
                 string desc = request.Form.Get("Desc");
                 //Gather everything necessary 
                 double lng, lat, alt;
-                if (!double.TryParse(request.Form.Get("Coordinate.Lng"),NumberStyles.Any,CultureInfo.CurrentCulture,out lng))
+                if (!double.TryParse(request.Form.Get("Coordinate.Lng"),NumberStyles.Any,CultureInfo.GetCultureInfo("nb-NO"),out lng))
                 {
                     bindingContext.ModelState.AddModelError("Coordinate.Lng", "Breddegrad må være en gyldig double");
                 }
-                if (!double.TryParse(request.Form.Get("Coordinate.Lat"),NumberStyles.Any,CultureInfo.CurrentCulture,out lat))
+                if (!double.TryParse(request.Form.Get("Coordinate.Lat"),NumberStyles.Any,CultureInfo.GetCultureInfo("nb-NO"),out lat))
                 {
                     bindingContext.ModelState.AddModelError("Coordinate.Lat", "Lengdegrad må være en gyldig double");
                 }
-                if (!double.TryParse(request.Form.Get("Coordinate.Alt"),NumberStyles.Any,CultureInfo.CurrentCulture,out alt))
+                if (!double.TryParse(request.Form.Get("Coordinate.Alt"),NumberStyles.Any,CultureInfo.GetCultureInfo("nb-NO"),out alt))
                 {
                     bindingContext.ModelState.AddModelError("Coordinate.Alt", "Høyde må være en gyldig double");
                 }
