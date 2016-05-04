@@ -20,6 +20,8 @@ namespace Api.Models.EF
         [Required]
         public string Desc { get; set; }
 
+        public double Distance { get; set; }
+
         public int Hits { get; set; }
 
         public int CoordinateId { get; set; }

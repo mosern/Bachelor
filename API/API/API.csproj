@@ -309,6 +309,10 @@
     <Compile Include="Migrations\LocationConfiguration\201605021603254_lenghtToDistance.Designer.cs">
       <DependentUpon>201605021603254_lenghtToDistance.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\LocationConfiguration\201605041407564_locationDistance.cs" />
+    <Compile Include="Migrations\LocationConfiguration\201605041407564_locationDistance.Designer.cs">
+      <DependentUpon>201605041407564_locationDistance.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\LocationConfiguration\Configuration.cs" />
     <Compile Include="Models\Api\AccesspointViewModel.cs" />
     <Compile Include="Models\Api\BaseViewModel.cs" />
@@ -423,6 +427,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\LocationConfiguration\201605021603254_lenghtToDistance.resx">
       <DependentUpon>201605021603254_lenghtToDistance.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\LocationConfiguration\201605041407564_locationDistance.resx">
+      <DependentUpon>201605041407564_locationDistance.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

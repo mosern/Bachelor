@@ -225,7 +225,8 @@ namespace Api
                         LocNr = source.LocNr,
                         CoordinateId = cor.Id,
                         TypeId = source.Type.Id.Value,
-                        NeighbourId = source.NeighbourId
+                        NeighbourId = source.NeighbourId,
+                        Distance = source.Distance
                   };
             }
                 
@@ -252,6 +253,7 @@ namespace Api
                     LocNr = source.LocNr,
                     Coordinate = AutoMapConfig.getMapper().Map<Coordinate, CoordinateViewModel>(coorRepo.Read(source.CoordinateId)),
                     Type = AutoMapConfig.getMapper().Map<Models.EF.Type, TypeViewModel>(typeRepo.Read(source.TypeId)),
+                    Distance = source.Distance
                 };
 
             if (source.NeighbourId == null)

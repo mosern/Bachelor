@@ -16,6 +16,8 @@ namespace Api.Models.Api
         [Required, MaxLength(5)]
         public string LocNr { get; set; }
         [Required]
+        public double Distance { get; set; }
+        [Required]
         public int Hits { get; set; }
         [Required]
         public CoordinateViewModel Coordinate { get; set; }
