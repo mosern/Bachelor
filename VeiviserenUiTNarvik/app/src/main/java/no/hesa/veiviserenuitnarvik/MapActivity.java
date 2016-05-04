@@ -61,8 +61,6 @@ import java.util.List;
 
 import no.hesa.positionlibrary.Point;
 import no.hesa.positionlibrary.PositionLibrary;
-//import no.hesa.veiviserenuitnarvik.api.ActionInterface;
-//import no.hesa.veiviserenuitnarvik.api.Api;
 import no.hesa.positionlibrary.api.ActionInterface;
 import no.hesa.positionlibrary.api.Api;
 
@@ -155,7 +153,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
             float zoomLevel = mMap.getCameraPosition().zoom;
             sharedPreferences.putFloat("ZoomLevel", zoomLevel);
-            sharedPreferences.putInt("Maptype", mapType);
+            sharedPreferences.putInt("MapType", mapType);
 
             if (currentPosition != null) {
                 float lat = (float) currentPosition.latitude;
