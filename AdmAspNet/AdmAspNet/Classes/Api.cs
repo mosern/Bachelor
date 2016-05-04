@@ -196,6 +196,71 @@ namespace AdmAspNet.Classes
         }
         #endregion
 
+        #region PathPointMethods
+        public List<PathPoint> GetAllPathPoints()
+        {
+            string url = ConfigurationManager.AppSettings["apiPathPoints"] + "/?asObject=false";
+            return CallApi<List<PathPoint>>(url); 
+        }
+
+        public bool PostPathPoint(PathPoint data)
+        {
+            string url = ConfigurationManager.AppSettings["apiPathPoints"];
+            return PostApi(url, data); 
+        }
+
+        public PathPoint GetPathPointById(int id)
+        {
+            string url = ConfigurationManager.AppSettings["apiPathPoints"] + "/" + id;
+            return CallApi<PathPoint>(url); 
+        }
+
+        public bool UpdatePathPoint(int id, PathPoint data)
+        {
+            string url = ConfigurationManager.AppSettings["apiPathPoints"] + "/" + id;
+            return PutApi(url, data); 
+        }
+
+        public bool DeletePathPoint(int id)
+        {
+            string url = ConfigurationManager.AppSettings["apiPathPoints"] + "/" + id;
+            return DeleteObject(url); 
+        }
+        #endregion
+
+        #region NeighbourMethods
+        public List<Neighbour> GetAllNeighbours()
+        {
+            string url = ConfigurationManager.AppSettings["apiNeighbours"] + "/?asObject=false";
+            return CallApi<List<Neighbour>>(url); 
+        }
+
+        public Neighbour GetNeighbourById(int id)
+        {
+            string url = ConfigurationManager.AppSettings["apiNeighbours"] + "/" + id;
+            return CallApi<Neighbour>(url); 
+        }
+
+        public bool PostNeighbour(Neighbour data)
+        {
+            string url = ConfigurationManager.AppSettings["apiNeighbours"];
+            return PostApi(url, data);
+        }
+
+        public bool DeleteNeighbour(int id)
+        {
+            string url = ConfigurationManager.AppSettings["apiNeighbours"]+"/"+id;
+            return DeleteObject(url); 
+        }
+
+        public bool UpdateNeighbour(int id,Neighbour data)
+        {
+            string url = ConfigurationManager.AppSettings["apiNeighbours"] + "/" + id;
+            return PutApi(url, data); 
+        }
+
+        #endregion
+
         #region HelperMethods
         /// <summary>
         /// Handle GET calls to the API with a generic type
