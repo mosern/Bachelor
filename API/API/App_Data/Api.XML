@@ -586,6 +586,56 @@
             <param name="id">Id of the pathPoint to remove</param>
             <returns>200 ok</returns>
         </member>
+        <member name="M:Api.Controllers.PeopleController.Get(System.String,System.String,System.Nullable{System.Int32},System.Int32,System.Boolean,System.String)">
+            <summary>
+            Gets a list of People
+            </summary>
+            <param name="fields">Optional. The fields to include in returned object. Returns all fields if no field is specified</param>
+            <param name="sort">Optional, sorts accending by id if not set. The fields to sort by, use "," to serparate fields. Use "-" in fornt of field name to sort decending. Sorts accesnding by id as default</param>
+            <param name="page">Optional. The page you want</param>
+            <param name="pageSize">Optional, standard value is 5. The size you want your pages to be</param>
+            <param name="asObject">Optional, standard value is true. Spesify if you want a collection or a object with the collection as a property</param>
+            <param name="objPropName">Optional, standard value is "people". Name of object if asObject is true</param>
+            <returns>200 ok with processed list of all people in the database</returns>
+        </member>
+        <member name="M:Api.Controllers.PeopleController.Get(System.Int32,System.String)">
+            <summary>
+            Gets a spesific people
+            </summary>
+            <param name="id"> id for the neighbour you want to get</param>
+            <param name="fields">Optional. The fields to include in returned object. Returns all fields if no field is specified</param>
+            <returns>200 ok with processed people object</returns>
+        </member>
+        <member name="M:Api.Controllers.PeopleController.Post(Api.Models.Api.PeopleViewModel)">
+            <summary>
+            Creates new people
+            </summary>
+            <param name="people">peopleViewModel with info about the people to create</param>
+            <returns>201 created with the new object</returns>
+        </member>
+        <member name="M:Api.Controllers.PeopleController.Put(Api.Models.Api.PeopleViewModel,System.Int32)">
+            <summary>
+            Full update of a people
+            </summary>
+            <param name="people">All information about the people to be updated</param>
+            <param name="id">Id of the people to be updated</param>
+            <returns>200 ok</returns>
+        </member>
+        <member name="M:Api.Controllers.PeopleController.Patch(Api.Models.Api.PeopleViewModel,System.Int32)">
+            <summary>
+            Partial update of a people
+            </summary>
+            <param name="people">Information about the people to be updated</param>
+            <param name="id">Id of the people to be updated</param>
+            <returns>200 ok</returns>
+        </member>
+        <member name="M:Api.Controllers.PeopleController.Delete(System.Int32)">
+            <summary>
+            Removes an people
+            </summary>
+            <param name="id">Id of the people to remove</param>
+            <returns>200 ok</returns>
+        </member>
         <member name="T:Api.Controllers.TypeController">
             <summary>
             Controller that handels crud for Types

@@ -266,6 +266,7 @@
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
     <Compile Include="Controllers\NeighbourController.cs" />
     <Compile Include="Controllers\PathPointController.cs" />
+    <Compile Include="Controllers\PeopleController.cs" />
     <Compile Include="Controllers\TypeController.cs" />
     <Compile Include="Factories\ShapeFactory.cs" />
     <Compile Include="Helpers\AuthorizationManager.cs" />

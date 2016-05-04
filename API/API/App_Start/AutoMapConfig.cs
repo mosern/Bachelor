@@ -26,8 +26,8 @@ namespace Api
                 c.CreateMap<Models.EF.Type, TypeViewModel>();
                 c.CreateMap<TypeViewModel, Models.EF.Type>();
 
-                c.CreateMap<People, PeopleViewModel>();
-                c.CreateMap<PeopleViewModel, People>();
+                c.CreateMap<People, PeopleViewModel>().ConvertUsing<PeopleViewTypeConverter>();
+                c.CreateMap<PeopleViewModel, People>().ConvertUsing<ViewPeopleTypeConverter>();
 
                 c.CreateMap<Location, LocationViewModel>().ConvertUsing<LocationViewTypeConverter>();
                 c.CreateMap<LocationViewModel, Location>().ConvertUsing<ViewLocationTypeConverter>();
@@ -88,6 +88,52 @@ namespace Api
         }
     }
 
+    public class ViewPeopleTypeConverter : ITypeConverter<PeopleViewModel, People>
+    {
+        public People Convert(ResolutionContext context)
+        {
+            PeopleViewModel source = (PeopleViewModel)context.SourceValue;
+
+            People dest = new People
+            {
+                Id = source.Id.Value,
+                Name = source.Name,
+                Desc = source.Desc,
+                Email = source.Email,
+                Jobtitle = source.Jobtitle,
+                TlfMobile = source.TlfMobile,
+                TlfOffice = source.TlfOffice,
+                LocationId = source.Location.Id
+            };
+
+            return dest;
+        }
+    }
+
+    public class PeopleViewTypeConverter : ITypeConverter<People, PeopleViewModel>
+    {
+        public PeopleViewModel Convert(ResolutionContext context)
+        {
+            People source = (People)context.SourceValue;
+            PeopleViewModel dest;
+
+            using (var repo = new LocationRepository<Location>())
+            dest = new PeopleViewModel
+            {
+                Id = source.Id,
+                Name = source.Name,
+                Desc = source.Desc,
+                Email = source.Email,
+                Jobtitle = source.Jobtitle,
+                TlfMobile = source.TlfMobile,
+                TlfOffice = source.TlfOffice,
+                Location = AutoMapConfig.getMapper().Map<Location, LocationViewModel>(repo.Read(source.LocationId.Value))
+            };
+
+            return dest;
+        }
+    }
+
     public class UserLocationTypeConverter : ITypeConverter<UserLocation, LocationViewModel>
     {
         public LocationViewModel Convert(ResolutionContext context)
@@ -122,10 +168,17 @@ namespace Api
 
             Coordinate cor;
             Location dest;
+
+            if(source.Id != null)
+            {
+                using (var repo = new LocationRepository<Location>())
+                    return repo.Read(source.Id.Value);
+            }
+
             using (var repo = new LocationRepository<Coordinate>())
             {
-                if (source.Coordinate.Id == null)
-                    source.Coordinate.Id = 0;
+                if (source.Coordinate == null)
+                    source.Coordinate = new CoordinateViewModel { Id = 0 };
 
                 if (source.Coordinate.Id.Value == 0)
                 {
@@ -394,6 +447,7 @@ namespace Api
             dest = new PathPoint()
             {
                 Id = source.Id.Value,
+                Coordinate = cor,
                 CoordinateId = cor.Id,
             };
 
