@@ -176,7 +176,12 @@ namespace AdmAspNet.Classes
             return PostApi(url, accessPoint); 
         }
 
-
+        /// <summary>
+        /// Update an access point 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="accessPoint"></param>
+        /// <returns></returns>
         public bool UpdateAccessPoint(int id, AccessPoint accessPoint)
         {
             string url = ConfigurationManager.AppSettings["apiAccessPoints"] + "/" + id;
@@ -259,6 +264,9 @@ namespace AdmAspNet.Classes
             return PutApi(url, data); 
         }
 
+        #endregion
+
+        #region PersonMethods
         #endregion
 
         #region HelperMethods

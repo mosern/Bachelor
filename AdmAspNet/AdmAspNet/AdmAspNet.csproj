@@ -214,6 +214,7 @@
     <Compile Include="Controllers\LocationController.cs" />
     <Compile Include="Controllers\NeighbourController.cs" />
     <Compile Include="Controllers\PathController.cs" />
+    <Compile Include="Controllers\PersonController.cs" />
     <Compile Include="Controllers\TypeController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -227,6 +228,7 @@
     <Compile Include="Models\DataContracts\Location.cs" />
     <Compile Include="Models\DataContracts\Neighbour.cs" />
     <Compile Include="Models\DataContracts\PathPoint.cs" />
+    <Compile Include="Models\DataContracts\People.cs" />
     <Compile Include="Models\DataContracts\Type.cs" />
     <Compile Include="Models\DataContracts\User.cs" />
     <Compile Include="Models\ViewModels\AccessPointViewModel.cs" />
@@ -234,6 +236,7 @@
     <Compile Include="Models\ViewModels\LocationViewModel.cs" />
     <Compile Include="Models\ViewModels\NeighbourViewModel.cs" />
     <Compile Include="Models\ViewModels\PathPointViewModel.cs" />
+    <Compile Include="Models\ViewModels\PeopleViewModel.cs" />
     <Compile Include="Models\ViewModels\TypeViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
@@ -312,6 +315,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Views\Person\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
