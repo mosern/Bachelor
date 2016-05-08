@@ -9,8 +9,10 @@
     </style>
 
     <style name="AppTheme.NoActionBar">
+        <!--
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+        -->
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
@@ -32,11 +34,12 @@
     </style>
 
     <!-- ToolBar -->
-    <style name="Toolbar.Transparent" parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+    <style name="Toolbar" parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
         <item name="android:windowActionBarOverlay">true</item>
 
         <!-- Support Library compability -->
         <item name="windowActionBarOverlay">true</item>
+        <item name="android:title">@string/app_label</item>
     </style>
 </resources>
 

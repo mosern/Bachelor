@@ -20,11 +20,13 @@
     <!-- ALERTS -->
     <string name="positioning_automatic_on">Automatic Positioning ON</string>
     <string name="positioning_automatic_off">Automatic Positioning OFF</string>
-    <string name="close_mapactivity_backpress_confirmation">Press back again to exit</string>
+    <string name="close_mapactivity_backpress_confirmation">Are you sure you want to leave?\nPress back again to exit</string>
 
     <!-- ERRORS -->
-    <string name="search_no_results_error">No results, please try another search</string>
-    <string name="positioning_unable_to_locate_user">Location could not be determined automatically. Not enough WiFi-accesspoints within range.</string>
+    <string name="search_no_results">No results, please try another search</string>
+    <string name="positioning_unable_to_locate_user">Location could not be determined automatically.\nNot enough WiFi-accesspoints within range.</string>
+    <string name="failed_to_load_map">Failed to load map</string>
+    <string name="loading_floorplan_failed">Failed to load floorplan</string>
 
     <!-- SMS, CALL, EMAIL -->
     <string name="sms_selection_descriptor">Send SMS with...</string>

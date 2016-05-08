@@ -4,8 +4,9 @@
     <color name="colorPrimaryDark">#2b7ccc</color>
     <color name="colorAccent">#FF4081</color>
 
-    <color name="blue">#79adde</color>
-<color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="white">#FFFFFF</color>
+    <color name="blue">#5592ce</color>
 
     <color name="route_polyline_color">#FFa221b3</color>
     <color name="route_circle_color">#626dab</color>

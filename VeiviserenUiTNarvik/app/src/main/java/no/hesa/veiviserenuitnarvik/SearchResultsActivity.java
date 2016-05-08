@@ -2,14 +2,18 @@ package no.hesa.veiviserenuitnarvik;
 
 import android.app.Activity;
 import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
 import android.support.v7.app.AppCompatActivity;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ExpandableListView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -147,7 +151,7 @@ public class SearchResultsActivity extends AppCompatActivity implements ActionIn
                     }
                     else
                     {
-                        Toast.makeText(getApplicationContext(), "No results, please try another search", Toast.LENGTH_LONG).show();
+                        showCustomToast(getApplicationContext(), getResources().getString(R.string.search_no_results), Toast.LENGTH_LONG);
                         this.finish();
                     }
 
@@ -203,5 +207,19 @@ public class SearchResultsActivity extends AppCompatActivity implements ActionIn
     @Override
     public void onDoubleTap() {
         // Toast.makeText(this, "Double Tap", Toast.LENGTH_SHORT).show();
+    }
+
+    private void showCustomToast(Context context, String msg, int length)
+    {
+        LayoutInflater inflater = getLayoutInflater();
+        View toastLayout = inflater.inflate(R.layout.toast, (ViewGroup) findViewById(R.id.toast_layout));
+
+        TextView text = (TextView) toastLayout.findViewById(R.id.toast_content);
+        text.setText(msg);
+
+        Toast t = new Toast(getApplicationContext());
+        t.setView(toastLayout);
+        t.setDuration(length);
+        t.show();
     }
 }

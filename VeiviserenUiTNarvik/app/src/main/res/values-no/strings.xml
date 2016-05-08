@@ -1,0 +1,43 @@
+<resources>
+    <string name="app_name">Veiviseren UiT Narvik</string>
+
+    <string name="action_log_in">Logg inn</string>
+    <string name="action_log_out">Logg ut</string>
+    <string name="app_label">Veiviseren UiT Narvik</string>
+
+    <!-- TODO remove, unnecessary
+    <string name="action_measure">Measure</string>
+    <string name="action_register_location_receiver">Start location listener
+    <string name="action_settings">Settings</string>
+-->
+    <string name="title_activity_measurement">MeasurementActivity</string>
+    <string name="title_activity_authentication">AuthenticationActivity</string>
+    <string name="title_activity_map">MapActivity</string>
+    <string name="title_activity_search_results">SearchResultsActivity</string>
+
+    <string name="search_default_text">Søk etter person/rom</string>
+
+    <!-- ALERTS -->
+    <string name="positioning_automatic_on">Automatisk Posisjonering PÅ</string>
+    <string name="positioning_automatic_off">Automatisk Posisjonering AV</string>
+    <string name="close_mapactivity_backpress_confirmation">Er du sikker på at du vil dra?\nTrykk en gang til for å lukke appen </string>
+
+    <!-- ERRORS -->
+    <string name="search_no_results">Ingen resultater, prøv å søk på noe annet</string>
+    <string name="positioning_unable_to_locate_user">Posisjonen din kunne ikke bestemmes automatisk.\nIkke nok WiFi-aksesspunkter innen rekkevidde.</string>
+    <string name="failed_to_load_map">Kartet ble ikke lastet korrekt</string>
+    <string name="loading_floorplan_failed">Kartet over etasjen ble ikke lastet</string>
+
+    <!-- SMS, CALL, EMAIL -->
+    <string name="sms_selection_descriptor">Send SMS med...</string>
+    <string name="sms_no_sms_apps_installed">Klarte ikke å finne noen SMS-applikasjoner</string>
+
+    <string name="call_selection_descriptor">Ring med...</string>
+    <string name="call_no_calling_apps_installed">Klarte ikke å finne noen telefon-applikasjoner</string>
+
+    <string name="email_selection_descriptor">Send epost med...</string>
+    <string name="email_no_email_apps_installed">Klarte ikke å finne noen epost-applikasjoner</string>
+
+
+
+</resources>

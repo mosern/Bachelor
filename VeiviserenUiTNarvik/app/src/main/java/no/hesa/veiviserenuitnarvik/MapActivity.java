@@ -20,11 +20,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -127,19 +130,27 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        //getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+        getSupportActionBar().setDisplayShowTitleEnabled(true);
+        getSupportActionBar().setTitle("ARGH!");
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+
+        if(getResources().getConfiguration().locale.getISO3Country().compareTo("NOR") == 0) {
+            showCustomToast(getApplicationContext(), "Norsk locale", Toast.LENGTH_SHORT);
+            getSupportActionBar().setIcon(R.mipmap.ic_uit_logo_nor);
+        }
+        else {
+            showCustomToast(getApplicationContext(), getResources().getConfiguration().locale.toString(), Toast.LENGTH_SHORT);
+            getSupportActionBar().setIcon(R.mipmap.ic_uit_logo);
+        }
 
         fetchMapSpinner = (ProgressBar)findViewById(R.id.fetch_map_progress_bar);
         positionLibrary = new PositionLibrary();
         registerButtonListeners();
-
+/*
         //Api api = new Api(this, getApplicationContext().getResources());
         Api api = new Api(this);
         api.allUsers();
-/*
-        SharedPreferences sharedPreferences = getSharedPreferences("AppPref",MODE_PRIVATE);
-        String token = sharedPreferences.getString("Code",Api.NO_TOKEN);
-        api.locationById(2,token);
 */
         returnedCoordsFromSearchIntent = getIntent();
     }
@@ -158,16 +169,13 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             if (currentPosition != null) {
                 float lat = (float) currentPosition.latitude;
                 float lng = (float) currentPosition.longitude;
-
                 sharedPreferences.putFloat("CurrentLat", lat);
                 sharedPreferences.putFloat("CurrentLng", lng);
             }
 
-            if (!currentFloorPlan.isEmpty())
-            {
+            if (!currentFloorPlan.isEmpty()) {
                 sharedPreferences.putString("CurrentFloorPlan", currentFloorPlan);
             }
-
             sharedPreferences.commit();
         }
     }
@@ -217,15 +225,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-//        mMap.getUiSettings().setMapToolbarEnabled(false); // disable map toolbar:
-//        mMap.getUiSettings().setIndoorLevelPickerEnabled(false);
-
         SharedPreferences sharedPreferences = getSharedPreferences("MapActivityPrefs",MODE_PRIVATE);
 
         mapType = sharedPreferences.getInt("MapType", googleMap.MAP_TYPE_NONE);
         float zoomLevel = sharedPreferences.getFloat("ZoomLevel", 17.0f);
-        float lat = sharedPreferences.getFloat("CurrentLat", 68.436135f);
-        float lng = sharedPreferences.getFloat("CurrentLng", 17.434950f);
+        float lat = sharedPreferences.getFloat("CurrentLat", 68.43590708f);
+        float lng = sharedPreferences.getFloat("CurrentLng", 17.43452958f);
 
         positioningEnabled = sharedPreferences.getBoolean("PositioningEnabled", false);
         enablePositioning(positioningEnabled, false);
@@ -508,7 +513,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     mapType = mMap.MAP_TYPE_NONE;
                 }
                 else {
-                    switchMapTypeFab.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_language_white_24dp));
+                    switchMapTypeFab.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_public_white_24dp));
                     mapType = mMap.MAP_TYPE_NORMAL;
                 }
                 mMap.setMapType(mapType);
@@ -516,6 +521,20 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         });
     }
 //endregion
+
+    private void showCustomToast(Context context, String msg, int length)
+    {
+        LayoutInflater inflater = getLayoutInflater();
+        View toastLayout = inflater.inflate(R.layout.toast, (ViewGroup) findViewById(R.id.toast_layout));
+
+        TextView text = (TextView) toastLayout.findViewById(R.id.toast_content);
+        text.setText(msg);
+
+        Toast t = new Toast(getApplicationContext());
+        t.setView(toastLayout);
+        t.setDuration(length);
+        t.show();
+    }
 
     private void enablePositioning(boolean positioningEnabled, boolean showToast)
     {
@@ -528,7 +547,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             sharedPreferences.putBoolean("PositioningEnabled", positioningEnabled);
 
             if (showToast) {
-                Toast.makeText(getApplicationContext(), getResources().getString(R.string.positioning_automatic_on), Toast.LENGTH_SHORT).show();
+                showCustomToast(getApplicationContext(), getResources().getString(R.string.positioning_automatic_on), Toast.LENGTH_SHORT);
             }
             registerPositionReceiver();
         }
@@ -543,7 +562,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 unregisterReceiver(positionLibOutputReceiver);
                 positionLibOutputReceiver = null;
                 if (showToast) {
-                    Toast.makeText(getApplicationContext(), getResources().getString(R.string.positioning_automatic_off), Toast.LENGTH_SHORT).show();
+                    showCustomToast(getApplicationContext(), getResources().getString(R.string.positioning_automatic_off), Toast.LENGTH_SHORT);
                 }
             }
         }
@@ -601,7 +620,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     }
                     else
                     {
-                        Toast.makeText(MapActivity.this, getResources().getString(R.string.positioning_unable_to_locate_user), Toast.LENGTH_SHORT).show();
+                        showCustomToast(MapActivity.this, getResources().getString(R.string.positioning_unable_to_locate_user), Toast.LENGTH_LONG);
                     }
                 }
             }
@@ -653,14 +672,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
          * Sets bitmap of floor plan as ground overlay on Google Maps
          */
     private void setupGroundOverlay(IAFloorPlan floorPlan, Bitmap bitmap) {
-
-        if (mGroundOverlay != null)
-        {
+        if (mGroundOverlay != null) {
             mGroundOverlay.remove();
         }
 
-        if (mMap != null)
-        {
+        if (mMap != null) {
             BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(bitmap);
             IALatLng iaLatLng = floorPlan.getCenter();
             LatLng center = new LatLng(iaLatLng.latitude, iaLatLng.longitude);
@@ -671,7 +687,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     .zIndex(0.1f);
 
             mGroundOverlay = mMap.addGroundOverlay(fpOverlay);
-            fetchMapSpinner.setVisibility(View.GONE);
+            fetchMapSpinner.setVisibility(View.GONE); // hide loading spinner, load complete
         }
     }
 
@@ -685,7 +701,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         if (mLoadTarget == null) {
             mLoadTarget = new Target()
             {
-
                 @Override
                 public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from)
                 {
@@ -703,8 +718,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 @Override
                 public void onBitmapFailed(Drawable placeHolderDraweble)
                 {
-                    Toast.makeText(MapActivity.this, "Failed to load bitmap",
-                            Toast.LENGTH_SHORT).show();
+                    showCustomToast(getApplicationContext(), getResources().getString(R.string.failed_to_load_map), Toast.LENGTH_SHORT);
                     fetchMapSpinner.setVisibility(View.GONE);
                 }
             };
@@ -715,15 +729,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         final int bitmapWidth = floorPlan.getBitmapWidth();
         final int bitmapHeight = floorPlan.getBitmapHeight();
 
-        if (bitmapHeight > MAX_DIMENSION)
-        {
+        if (bitmapHeight > MAX_DIMENSION) {
             request.resize(0, MAX_DIMENSION);
         }
-        else if (bitmapWidth > MAX_DIMENSION)
-        {
+        else if (bitmapWidth > MAX_DIMENSION) {
             request.resize(MAX_DIMENSION, 0);
         }
-
         request.into(mLoadTarget);
     }
 
@@ -731,7 +742,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
      * Fetches floor plan data from IndoorAtlas server.
      */
     private void fetchFloorPlan(String id) {
-        fetchMapSpinner.setVisibility(View.VISIBLE);
+        fetchMapSpinner.setVisibility(View.VISIBLE); // show loading spinner
 
         // if there is already running task, cancel it
         cancelPendingNetworkCalls();
@@ -747,18 +758,13 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     // retrieve bitmap for this floor plan metadata
                     fetchFloorPlanBitmap(result.getResult());
                 }
-                else
-                {
+                else {
                     // ignore errors if this task was already canceled
-                    if (!task.isCancelled())
-                    {
+                    if (!task.isCancelled()) {
                         // do something with error
-                        Toast.makeText(MapActivity.this,
-                                "loading floor plan failed: " + result.getError(), Toast.LENGTH_LONG)
-                                .show();
+                        showCustomToast(MapActivity.this, getResources().getString(R.string.loading_floorplan_failed) + ": " + result.getError(), Toast.LENGTH_SHORT);
                         // remove current ground overlay
-                        if (mGroundOverlay != null)
-                        {
+                        if (mGroundOverlay != null) {
                             mGroundOverlay.remove();
                             mGroundOverlay = null;
                         }
@@ -766,10 +772,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 }
             }
         }, Looper.getMainLooper()); // deliver callbacks using main looper
-
         // keep reference to task so that it can be canceled if needed
         mFetchFloorPlanTask = task;
-
     }
 
     /**
@@ -802,7 +806,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         // Retrieve the SearchView and plug it into SearchManager
         final SearchView searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
-        searchView.setIconifiedByDefault(false); // autoexpands the search field
+        // searchView.setIconifiedByDefault(false); // autoexpands the search field
+        searchView.setMaxWidth(Integer.MAX_VALUE);
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName("no.hesa.veiviserenuitnarvik","no.hesa.veiviserenuitnarvik.SearchResultsActivity")));
 
@@ -811,7 +816,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
             @Override
             public boolean onQueryTextSubmit(String newText) {
-                //Toast.makeText(MapActivity.this, "You searched for: " + newText, Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(getApplicationContext(), SearchResultsActivity.class);
                 intent.setAction(Intent.ACTION_SEARCH);
                 intent.putExtra("query", newText);
@@ -825,8 +829,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             public boolean onQueryTextChange(String newText) {
                 return false;
             }
+
         });
         return true;
+
     }
 
     @Override
@@ -840,11 +846,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 startActivity(intent);
                 break;
             case R.id.action_logout:
-                /*
-        SharedPreferences sharedPreferences = getSharedPreferences("AppPref",MODE_PRIVATE);
-        String token = sharedPreferences.getString("Code",Api.NO_TOKEN);
-        api.locationById(2,token);
-        */
                 SharedPreferences sharedPreferences = getSharedPreferences("AppPref",MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.remove("Code");
@@ -852,14 +853,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 menuRef.findItem(R.id.action_login).setVisible(true); // logIN menu item
                 menuRef.findItem(R.id.action_logout).setVisible(false); // logOUT menu item
                 break;
-            /*
-            case R.id.action_settings:
-
-                break;
-            case R.id.action_measurement:
-                startActivity(new Intent(getApplicationContext(), MeasurementActivity.class));
-                break;
-                */
             default:
                 break;
         }
@@ -896,9 +889,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     public void onBackPressed() {
         long currentTime = System.currentTimeMillis();
         if(currentTime - lastPress > 5000){
-            Toast.makeText(getBaseContext(), getResources().getString(R.string.close_mapactivity_backpress_confirmation), Toast.LENGTH_LONG).show();
+            showCustomToast(getApplicationContext(), getResources().getString(R.string.close_mapactivity_backpress_confirmation), Toast.LENGTH_SHORT);
             lastPress = currentTime;
-        }else{
+        }
+        else{
             super.onBackPressed();
         }
     }
