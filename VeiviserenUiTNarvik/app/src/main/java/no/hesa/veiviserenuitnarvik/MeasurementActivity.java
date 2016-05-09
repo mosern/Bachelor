@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import no.hesa.positionlibrary.PositionLibrary;
+import no.hesa.positionlibrary.dijkstra.exception.PathNotFoundException;
 
 public class MeasurementActivity extends AppCompatActivity {
 

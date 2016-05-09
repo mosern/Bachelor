@@ -167,7 +167,7 @@ public class WifiPosition implements ActionInterface {
      *
      * @param c
      */
-    public void registerBroadcast(Context c) {
+    public void registerBroadcast(Context c){
         c.registerReceiver(wifiReceiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
         WifiManager wifiManager = (WifiManager) c.getSystemService(Context.WIFI_SERVICE);
         wifiManager.startScan();
@@ -281,6 +281,7 @@ public class WifiPosition implements ActionInterface {
             calculatedPosition = calculatePosition(sortedWifiPointsLocationInf);
             floor = findFloor(sortedWifiPointsLocationInf);
         }
+
         if(lastSentPosition == null || !lastSentPosition.equals(new Point(calculatedPosition[0], calculatedPosition[1], floor))){
             lastSentPosition = new Point(calculatedPosition[0], calculatedPosition[1], floor);
 
@@ -348,6 +349,9 @@ public class WifiPosition implements ActionInterface {
         //double exp = (27.55 - (20 * Math.log10(freqInMHz)) + Math.abs(levelInDb)) / 20.0;
         //double exp = (tx_PWR - levelInDb + gain_TX - pl_1meter + s)/(10 * n);
         double b = Math.pow(10.0, exp);
+
+        if(b < 3)
+            a = 1.7;
 
         double distance = Math.sqrt(b * b - a * a);
         return distance;
@@ -478,14 +482,14 @@ public class WifiPosition implements ActionInterface {
                         for(int i = 0; i < jsonArrayPath.length(); i++){
                             //Save firstPoint in array
                             JSONObject firstPoint = jsonArrayPath.getJSONObject(i).getJSONObject("coordinate");
-                            Vertex<Point> firstVertex = new Vertex<>(new Point(firstPoint.getDouble("lng"), firstPoint.getDouble("lat"), firstPoint.getInt("alt")));
-                            allPathPoints.add(new Point(firstPoint.getDouble("lng"), firstPoint.getDouble("lat"), firstPoint.getInt("alt")));
+                            Vertex<Point> firstVertex = new Vertex<>(new Point(firstPoint.getDouble("lat"), firstPoint.getDouble("lng"), firstPoint.getInt("alt")));
+                            allPathPoints.add(new Point(firstPoint.getDouble("lat"), firstPoint.getDouble("lng"), firstPoint.getInt("alt")));
 
                             JSONArray jsonArrayNeighbours = jsonArrayPath.getJSONObject(i).getJSONArray("neighbours");
                             //Traverse second level
                             for(int j = 0; j < jsonArrayNeighbours.length(); j++){
-                                JSONObject secondPoint = jsonArrayPath.getJSONObject(i).getJSONObject("coordinate");
-                                Vertex<Point> secondVertex = new Vertex<>(new Point(secondPoint.getDouble("lng"), secondPoint.getDouble("lat"), secondPoint.getInt("alt")));
+                                JSONObject secondPoint = jsonArrayNeighbours.getJSONObject(j).getJSONObject("coordinate");
+                                Vertex<Point> secondVertex = new Vertex<>(new Point(secondPoint.getDouble("lat"), secondPoint.getDouble("lng"), secondPoint.getInt("alt")));
                                 model.add(new Edge(firstVertex, secondVertex, jsonArrayNeighbours.getJSONObject(j).getInt("distance")));
                             }
                         }
@@ -508,7 +512,10 @@ public class WifiPosition implements ActionInterface {
      * @return list with "path points" from start to destination
      * @throws PathNotFoundException
      */
-    public LinkedList<Vertex> plotRoute(Point destination) throws PathNotFoundException {
+    public List<Point> plotRoute(Point destination) throws PathNotFoundException {
+        //Point destination = new Point(68.43609254621903, 17.434575855731964, 1);
+        //Point lastSentPosition = new Point(68.43620505217169, 17.433623000979424, 1);
+        //Point lastSentPosition = new Point(68.43614836797185, 17.433611266314983, 1);
         HashMap<Point, Double> closestPathPoint = findClosestPathPoint(lastSentPosition);
         Point[] point = (Point[]) closestPathPoint.keySet().toArray(new Point[closestPathPoint.size()]);
         Double[] distance = (Double[]) closestPathPoint.values().toArray(new Double[closestPathPoint.size()]);
@@ -517,9 +524,12 @@ public class WifiPosition implements ActionInterface {
 
         graph = new Graph(model);
         da = new DijkstraAlgorithm(graph);
-
         da.execute(new Vertex<>(lastSentPosition));
-        return da.getPath(new Vertex<>(destination));
+        LinkedList<Vertex> path = da.getPath(new Vertex<>(destination));
+
+        List<Point> result = getPointsOnCurrentFloor(path, lastSentPosition.getFloor());
+
+        return result;
     }
 
     /**
@@ -532,12 +542,33 @@ public class WifiPosition implements ActionInterface {
         HashMap<Point, Double> result = new HashMap<Point, Double>();
 
         for(int i = 0; i < allPathPoints.size(); i++){
-            float [] dist = new float[1];
-            Location.distanceBetween(position.getLatitude(), position.getLongitude(), allPathPoints.get(i).getLatitude(), allPathPoints.get(i).getLongitude(), dist);
-            distances.add(dist[0]);
+            if(allPathPoints.get(i).getFloor() == position.getFloor()){
+                float [] dist = new float[1];
+                Location.distanceBetween(position.getLatitude(), position.getLongitude(), allPathPoints.get(i).getLatitude(), allPathPoints.get(i).getLongitude(), dist);
+                distances.add(dist[0]);
+            }
         }
-        Double minDist = Double.valueOf(Collections.min(distances));
-        result.put(allPathPoints.get(distances.indexOf(minDist)), minDist);
+
+        Float minDist = Collections.min(distances);
+        result.put(allPathPoints.get(distances.indexOf(minDist)), Double.valueOf(minDist));
+        return result;
+    }
+
+    /**
+     * Select all path points on current floor
+     * @param path list with all path points from start to destination
+     * @param floor current floor (from current position)
+     * @return list with all path points on current floor
+     */
+    public List<Point> getPointsOnCurrentFloor(LinkedList<Vertex> path, int floor){
+        List<Point> result = new LinkedList<>();
+        for(int i = 0; i < path.size(); i++){
+            if (path.get(i).getPayload() instanceof Point){
+                Point pathPoint = (Point) path.get(i).getPayload();
+                if(pathPoint.getFloor() == floor)
+                    result.add(pathPoint);
+            }
+        }
 
         return result;
     }
