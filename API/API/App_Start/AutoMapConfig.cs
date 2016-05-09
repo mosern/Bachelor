@@ -210,6 +210,9 @@ namespace Api
                     if (source.NeighbourId != 0)
                         toReturn.NeighbourId = source.NeighbourId;
 
+                    if (source.Distance != 0)
+                        toReturn.Distance = source.Distance;
+
                     toReturn.CoordinateId = cor.Id;
 
                     return toReturn;
