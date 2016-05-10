@@ -515,19 +515,26 @@ public class WifiPosition implements ActionInterface {
     public List<Point> plotRoute(Point destination) throws PathNotFoundException {
         //Point destination = new Point(68.43609254621903, 17.434575855731964, 1);
         //Point lastSentPosition = new Point(68.43620505217169, 17.433623000979424, 1);
-        //Point lastSentPosition = new Point(68.43614836797185, 17.433611266314983, 1);
-        HashMap<Point, Double> closestPathPoint = findClosestPathPoint(lastSentPosition);
-        Point[] point = (Point[]) closestPathPoint.keySet().toArray(new Point[closestPathPoint.size()]);
-        Double[] distance = (Double[]) closestPathPoint.values().toArray(new Double[closestPathPoint.size()]);
-        //Add new node
-        model.add(new Edge(new Vertex(lastSentPosition), new Vertex(point[0]), distance[0].intValue()));
+        //Point lastSentPosition = new Point(68.43614836797185, 17.433611266314983, 1)
+        List<Point> result;
 
-        graph = new Graph(model);
-        da = new DijkstraAlgorithm(graph);
-        da.execute(new Vertex<>(lastSentPosition));
-        LinkedList<Vertex> path = da.getPath(new Vertex<>(destination));
+        if(lastSentPosition == null || lastSentPosition.equals(new Point(0, 0, 1))){
+            result = null;
+        }
+        else{
+            HashMap<Point, Double> closestPathPoint = findClosestPathPoint(lastSentPosition);
+            Point[] point = (Point[]) closestPathPoint.keySet().toArray(new Point[closestPathPoint.size()]);
+            Double[] distance = (Double[]) closestPathPoint.values().toArray(new Double[closestPathPoint.size()]);
+            //Add new node
+            model.add(new Edge(new Vertex(lastSentPosition), new Vertex(point[0]), distance[0].intValue()));
 
-        List<Point> result = getPointsOnCurrentFloor(path, lastSentPosition.getFloor());
+            graph = new Graph(model);
+            da = new DijkstraAlgorithm(graph);
+            da.execute(new Vertex<>(lastSentPosition));
+            LinkedList<Vertex> path = da.getPath(new Vertex<>(destination));
+
+            result = getPointsOnCurrentFloor(path, lastSentPosition.getFloor());
+        }
 
         return result;
     }
