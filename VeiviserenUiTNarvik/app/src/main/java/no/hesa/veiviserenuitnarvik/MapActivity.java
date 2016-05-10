@@ -66,11 +66,13 @@ import no.hesa.positionlibrary.Point;
 import no.hesa.positionlibrary.PositionLibrary;
 import no.hesa.positionlibrary.api.ActionInterface;
 import no.hesa.positionlibrary.api.Api;
+import no.hesa.positionlibrary.dijkstra.exception.PathNotFoundException;
 
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback,ActionInterface{
 
     private static final String TAG = "MapActivity";
+    private final LatLng UIT_NARVIK_POSITION = new LatLng(68.43590708f, 17.43452958f);
     private static final int POLYLINEWIDTH = 4;
     private static String DEFAULT_FLOORPLAN;
 
@@ -229,8 +231,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         mapType = sharedPreferences.getInt("MapType", googleMap.MAP_TYPE_NONE);
         float zoomLevel = sharedPreferences.getFloat("ZoomLevel", 17.0f);
-        float lat = sharedPreferences.getFloat("CurrentLat", 68.43590708f);
-        float lng = sharedPreferences.getFloat("CurrentLng", 17.43452958f);
+        float lat = sharedPreferences.getFloat("CurrentLat", (float)UIT_NARVIK_POSITION.latitude);
+        float lng = sharedPreferences.getFloat("CurrentLng", (float)UIT_NARVIK_POSITION.longitude);
 
         positioningEnabled = sharedPreferences.getBoolean("PositioningEnabled", false);
         enablePositioning(positioningEnabled, false);
@@ -245,7 +247,16 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 if (returnedCoordsFromSearchIntent.getAction().equals("no.hesa.veiviserennarvik.LAT_LNG_RETURN")) {
                     LatLng latLng = new LatLng(returnedCoordsFromSearchIntent.getDoubleExtra("lat",0),returnedCoordsFromSearchIntent.getDoubleExtra("lng",0));
                     double floor = returnedCoordsFromSearchIntent.getDoubleExtra("floor", 1.0);
-                    changeFloor((int)floor);
+//                    changeFloor((int)floor);
+                    try {
+                        List<Point> path = positionLibrary.wifiPosition.plotRoute(new Point(latLng.latitude, latLng.longitude, (int) floor));
+                        drawFloorPath(path);
+                    }
+                    catch (PathNotFoundException ex)
+                    {
+                        showCustomToast(getApplicationContext(), getResources().getString(R.string.path_not_found_exception), Toast.LENGTH_SHORT );
+                    }
+
                     mMap.addMarker(new MarkerOptions().position(latLng).title("TestLoc2"));
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoomLevel));
                     targetPosition = latLng;
@@ -502,6 +513,15 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             }
         });
 
+        myLocationFab.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                currentPosition = new LatLng(68.43590708f, 17.43452958f);
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentPosition, 17.4f));
+                return true;
+            }
+        });
+
         FloatingActionButton switchMapTypeFab = (FloatingActionButton) findViewById(R.id.fab_switch_map_type);
         switchMapTypeFab.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -628,7 +648,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         positionLibrary.wifiPosition.registerBroadcast(this);
         registerReceiver(positionLibOutputReceiver, new IntentFilter("no.hesa.positionlibrary.Output"));
     }
-
+/*
     private void registerPathReceiver()
     {
         pathPositionLibReceiver = new BroadcastReceiver() {
@@ -644,6 +664,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         positionLibrary.wifiPosition.registerBroadcast(this);
         registerReceiver(pathPositionLibReceiver, new IntentFilter("no.hesa.positionlibrary.Output")); // change
     }
+    */
 /*
     private void registerSearchLocationReceiver()
     {
