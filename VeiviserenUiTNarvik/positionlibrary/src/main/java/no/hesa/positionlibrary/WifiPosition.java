@@ -540,6 +540,30 @@ public class WifiPosition implements ActionInterface {
     }
 
     /**
+     * Generate list with "path points" to plot the route on the map
+     * @param position geo coordinates of start point
+     * @param destination geo coordinates of destination point
+     * @return list with "path points" from start to destination
+     * @throws PathNotFoundException
+     */
+    public List<Point> plotRoute(Point position, Point destination) throws PathNotFoundException {
+        HashMap<Point, Double> closestPathPoint = findClosestPathPoint(position);
+        Point[] point = (Point[]) closestPathPoint.keySet().toArray(new Point[closestPathPoint.size()]);
+        Double[] distance = (Double[]) closestPathPoint.values().toArray(new Double[closestPathPoint.size()]);
+        //Add new node
+        model.add(new Edge(new Vertex(position), new Vertex(point[0]), distance[0].intValue()));
+
+        graph = new Graph(model);
+        da = new DijkstraAlgorithm(graph);
+        da.execute(new Vertex<>(position));
+        LinkedList<Vertex> path = da.getPath(new Vertex<>(destination));
+
+        List<Point> result = getPointsOnCurrentFloor(path, position.getFloor());
+
+        return result;
+    }
+
+    /**
      * Find closest path point to users current position
      * @param position current position
      * @return Closest path point and distance to it
