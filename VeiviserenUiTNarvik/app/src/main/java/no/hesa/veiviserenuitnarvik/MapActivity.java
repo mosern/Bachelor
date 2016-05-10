@@ -516,7 +516,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         myLocationFab.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                currentPosition = new LatLng(68.43590708f, 17.43452958f);
+                currentPosition = UIT_NARVIK_POSITION;
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentPosition, 17.4f));
                 return true;
             }
