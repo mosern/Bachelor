@@ -522,18 +522,7 @@ public class WifiPosition implements ActionInterface {
             result = null;
         }
         else{
-            HashMap<Point, Double> closestPathPoint = findClosestPathPoint(lastSentPosition);
-            Point[] point = (Point[]) closestPathPoint.keySet().toArray(new Point[closestPathPoint.size()]);
-            Double[] distance = (Double[]) closestPathPoint.values().toArray(new Double[closestPathPoint.size()]);
-            //Add new node
-            model.add(new Edge(new Vertex(lastSentPosition), new Vertex(point[0]), distance[0].intValue()));
-
-            graph = new Graph(model);
-            da = new DijkstraAlgorithm(graph);
-            da.execute(new Vertex<>(lastSentPosition));
-            LinkedList<Vertex> path = da.getPath(new Vertex<>(destination));
-
-            result = getPointsOnCurrentFloor(path, lastSentPosition.getFloor());
+            result = generateRoute(lastSentPosition, destination);
         }
 
         return result;
@@ -547,6 +536,11 @@ public class WifiPosition implements ActionInterface {
      * @throws PathNotFoundException
      */
     public List<Point> plotRoute(Point position, Point destination) throws PathNotFoundException {
+        List<Point> result = generateRoute(position, destination);
+        return result;
+    }
+
+    public List<Point> generateRoute(Point position, Point destination) throws PathNotFoundException {
         HashMap<Point, Double> closestPathPoint = findClosestPathPoint(position);
         Point[] point = (Point[]) closestPathPoint.keySet().toArray(new Point[closestPathPoint.size()]);
         Double[] distance = (Double[]) closestPathPoint.values().toArray(new Double[closestPathPoint.size()]);
