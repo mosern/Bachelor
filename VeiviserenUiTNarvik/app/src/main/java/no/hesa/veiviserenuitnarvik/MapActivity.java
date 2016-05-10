@@ -73,6 +73,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     private static final String TAG = "MapActivity";
     private final LatLng UIT_NARVIK_POSITION = new LatLng(68.43590708f, 17.43452958f);
+    private final float UIT_NARVIK_ZOOMLEVEL = 17.4f;
+    private final int UIT_NARVIK_DEFAULTFLOOR = 1;
     private static final int POLYLINEWIDTH = 4;
     private static String DEFAULT_FLOORPLAN;
 
@@ -178,6 +180,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             if (!currentFloorPlan.isEmpty()) {
                 sharedPreferences.putString("CurrentFloorPlan", currentFloorPlan);
             }
+
+            if (currentFloor != 0)
+            {
+                sharedPreferences.putInt("CurrentFloor", currentFloor);
+            }
             sharedPreferences.commit();
         }
     }
@@ -233,6 +240,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         float zoomLevel = sharedPreferences.getFloat("ZoomLevel", 17.0f);
         float lat = sharedPreferences.getFloat("CurrentLat", (float)UIT_NARVIK_POSITION.latitude);
         float lng = sharedPreferences.getFloat("CurrentLng", (float)UIT_NARVIK_POSITION.longitude);
+        int currentFloor = sharedPreferences.getInt("CurrentFloor", UIT_NARVIK_DEFAULTFLOOR);
+        currentPosition = new LatLng(lat, lng);
 
         positioningEnabled = sharedPreferences.getBoolean("PositioningEnabled", false);
         enablePositioning(positioningEnabled, false);
@@ -248,8 +257,14 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     LatLng latLng = new LatLng(returnedCoordsFromSearchIntent.getDoubleExtra("lat",0),returnedCoordsFromSearchIntent.getDoubleExtra("lng",0));
                     double floor = returnedCoordsFromSearchIntent.getDoubleExtra("floor", 1.0);
 //                    changeFloor((int)floor);
+                    latLng = new LatLng(68.4358635893339, 17.434213757514954);
+                    floor = 1;
+
+                    currentPosition =  new LatLng(68.43611842, 17.43462983);
+                    currentFloor = 1;
+
                     try {
-                        List<Point> path = positionLibrary.wifiPosition.plotRoute(new Point(latLng.latitude, latLng.longitude, (int) floor));
+                        List<Point> path = positionLibrary.wifiPosition.plotRoute(new Point(currentPosition.latitude, currentPosition.longitude, currentFloor), new Point(latLng.latitude, latLng.longitude, (int) floor));
                         drawFloorPath(path);
                     }
                     catch (PathNotFoundException ex)
@@ -517,7 +532,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             @Override
             public boolean onLongClick(View v) {
                 currentPosition = UIT_NARVIK_POSITION;
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentPosition, 17.4f));
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentPosition, UIT_NARVIK_ZOOMLEVEL));
                 return true;
             }
         });
