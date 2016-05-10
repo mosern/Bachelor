@@ -2,6 +2,7 @@
 _Innendørs navigasjonssytem_
 
 Består av:
-* Android App
-* Web Admin grensesnitt (asp.net mvc)
-* Api (asp.net webapi2 EE)
+* Android App(Java, Android) - Henning Fredriksen
+* Possisjonerings Algoritme(Java) - Evgeniia Gladkova, Simon Ingebrigtsen
+* Web Admin grensesnitt (asp.net mvc) - Simon Ingebrigtsen
+* Api og Database (asp.net webapi2 EE) - Andreas Mosvoll
