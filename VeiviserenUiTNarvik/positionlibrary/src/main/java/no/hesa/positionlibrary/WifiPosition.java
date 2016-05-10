@@ -515,19 +515,44 @@ public class WifiPosition implements ActionInterface {
     public List<Point> plotRoute(Point destination) throws PathNotFoundException {
         //Point destination = new Point(68.43609254621903, 17.434575855731964, 1);
         //Point lastSentPosition = new Point(68.43620505217169, 17.433623000979424, 1);
-        //Point lastSentPosition = new Point(68.43614836797185, 17.433611266314983, 1);
-        HashMap<Point, Double> closestPathPoint = findClosestPathPoint(lastSentPosition);
+        //Point lastSentPosition = new Point(68.43614836797185, 17.433611266314983, 1)
+        List<Point> result;
+
+        if(lastSentPosition == null || lastSentPosition.equals(new Point(0, 0, 1))){
+            result = null;
+        }
+        else{
+            result = generateRoute(lastSentPosition, destination);
+        }
+
+        return result;
+    }
+
+    /**
+     * Generate list with "path points" to plot the route on the map
+     * @param position geo coordinates of start point
+     * @param destination geo coordinates of destination point
+     * @return list with "path points" from start to destination
+     * @throws PathNotFoundException
+     */
+    public List<Point> plotRoute(Point position, Point destination) throws PathNotFoundException {
+        List<Point> result = generateRoute(position, destination);
+        return result;
+    }
+
+    public List<Point> generateRoute(Point position, Point destination) throws PathNotFoundException {
+        HashMap<Point, Double> closestPathPoint = findClosestPathPoint(position);
         Point[] point = (Point[]) closestPathPoint.keySet().toArray(new Point[closestPathPoint.size()]);
         Double[] distance = (Double[]) closestPathPoint.values().toArray(new Double[closestPathPoint.size()]);
         //Add new node
-        model.add(new Edge(new Vertex(lastSentPosition), new Vertex(point[0]), distance[0].intValue()));
+        model.add(new Edge(new Vertex(position), new Vertex(point[0]), distance[0].intValue()));
 
         graph = new Graph(model);
         da = new DijkstraAlgorithm(graph);
-        da.execute(new Vertex<>(lastSentPosition));
+        da.execute(new Vertex<>(position));
         LinkedList<Vertex> path = da.getPath(new Vertex<>(destination));
 
-        List<Point> result = getPointsOnCurrentFloor(path, lastSentPosition.getFloor());
+        List<Point> result = getPointsOnCurrentFloor(path, position.getFloor());
 
         return result;
     }
