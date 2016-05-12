@@ -21,6 +21,7 @@
     <string name="positioning_automatic_on">Automatic Positioning ON</string>
     <string name="positioning_automatic_off">Automatic Positioning OFF</string>
     <string name="close_mapactivity_backpress_confirmation">Are you sure you want to leave?\nPress back again to exit</string>
+    <string name="refresh_pathpoints">Refreshing pathpoints, please wait a moment. Search is disabled temporarily.</string>
 
     <!-- ERRORS -->
     <string name="search_no_results">No results, please try another search</string>

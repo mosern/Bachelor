@@ -19,6 +19,7 @@ import org.apache.commons.math3.fitting.leastsquares.LeastSquaresOptimizer;
 import org.apache.commons.math3.fitting.leastsquares.LevenbergMarquardtOptimizer;
 import org.apache.commons.math3.linear.RealVector;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -179,7 +180,7 @@ public class WifiPosition implements ActionInterface {
         Api api = new Api(this);
         //Load list of all mapped wi-fi access points
         api.allAccessPoints();
-        api.allPathPoints();
+        //api.allPathPoints(); //TODO remove this
     }
 
     /**
@@ -473,6 +474,7 @@ public class WifiPosition implements ActionInterface {
                     e.printStackTrace();
                 }
                 break;
+            // TODO: remove the following case
             case Api.ALL_PATH_POINTS:
                 try {
                     if(jsonObject != null){
@@ -506,13 +508,42 @@ public class WifiPosition implements ActionInterface {
 
     }
 
+    private void buildPathPointModel(String pathPointJson) {
+        try {
+            JSONObject jsonObject = new JSONObject(pathPointJson);
+
+            if(jsonObject != null){
+                model = new ArrayList<Edge>();
+                JSONArray jsonArrayPath = jsonObject.getJSONArray("pathPoints");
+                //Traverse first level
+                for(int i = 0; i < jsonArrayPath.length(); i++){
+                    //Save firstPoint in array
+                    JSONObject firstPoint = jsonArrayPath.getJSONObject(i).getJSONObject("coordinate");
+                    Vertex<Point> firstVertex = new Vertex<>(new Point(firstPoint.getDouble("lat"), firstPoint.getDouble("lng"), firstPoint.getInt("alt")));
+                    allPathPoints.add(new Point(firstPoint.getDouble("lat"), firstPoint.getDouble("lng"), firstPoint.getInt("alt")));
+
+                    JSONArray jsonArrayNeighbours = jsonArrayPath.getJSONObject(i).getJSONArray("neighbours");
+                    //Traverse second level
+                    for(int j = 0; j < jsonArrayNeighbours.length(); j++){
+                        JSONObject secondPoint = jsonArrayNeighbours.getJSONObject(j).getJSONObject("coordinate");
+                        Vertex<Point> secondVertex = new Vertex<>(new Point(secondPoint.getDouble("lat"), secondPoint.getDouble("lng"), secondPoint.getInt("alt")));
+                        model.add(new Edge(firstVertex, secondVertex, jsonArrayNeighbours.getJSONObject(j).getInt("distance")));
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     /**
      * Generate list with "path points" to plot the route on the map
      * @param destination geo coordinates of destination point
      * @return list with "path points" from start to destination
      * @throws PathNotFoundException
      */
-    public List<Point> plotRoute(Point destination) throws PathNotFoundException {
+    public List<Point> plotRoute(Point destination, String pathPointsJson) throws PathNotFoundException {
+        buildPathPointModel(pathPointsJson);
         //Point destination = new Point(68.43609254621903, 17.434575855731964, 1);
         //Point lastSentPosition = new Point(68.43620505217169, 17.433623000979424, 1);
         //Point lastSentPosition = new Point(68.43614836797185, 17.433611266314983, 1)
@@ -535,7 +566,8 @@ public class WifiPosition implements ActionInterface {
      * @return list with "path points" from start to destination
      * @throws PathNotFoundException
      */
-    public List<Point> plotRoute(Point position, Point destination) throws PathNotFoundException {
+    public List<Point> plotRoute(Point position, Point destination, String pathPointsJson) throws PathNotFoundException {
+        buildPathPointModel(pathPointsJson);
         List<Point> result = generateRoute(position, destination);
 
         return result;

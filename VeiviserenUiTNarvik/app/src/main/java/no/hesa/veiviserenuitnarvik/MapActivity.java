@@ -30,6 +30,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -46,6 +47,11 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.gson.Gson;
+import java.lang.reflect.Type;
+
+
+import com.google.gson.reflect.TypeToken;
 import com.indooratlas.android.sdk.IALocationManager;
 import com.indooratlas.android.sdk.resources.IAFloorPlan;
 import com.indooratlas.android.sdk.resources.IALatLng;
@@ -57,6 +63,7 @@ import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
 import com.squareup.picasso.Target;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -67,6 +74,8 @@ import no.hesa.positionlibrary.PositionLibrary;
 import no.hesa.positionlibrary.api.ActionInterface;
 import no.hesa.positionlibrary.api.Api;
 import no.hesa.positionlibrary.dijkstra.exception.PathNotFoundException;
+import no.hesa.positionlibrary.dijkstra.model.Edge;
+import no.hesa.positionlibrary.dijkstra.model.Vertex;
 
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback,ActionInterface{
@@ -105,7 +114,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private LatLngBounds elevationChangeBounds = null;
 
     private String currentFloorPlan;
-    private int currentFloor;
+    private int currentFloor = -100;
     private ArrayList<ArrayList<Point>> receivedPath = null;
 
     private ProgressBar fetchMapSpinner;
@@ -122,6 +131,13 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     ArrayList<Circle> circleList = new ArrayList<Circle>();
 
     private int mapType;
+    private String pathPointJson;
+
+    private SearchView searchView;
+    private Api api;
+    private boolean pathPointsDownloading = false;
+
+    private List<Point> path;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -157,9 +173,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         registerButtonListeners();
 /*
         //Api api = new Api(this, getApplicationContext().getResources());
-        Api api = new Api(this);
+
         api.allUsers();
 */
+
+        api = new Api(this);
         returnedCoordsFromSearchIntent = getIntent();
     }
 
@@ -185,11 +203,20 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 sharedPreferences.putString("CurrentFloorPlan", currentFloorPlan);
             }
 
-            if (currentFloor != 0)
+            if (currentFloor != -100)
             {
                 sharedPreferences.putInt("CurrentFloor", currentFloor);
             }
-            sharedPreferences.commit();
+
+            if (path != null)
+            {
+                Gson gson = new Gson();
+//                java.lang.reflect.Type listType = new TypeToken<List<Point>>(){}.getType();
+                String json = gson.toJson(path /*, listType */);
+
+                sharedPreferences.putString("PathJson", json);
+            }
+            sharedPreferences.apply();
         }
     }
 
@@ -244,7 +271,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         float zoomLevel = sharedPreferences.getFloat("ZoomLevel", 17.0f);
         float lat = sharedPreferences.getFloat("CurrentLat", (float)UIT_NARVIK_POSITION.latitude);
         float lng = sharedPreferences.getFloat("CurrentLng", (float)UIT_NARVIK_POSITION.longitude);
-        int currentFloor = sharedPreferences.getInt("CurrentFloor", UIT_NARVIK_DEFAULTFLOOR);
+        currentFloor = sharedPreferences.getInt("CurrentFloor", UIT_NARVIK_DEFAULTFLOOR);
         currentPosition = new LatLng(lat, lng);
 
         positioningEnabled = sharedPreferences.getBoolean("PositioningEnabled", false);
@@ -252,35 +279,76 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         mMap.setMapType(mapType);
 
+        pathPointJson = sharedPreferences.getString("PathPointJson", null);
+        /*
+        String pathJson = sharedPreferences.getString("PathJson", null);
+        Gson gson = new Gson();
+
+        java.lang.reflect.Type listType = new TypeToken<List<Point>>(){}.getType();
+
+        path = gson.toJson(pathJson, listType);
+        */
+
         // TODO: 28/04/2016 first run only, maybe change to users position via GPS
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lng), zoomLevel));
 
-        if (returnedCoordsFromSearchIntent != null) {
-            if (returnedCoordsFromSearchIntent.getAction() != null) {
-                if (returnedCoordsFromSearchIntent.getAction().equals("no.hesa.veiviserennarvik.LAT_LNG_RETURN")) {
-                    LatLng latLng = new LatLng(returnedCoordsFromSearchIntent.getDoubleExtra("lat",0),returnedCoordsFromSearchIntent.getDoubleExtra("lng",0));
-                    double floor = returnedCoordsFromSearchIntent.getDoubleExtra("floor", 1.0);
-//                    changeFloor((int)floor);
-                    latLng = new LatLng(68.4358635893339, 17.434213757514954);
-                    floor = 1;
+        if (pathPointJson != null) {
+//            showCustomToast(getApplicationContext(), "USING CACHED PATHPOINTS", Toast.LENGTH_SHORT);
+            if (returnedCoordsFromSearchIntent != null) {
+                if (returnedCoordsFromSearchIntent.getAction() != null) {
+                    if (returnedCoordsFromSearchIntent.getAction().equals("no.hesa.veiviserennarvik.LAT_LNG_RETURN")) {
+                        LatLng latLng = new LatLng(returnedCoordsFromSearchIntent.getDoubleExtra("lat", 0), returnedCoordsFromSearchIntent.getDoubleExtra("lng", 0));
+                        double floor = returnedCoordsFromSearchIntent.getDoubleExtra("floor", 1.0);
+//                        changeFloor((int)floor);
+                        latLng = new LatLng(68.4358635893339, 17.434213757514954);
+                        //floor = 1;
 
-                    currentPosition =  new LatLng(68.43548946533, 17.4339371547);
-                    currentFloor = 1;
+                        //currentPosition =  new LatLng(68.43548946533, 17.4339371547);
+                        // currentFloor = 1;
+                        if (floor != currentFloor) {
+                            changeFloor(currentFloor);
+                        }
 
-                    try {
-                        List<Point> path = positionLibrary.wifiPosition.plotRoute(new Point(currentPosition.latitude, currentPosition.longitude, currentFloor), new Point(latLng.latitude, latLng.longitude, (int) floor));
-                        drawFloorPath(path);
+                        try {
+                            path = positionLibrary.wifiPosition.plotRoute(new Point(currentPosition.latitude, currentPosition.longitude, currentFloor), new Point(latLng.latitude, latLng.longitude, (int) floor), pathPointJson);
+                            if (path != null) {
+                                // draw path for this floor if available
+                                List<Point> floorToDraw = null;
+                                if (path != null) {
+                                    floorToDraw = new ArrayList<Point>();
+                                    for (Point point : path) {
+                                        if (point.getFloor() == currentFloor) {
+                                            floorToDraw.add(point);
+                                        }
+                                    }
+                                }
+                                if (floorToDraw != null) {
+                                    drawFloorPath(floorToDraw);
+                                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(path.get(0).getLatitude(), path.get(0).getLongitude()), 19));
+                                }
+                            }
+                        }
+                        catch (PathNotFoundException ex)
+                        {
+                            showCustomToast(getApplicationContext(), getResources().getString(R.string.path_not_found_exception), Toast.LENGTH_SHORT );
+                        }
+
+                        targetPosition = latLng;
                     }
-                    catch (PathNotFoundException ex)
-                    {
-                        showCustomToast(getApplicationContext(), getResources().getString(R.string.path_not_found_exception), Toast.LENGTH_SHORT );
-                    }
-
-                    mMap.addMarker(new MarkerOptions().position(latLng).title("TestLoc2"));
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoomLevel));
-                    targetPosition = latLng;
                 }
             }
+        }
+        else {
+            /*
+            Pathpoints are potentially a substantial download, and to avoid downloading them via
+            the positioning-library they are retrieved and cached in this activity better suited for handling
+            android lifecycle changes, then sent to the library when it's time to plot a route
+             */
+
+            // the searchView is not instantiated at this point,
+            // so we set a variable to hide the search field after initialization
+            pathPointsDownloading = true;
+            api.allPathPoints();
         }
 
         registerOnMapClickReceiver();
@@ -288,8 +356,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 //        registerPathReceiver();
 //        registerSearchLocationReceiver();
     }
-
-
 
     /**
      * Places markers (circles) with polylines connecting them along provided path.
@@ -300,36 +366,14 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
      */
     private LatLng drawFloorPath(List<Point> coordinateList)
     {
-//        ArrayList<Polyline> polylineList = new ArrayList<Polyline>();
-//        ArrayList<LatLng> latLngList = new ArrayList<LatLng>();
-//        ArrayList<Circle> circleList = new ArrayList<Circle>();
-
-
-        for (Polyline polyline : polylineList)
-        {
-            polyline.remove();
-        }
-
-        for (Circle circle : circleList)
-        {
-            circle.remove();
-        }
-
-        polylineList.clear();
-        latLngList.clear();
-        circleList.clear();
-
+        clearDrawnPaths();
 
         LatLng currentPoint = null;
         LatLng previousPoint = null;
 
-        currentFloor = coordinateList.get(0).getFloor(); // all points will be on the same floor
-
         final double CIRCLERADIUS = 1;
         final double DOTRADIUS = 0.20;
         final double SMALLCIRCLERADIUS = 0.10;
-
-        // mMap.clear(); // clears map of all markers
 
         for(int i = 0; i < coordinateList.size(); i++)
         {
@@ -337,24 +381,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             latLngList.add(currentPoint);
 
             // first point
-            if (latLngList.size() == 1)
-            {
-                /*
-                CircleOptions co = new CircleOptions()
-                        .center(currentPoint)
-                        .radius(CIRCLERADIUS)
-                        .strokeColor(getResources().getColor(R.color.route_circle_start_color))
-                        .fillColor(getResources().getColor(R.color.route_circle_start_color))
-                        .zIndex(0.61f);
-
-                circleList.add(mMap.addCircle(co));
-                */
-
+            if (latLngList.size() == 1) {
                 drawUserPosition(currentPoint);
             }
 
-            if (latLngList.size() > 1)
-            {
+            if (latLngList.size() > 1) {
                 previousPoint = new LatLng(coordinateList.get(i - 1).getLatitude(), coordinateList.get(i - 1).getLongitude());
 
                 PolylineOptions po = new PolylineOptions()
@@ -377,8 +408,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
                     circleList.add(mMap.addCircle(co));
                 }
-                else // last point
-                {
+                else { // last point
                     CircleOptions co = new CircleOptions()
                             .center(currentPoint)
                             .radius(CIRCLERADIUS)
@@ -396,47 +426,32 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                             .zIndex(0.61f);
 
                     circleList.add(mMap.addCircle(co));
-/*
-                    BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.ic_path_destination);
-                    MarkerOptions mo = new MarkerOptions()
-                            .position(currentPoint)
-                            .anchor(0.5f, 0.5f)
-                            .icon(icon);
-
-                    Marker m = mMap.addMarker(mo);
-                    */
                 }
             }
         }
         return currentPoint;
     }
-/*
-    private void drawNextFloor()
+
+    private void clearDrawnPaths()
     {
-        if (receivedPath.get(0) != null) {
- //           changeFloor(receivedPath.get(0).get(0).getFloor()); // downloads the floorplan
-
-            LatLng endPoint = drawFloorPath(receivedPath.get(0)); // draws path
-            receivedPath.remove(0); // removes the floor the path has already been drawn on
-
-            if (endPoint != null) {
-                elevationChangeBounds = toBounds(endPoint, 5); // registers a position + radius for elevationChangeBounds
-            }
+        for (Polyline polyline : polylineList) {
+            polyline.remove();
         }
-        else {
-            Toast.makeText(MapActivity.this, "You have arrived at your destination", Toast.LENGTH_SHORT).show();
-            elevationChangeBounds = null; // unregister listener
+
+        for (Circle circle : circleList) {
+            circle.remove();
         }
+
+        polylineList.clear();
+        latLngList.clear();
+        circleList.clear();
     }
-*/
+
     private void drawUserPosition(LatLng currentPosition)
     {
         if (circleOne != null)
             circleOne.remove();
-/*
-        if (circleTwo != null)
-            circleTwo.remove();
-*/
+
         CircleOptions co = new CircleOptions()
                 .center(currentPosition)
                 .radius(1)
@@ -445,55 +460,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 .zIndex(0.50f);
 
         circleOne = mMap.addCircle(co);
-/*
-        co = new CircleOptions()
-                .center(currentPosition)
-                .radius(0.2)
-                .strokeColor(getResources().getColor(R.color.route_circle_end_border_color))
-                .fillColor(getResources().getColor(R.color.route_circle_end_border_color))
-                .zIndex(0.51f);
-
-        circleTwo = mMap.addCircle(co);
-*/
-        /*
-        BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.ic_path_startpoint);
-        MarkerOptions mo = new MarkerOptions()
-                .position(currentPosition)
-                .anchor(0.5f, 0.5f)
-
-                .icon(icon);
-
-        Marker m = mMap.addMarker(mo);
-        */
-/*
-        if (circleThree != null)
-            circleThree.remove();
-
-        //Painting position marker
-        circleThree = mMap.addCircle(new CircleOptions()
-                .center(currentPosition)
-                .radius(1)
-                .strokeColor(getResources().getColor(R.color.user_location_outer_ring))
-                .fillColor(getResources().getColor(R.color.user_location_outer_ring))
-                .zIndex(50));
-
-        circleTwo = mMap.addCircle(new CircleOptions()
-                .center(currentPosition)
-                .radius(0.5)
-                .strokeColor(getResources().getColor(R.color.user_location_middle_ring))
-                .fillColor(getResources().getColor(R.color.user_location_middle_ring))
-                .zIndex(51));
-
-        circleOne = mMap.addCircle(new CircleOptions()
-                .center(currentPosition)
-                .radius(0.25)
-                .strokeColor(getResources().getColor(R.color.user_location_inner_ring))
-                .fillColor(getResources().getColor(R.color.user_location_inner_ring))
-                .zIndex(52));
-*/
-        //circleThree.setCenter(currentPosition);
-        //circleTwo.setCenter(currentPosition);
-        //circleOne.setCenter(currentPosition);
     }
 
     private void changeFloor(int floor)
@@ -541,6 +507,19 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 if (currentFloorPlan.compareTo(getResources().getString(R.string.indooratlas_floor_1_floorplanid)) == 0) {
                     changeFloor(2);
                     mMap.clear();
+                    // draw path for this floor if availableList
+                    List<Point> floorToDraw = null;
+                    if (path != null) {
+                        floorToDraw = new ArrayList<Point>();
+                        for (Point point : path) {
+                            if (point.getFloor() == currentFloor) {
+                                floorToDraw.add(point);
+                            }
+                        }
+                    }
+                    if (floorToDraw != null) {
+                        drawFloorPath(floorToDraw);
+                    }
                 }
             }
         });
@@ -552,6 +531,19 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 if (currentFloorPlan.compareTo(getResources().getString(R.string.indooratlas_floor_2_floorplanid)) == 0) {
                     changeFloor(1);
                     mMap.clear();
+                    // draw path for this floor if availableList
+                    List<Point> floorToDraw = null;
+                    if (path != null) {
+                        floorToDraw = new ArrayList<Point>();
+                        for (Point point : path) {
+                            if (point.getFloor() == currentFloor) {
+                                floorToDraw.add(point);
+                            }
+                        }
+                    }
+                    if (floorToDraw != null) {
+                        drawFloorPath(floorToDraw);
+                    }
                 }
             }
         });
@@ -561,6 +553,17 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             @Override
             public void onClick(View view) {
                 enablePositioning(positioningEnabled, true);
+            }
+        });
+
+        automaticPositioningFab.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                showCustomToast(getApplicationContext(), getResources().getString(R.string.refresh_pathpoints), Toast.LENGTH_LONG);
+                // disable search, show loading etc
+                searchView.setVisibility(View.INVISIBLE);
+                api.allPathPoints();
+                return true;
             }
         });
 
@@ -589,35 +592,15 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             public void onClick(View view) {
                 FloatingActionButton switchMapTypeFab = (FloatingActionButton) findViewById(R.id.fab_switch_map_type);
 
-                LatLng latLng = new LatLng(68.4358635893339, 17.434213757514954);
-                int floor = 1;
-
-//                currentPosition =  new LatLng(68.43548946533, 17.4339371547);
-
-                currentFloor = 1;
-
-                try {
-                    List<Point> path = positionLibrary.wifiPosition.plotRoute(new Point(currentPosition.latitude, currentPosition.longitude, currentFloor), new Point(latLng.latitude, latLng.longitude, (int) floor));
-                    if (path != null) {
-                        drawFloorPath(path);
-                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(path.get(0).getLatitude(), path.get(0).getLongitude()), 19));
-                    }
-
+                if (mapType == mMap.MAP_TYPE_NORMAL) {
+                    switchMapTypeFab.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_location_city_white_24dp));
+                    mapType = mMap.MAP_TYPE_NONE;
                 }
-                catch (PathNotFoundException ex)
-                {
-                    showCustomToast(getApplicationContext(), getResources().getString(R.string.path_not_found_exception), Toast.LENGTH_SHORT );
+                else {
+                    switchMapTypeFab.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_public_white_24dp));
+                    mapType = mMap.MAP_TYPE_NORMAL;
                 }
-//
-//                if (mapType == mMap.MAP_TYPE_NORMAL) {
-//                    switchMapTypeFab.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_location_city_white_24dp));
-//                    mapType = mMap.MAP_TYPE_NONE;
-//                }
-//                else {
-//                    switchMapTypeFab.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_public_white_24dp));
-//                    mapType = mMap.MAP_TYPE_NORMAL;
-//                }
-//                mMap.setMapType(mapType);
+                mMap.setMapType(mapType);
             }
         });
     }
@@ -667,7 +650,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 }
             }
         }
-        sharedPreferences.commit();
+        sharedPreferences.apply();
     }
 
 //region BROADCASTRECEIVERS
@@ -685,7 +668,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 mMarker.setDraggable(true);
                 mMarker.showInfoWindow();
                 currentPosition = new LatLng(point.latitude, point.longitude);
-
+                clearDrawnPaths();
                 drawUserPosition(currentPosition);
             }
         });
@@ -706,13 +689,15 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                         currentPosition = latLng;
 
                         drawUserPosition(currentPosition);
-                        //TODO: set to current zoom level, but have the first update zoom to 20
-                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentPosition, 20));
+                        //TODO: set to current zoom level, but have the first update zoom to 19
+                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentPosition, 19));
 
                         if (floor != currentFloor) {
                             changeFloor(floor);
                             mMap.clear();
                         }
+
+                        currentFloor = floor;
 /*
                         if (elevationChangeBounds != null) {
                             if (elevationChangeBounds.contains(latLng)) {
@@ -731,23 +716,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         positionLibrary.wifiPosition.registerBroadcast(this);
         registerReceiver(positionLibOutputReceiver, new IntentFilter("no.hesa.positionlibrary.Output"));
     }
-/*
+
     private void registerPathReceiver()
     {
-        pathPositionLibReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                if (intent.getAction().equals("no.hesa.positionlibrary.Output")) { // change
 
-                }
-            }
-        };
-
-
-        positionLibrary.wifiPosition.registerBroadcast(this);
-        registerReceiver(pathPositionLibReceiver, new IntentFilter("no.hesa.positionlibrary.Output")); // change
     }
-    */
+
 /*
     private void registerSearchLocationReceiver()
     {
@@ -909,9 +883,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
 
         // Retrieve the SearchView and plug it into SearchManager
-        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
-        // searchView.setIconifiedByDefault(false); // autoexpands the search field
-        searchView.setMaxWidth(Integer.MAX_VALUE);
+        searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
+        // searchView.setIconifiedByDefault(false); // autoexpands the searchfield
+        if (pathPointsDownloading) {
+            searchView.setVisibility(View.INVISIBLE);
+        }
+        searchView.setMaxWidth(Integer.MAX_VALUE); // sets the width of the search field to a very large number to keep it maximized
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName("no.hesa.veiviserenuitnarvik","no.hesa.veiviserenuitnarvik.SearchResultsActivity")));
 
@@ -970,7 +947,30 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             case Api.ALL_USERS:
                 //JSONObject dummyObject = jsonObject;
                 break;
-            case Api.DO_SEARCH:
+            case Api.ALL_PATH_POINTS:
+                try {
+                    if(jsonObject != null){
+                        // enable search, show download completed etc
+                        searchView.setVisibility(View.VISIBLE);
+                        pathPointsDownloading = false;
+                        pathPointJson = jsonObject.toString();
+
+                        /*
+                         SharedPreferences can theoretically hold a string 2^31 bits in length,
+                         however you are limited to heap size which can be as low as 16MB on some devices.
+                         The 141 path points in our test enviroment are 103kB so for simplicitys sake (and time constraints)
+                         we will cache the pathpoint list in sharedpreferences. Ideally we would set up an SQLite DB
+                         combined with an API call returning a hash (to determine if the pathlist has been updated)
+                         for scaling with a very large amount of points.
+                         */
+                        SharedPreferences.Editor sharedPreferences = getSharedPreferences("MapActivityPrefs", MODE_PRIVATE).edit();
+                        sharedPreferences.putString("PathPointJson", jsonObject.toString());
+                        sharedPreferences.apply();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                break;
 
             default:
                 break;
