@@ -75,8 +75,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private final LatLng UIT_NARVIK_POSITION = new LatLng(68.43590708f, 17.43452958f);
     private final float UIT_NARVIK_ZOOMLEVEL = 17.4f;
     private final int UIT_NARVIK_DEFAULTFLOOR = 1;
-    private static final int POLYLINEWIDTH = 4;
-    private static String DEFAULT_FLOORPLAN;
+    private final int POLYLINEWIDTH = 20;
+    private String DEFAULT_FLOORPLAN;
 
     /* used to decide when bitmap should be downscaled */
     private static final int MAX_DIMENSION = 2048;
@@ -116,6 +116,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private Circle circleThree;
     private Circle circleTwo;
     private Circle circleOne;
+
+    ArrayList<Polyline> polylineList = new ArrayList<Polyline>();
+    ArrayList<LatLng> latLngList = new ArrayList<LatLng>();
+    ArrayList<Circle> circleList = new ArrayList<Circle>();
 
     private int mapType;
 
@@ -260,7 +264,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     latLng = new LatLng(68.4358635893339, 17.434213757514954);
                     floor = 1;
 
-                    currentPosition =  new LatLng(68.43611842, 17.43462983);
+                    currentPosition =  new LatLng(68.43548946533, 17.4339371547);
                     currentFloor = 1;
 
                     try {
@@ -283,34 +287,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 //        registerPositionReceiver();
 //        registerPathReceiver();
 //        registerSearchLocationReceiver();
-
-
-//region RECEIVEDPATH PLACEHOLDER
-        receivedPath = new ArrayList<ArrayList<Point>>();
-        ArrayList<Point> andreetg = new ArrayList<>();
-        andreetg.add(new Point(68.4362723, 17.4353580, 2));
-        andreetg.add(new Point(68.4361468, 17.4352132, 2));
-        andreetg.add(new Point(68.4361089, 17.4352722, 2));
-        andreetg.add(new Point(68.4360255, 17.4351280, 2));
-        andreetg.add(new Point(68.4359827, 17.4353097, 2));
-
-        ArrayList<Point> forstetg = new ArrayList<>();
-        forstetg.add(new Point(68.4361723, 17.4353580, 1));
-        forstetg.add(new Point(68.4360468, 17.4352132, 1));
-        forstetg.add(new Point(68.4360089, 17.4352722, 1));
-        forstetg.add(new Point(68.4359255, 17.4351280, 1));
-        forstetg.add(new Point(68.4358827, 17.4353097, 1));
-
-        receivedPath.add(andreetg);
-        receivedPath.add(forstetg);
-//endregion
-
-        // order of floor traversal
-        if (receivedPath != null) {
-        //    drawNextFloor();
-        }
-
-        // TODO: add button to change floor after a path has been drawn
     }
 
 
@@ -324,15 +300,34 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
      */
     private LatLng drawFloorPath(List<Point> coordinateList)
     {
-        ArrayList<Polyline> polylineList = new ArrayList<Polyline>();
-        ArrayList<LatLng> latLngList = new ArrayList<LatLng>();
-        ArrayList<Circle> circleList = new ArrayList<Circle>();
+//        ArrayList<Polyline> polylineList = new ArrayList<Polyline>();
+//        ArrayList<LatLng> latLngList = new ArrayList<LatLng>();
+//        ArrayList<Circle> circleList = new ArrayList<Circle>();
+
+
+        for (Polyline polyline : polylineList)
+        {
+            polyline.remove();
+        }
+
+        for (Circle circle : circleList)
+        {
+            circle.remove();
+        }
+
+        polylineList.clear();
+        latLngList.clear();
+        circleList.clear();
+
+
         LatLng currentPoint = null;
         LatLng previousPoint = null;
 
         currentFloor = coordinateList.get(0).getFloor(); // all points will be on the same floor
 
-        final double CIRCLERADIUS = 0.25;
+        final double CIRCLERADIUS = 1;
+        final double DOTRADIUS = 0.20;
+        final double SMALLCIRCLERADIUS = 0.10;
 
         // mMap.clear(); // clears map of all markers
 
@@ -344,14 +339,18 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             // first point
             if (latLngList.size() == 1)
             {
+                /*
                 CircleOptions co = new CircleOptions()
                         .center(currentPoint)
                         .radius(CIRCLERADIUS)
                         .strokeColor(getResources().getColor(R.color.route_circle_start_color))
                         .fillColor(getResources().getColor(R.color.route_circle_start_color))
-                        .zIndex(0.7f);
+                        .zIndex(0.61f);
 
                 circleList.add(mMap.addCircle(co));
+                */
+
+                drawUserPosition(currentPoint);
             }
 
             if (latLngList.size() > 1)
@@ -363,7 +362,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                         .width(POLYLINEWIDTH)
                         .color(getResources().getColor(R.color.route_polyline_color))
                         .geodesic(false)
-                        .zIndex(0.4f); // lat/long lines curved by the shape of the planet
+                        .zIndex(0.45f);
 
                 polylineList.add(mMap.addPolyline(po));
 
@@ -371,10 +370,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 if (latLngList.size() < coordinateList.size()) {
                     CircleOptions co = new CircleOptions()
                             .center(currentPoint)
-                            .radius(CIRCLERADIUS)
+                            .radius(SMALLCIRCLERADIUS)
                             .strokeColor(getResources().getColor(R.color.route_circle_color))
                             .fillColor(getResources().getColor(R.color.route_circle_color))
-                            .zIndex(0.7f);
+                            .zIndex(0.61f);
 
                     circleList.add(mMap.addCircle(co));
                 }
@@ -383,11 +382,29 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     CircleOptions co = new CircleOptions()
                             .center(currentPoint)
                             .radius(CIRCLERADIUS)
-                            .strokeColor(getResources().getColor(R.color.route_circle_end_color))
+                            .strokeColor(getResources().getColor(R.color.route_circle_end_border_color))
                             .fillColor(getResources().getColor(R.color.route_circle_end_color))
-                            .zIndex(0.7f);
+                            .zIndex(0.61f);
 
                     circleList.add(mMap.addCircle(co));
+
+                    co = new CircleOptions()
+                            .center(currentPoint)
+                            .radius(DOTRADIUS)
+                            .strokeColor(getResources().getColor(R.color.route_circle_end_border_color))
+                            .fillColor(getResources().getColor(R.color.route_circle_end_border_color))
+                            .zIndex(0.61f);
+
+                    circleList.add(mMap.addCircle(co));
+/*
+                    BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.ic_path_destination);
+                    MarkerOptions mo = new MarkerOptions()
+                            .position(currentPoint)
+                            .anchor(0.5f, 0.5f)
+                            .icon(icon);
+
+                    Marker m = mMap.addMarker(mo);
+                    */
                 }
             }
         }
@@ -416,38 +433,67 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     {
         if (circleOne != null)
             circleOne.remove();
-
+/*
         if (circleTwo != null)
             circleTwo.remove();
+*/
+        CircleOptions co = new CircleOptions()
+                .center(currentPosition)
+                .radius(1)
+                .strokeColor(getResources().getColor(R.color.route_circle_end_border_color))
+                .fillColor(getResources().getColor(R.color.route_circle_end_color))
+                .zIndex(0.50f);
 
+        circleOne = mMap.addCircle(co);
+/*
+        co = new CircleOptions()
+                .center(currentPosition)
+                .radius(0.2)
+                .strokeColor(getResources().getColor(R.color.route_circle_end_border_color))
+                .fillColor(getResources().getColor(R.color.route_circle_end_border_color))
+                .zIndex(0.51f);
+
+        circleTwo = mMap.addCircle(co);
+*/
+        /*
+        BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.ic_path_startpoint);
+        MarkerOptions mo = new MarkerOptions()
+                .position(currentPosition)
+                .anchor(0.5f, 0.5f)
+
+                .icon(icon);
+
+        Marker m = mMap.addMarker(mo);
+        */
+/*
         if (circleThree != null)
             circleThree.remove();
 
         //Painting position marker
         circleThree = mMap.addCircle(new CircleOptions()
                 .center(currentPosition)
-                .radius(3)
+                .radius(1)
                 .strokeColor(getResources().getColor(R.color.user_location_outer_ring))
                 .fillColor(getResources().getColor(R.color.user_location_outer_ring))
                 .zIndex(50));
 
         circleTwo = mMap.addCircle(new CircleOptions()
                 .center(currentPosition)
-                .radius(1.5)
+                .radius(0.5)
                 .strokeColor(getResources().getColor(R.color.user_location_middle_ring))
                 .fillColor(getResources().getColor(R.color.user_location_middle_ring))
                 .zIndex(51));
 
         circleOne = mMap.addCircle(new CircleOptions()
                 .center(currentPosition)
-                .radius(0.5)
+                .radius(0.25)
                 .strokeColor(getResources().getColor(R.color.user_location_inner_ring))
                 .fillColor(getResources().getColor(R.color.user_location_inner_ring))
                 .zIndex(52));
-
-        circleThree.setCenter(currentPosition);
-        circleTwo.setCenter(currentPosition);
-        circleOne.setCenter(currentPosition);
+*/
+        //circleThree.setCenter(currentPosition);
+        //circleTwo.setCenter(currentPosition);
+        //circleOne.setCenter(currentPosition);
     }
 
     private void changeFloor(int floor)
@@ -543,15 +589,35 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             public void onClick(View view) {
                 FloatingActionButton switchMapTypeFab = (FloatingActionButton) findViewById(R.id.fab_switch_map_type);
 
-                if (mapType == mMap.MAP_TYPE_NORMAL) {
-                    switchMapTypeFab.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_location_city_white_24dp));
-                    mapType = mMap.MAP_TYPE_NONE;
+                LatLng latLng = new LatLng(68.4358635893339, 17.434213757514954);
+                int floor = 1;
+
+//                currentPosition =  new LatLng(68.43548946533, 17.4339371547);
+
+                currentFloor = 1;
+
+                try {
+                    List<Point> path = positionLibrary.wifiPosition.plotRoute(new Point(currentPosition.latitude, currentPosition.longitude, currentFloor), new Point(latLng.latitude, latLng.longitude, (int) floor));
+                    if (path != null) {
+                        drawFloorPath(path);
+                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(path.get(0).getLatitude(), path.get(0).getLongitude()), 19));
+                    }
+
                 }
-                else {
-                    switchMapTypeFab.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_public_white_24dp));
-                    mapType = mMap.MAP_TYPE_NORMAL;
+                catch (PathNotFoundException ex)
+                {
+                    showCustomToast(getApplicationContext(), getResources().getString(R.string.path_not_found_exception), Toast.LENGTH_SHORT );
                 }
-                mMap.setMapType(mapType);
+//
+//                if (mapType == mMap.MAP_TYPE_NORMAL) {
+//                    switchMapTypeFab.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_location_city_white_24dp));
+//                    mapType = mMap.MAP_TYPE_NONE;
+//                }
+//                else {
+//                    switchMapTypeFab.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_public_white_24dp));
+//                    mapType = mMap.MAP_TYPE_NORMAL;
+//                }
+//                mMap.setMapType(mapType);
             }
         });
     }
@@ -619,6 +685,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 mMarker.setDraggable(true);
                 mMarker.showInfoWindow();
                 currentPosition = new LatLng(point.latitude, point.longitude);
+
+                drawUserPosition(currentPosition);
             }
         });
     }

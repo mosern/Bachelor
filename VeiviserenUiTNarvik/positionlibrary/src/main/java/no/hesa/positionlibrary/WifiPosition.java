@@ -537,6 +537,7 @@ public class WifiPosition implements ActionInterface {
      */
     public List<Point> plotRoute(Point position, Point destination) throws PathNotFoundException {
         List<Point> result = generateRoute(position, destination);
+
         return result;
     }
 
