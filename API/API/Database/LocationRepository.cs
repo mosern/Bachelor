@@ -124,9 +124,9 @@ namespace Api.Classes
 
         #endregion
 
-        public IQueryable<X> List()
+        public DbSet<X> List()
         {
-            return Entities.AsQueryable();
+            return Entities;
         }
 
         private DbSet<X> Entities

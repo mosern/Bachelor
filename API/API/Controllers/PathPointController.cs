@@ -4,6 +4,7 @@ using Api.Models.Api;
 using Api.Models.EF;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -34,7 +35,7 @@ namespace Api.Controllers
             object toReturn;
             using (var repo = new LocationRepository<PathPoint>())
             {
-                pathPoints = repo.List();
+                pathPoints = repo.List().Include(p => p.Coordinate).AsQueryable();
 
                 toReturn = ControllerHelper.get<PathPointNeighbourViewModel>(pathPoints, HttpContext.Current, Request, "pathPoints", asObject, objPropName, fields, sort, page, pageSize);
             }
