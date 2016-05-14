@@ -1,4 +1,5 @@
-﻿@model AdmAspNet.Models.ViewModels.PeopleViewModel
+﻿
+@model AdmAspNet.Models.ViewModels.PeopleViewModel
 
 @{
     ViewBag.Title = "Rediger person";
@@ -14,6 +15,14 @@
     
     <div class="form-horizontal">
         <h4>Person</h4>
+        @if (ViewBag.SuccessMessage != null)
+        {
+            Html.RenderPartial("_SuccessPartial");
+        }
+        @if (ViewBag.ErrorMessage != null)
+        {
+            Html.RenderPartial("_ErrorPartial");
+        }
         <hr />
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
         @Html.HiddenFor(model => model.Id)

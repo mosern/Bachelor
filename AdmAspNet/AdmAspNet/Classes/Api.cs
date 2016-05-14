@@ -78,12 +78,23 @@ namespace AdmAspNet.Classes
             return PostApi(url, location);
         }
 
+        /// <summary>
+        /// Update a location in the database
+        /// </summary>
+        /// <param name="id">The id of the location to be updated</param>
+        /// <param name="location">The updated object</param>
+        /// <returns>True if successful, false if not</returns>
         public bool UpdateLocation(int id, Location location)
         {
             string url = ConfigurationManager.AppSettings["apiLocations"]+"/"+id;
             return PutApi(url, location); 
         }
 
+        /// <summary>
+        /// Delete a location in the database
+        /// </summary>
+        /// <param name="id">The id of the object to be deleted</param>
+        /// <returns></returns>
         public bool DeleteLocation(int id)
         {
             string url = ConfigurationManager.AppSettings["apiLocations"] + "/" + id;
@@ -179,21 +190,31 @@ namespace AdmAspNet.Classes
         /// <summary>
         /// Update an access point 
         /// </summary>
-        /// <param name="id"></param>
-        /// <param name="accessPoint"></param>
-        /// <returns></returns>
+        /// <param name="id">The id of the access point</param>
+        /// <param name="accessPoint">The object with updated fields</param>
+        /// <returns>True if successful, false if not</returns>
         public bool UpdateAccessPoint(int id, AccessPoint accessPoint)
         {
             string url = ConfigurationManager.AppSettings["apiAccessPoints"] + "/" + id;
             return PutApi(url, accessPoint); 
         }
 
+        /// <summary>
+        /// Delete an access point 
+        /// </summary>
+        /// <param name="id">The id of the access point to be deleted</param>
+        /// <returns>True if successful, false if not</returns>
         public bool DeleteAccessPoint(int id)
         {
             string url = ConfigurationManager.AppSettings["apiAccessPoints"] + "/" + id;
             return DeleteObject(url); 
         }
 
+        /// <summary>
+        /// Get an access point with a specified id 
+        /// </summary>
+        /// <param name="id">The id of the access point</param>
+        /// <returns>The specified accesss point if it exists, null if not</returns>
         public AccessPoint GetAccessPointById(int id)
         {
             string url = ConfigurationManager.AppSettings["apiAccessPoints"] + "/" + id;
@@ -202,24 +223,44 @@ namespace AdmAspNet.Classes
         #endregion
 
         #region PathPointMethods
+        /// <summary>
+        /// Get a list with all the pathpoints
+        /// </summary>
+        /// <returns>A list of pathpoints</returns>
         public List<PathPoint> GetAllPathPoints()
         {
             string url = ConfigurationManager.AppSettings["apiPathPoints"] + "/?asObject=false";
             return CallApi<List<PathPoint>>(url); 
         }
 
+        /// <summary>
+        /// Adds a pathpoint to the database
+        /// </summary>
+        /// <param name="data">The pathpoint to add</param>
+        /// <returns>True if successful, false if not</returns>
         public bool PostPathPoint(PathPoint data)
         {
             string url = ConfigurationManager.AppSettings["apiPathPoints"];
             return PostApi(url, data); 
         }
 
+        /// <summary>
+        /// Returns a pathpoint with a specific ID
+        /// </summary>
+        /// <param name="id">The id of the pathpoint to return</param>
+        /// <returns>The pathpoint with the specific id</returns>
         public PathPoint GetPathPointById(int id)
         {
             string url = ConfigurationManager.AppSettings["apiPathPoints"] + "/" + id;
             return CallApi<PathPoint>(url); 
         }
 
+        /// <summary>
+        /// Update a pathpoint
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="data"></param>
+        /// <returns></returns>
         public bool UpdatePathPoint(int id, PathPoint data)
         {
             string url = ConfigurationManager.AppSettings["apiPathPoints"] + "/" + id;
@@ -278,6 +319,18 @@ namespace AdmAspNet.Classes
             string url = ConfigurationManager.AppSettings["apiPeople"];
             return PostApi(url, data); 
         }
+
+        public People GetPeopleById(int id)
+        {
+            string url = ConfigurationManager.AppSettings["apiPeople"] + "/" + id;
+            return CallApi<People>(url); 
+        }
+
+        public bool UpdatePeople(int id,People data)
+        {
+            string url = ConfigurationManager.AppSettings["apiPeople"] + "/" + id;
+            return PutApi(url, data); 
+        }
         #endregion
 
         #region HelperMethods
@@ -333,6 +386,13 @@ namespace AdmAspNet.Classes
             return false;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="url"></param>
+        /// <param name="data"></param>
+        /// <returns></returns>
         private bool PutApi<T>(string url, T data) where T : class {
             using (var client = SetupClient())
             {
@@ -377,14 +437,14 @@ namespace AdmAspNet.Classes
         private HttpClient SetupClient()
         {
             HttpClient client = new HttpClient(); 
-                if (token != null)
-                {
-                    client.SetBearerToken(token);
-                }
-                client.BaseAddress = new Uri(apiBaseAddress);
-                client.DefaultRequestHeaders.Accept.Clear();
-                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                return client; 
+            if (token != null)
+            {
+                client.SetBearerToken(token);
+            }
+            client.BaseAddress = new Uri(apiBaseAddress);
+            client.DefaultRequestHeaders.Accept.Clear();
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            return client; 
         }
         #endregion
 

@@ -96,7 +96,58 @@ namespace AdmAspNet.Controllers
                 ViewBag.ErrorMessage = "Du må spesifisere en ID";
                 return View("ErrorView"); 
             }
-            return View();  
+            People data; 
+            if ((data = api.GetPeopleById(id.Value)) == null)
+            {
+                ViewBag.ErrorMessage = "Kan ikke finne personen du forespurte";
+                return View("ErrorView"); 
+            }
+            var mapper = mapConfig.CreateMapper();
+            PeopleViewModel viewModel = mapper.Map<PeopleViewModel>(data);
+            List<Location> listLocation = api.GetAllLocations();
+            if (listLocation.Count == 0)
+            {
+                viewModel.DropDown = new SelectList(listLocation);
+
+            }
+            else
+            {
+                var ordered = listLocation.OrderBy(x => x.LocNr);
+                viewModel.DropDown = new SelectList(ordered, "Id", "LocNr", ordered.Where(p => p.Id == viewModel.Location.Id).First().Id);
+            }
+            return View(viewModel);  
+        }
+
+        [HttpPost]
+        public ActionResult Edit(int id, PeopleViewModel data)
+        {
+            People people; 
+            if ((people = api.GetPeopleById(id)) == null)
+            {
+                ViewBag.ErrorMessage = "Kan ikke finne personen du forespurte";
+                return View("ErrorView"); 
+            }
+            var mapper = mapConfig.CreateMapper();
+            People edit = mapper.Map<People>(data); 
+            if (api.UpdatePeople(id,edit))
+            {
+                ViewBag.SuccessMessage = "Personen ble oppdatert"; 
+            }
+            else
+            {
+                ViewBag.ErrorMessage = "En feil oppstod, kontakt en systemadministrator"; 
+            }
+            List<Location> listLocation = api.GetAllLocations(); 
+            if (listLocation.Count == 0)
+            {
+                data.DropDown = new SelectList(listLocation); 
+            }
+            else
+            {
+                var ordered = listLocation.OrderBy(x => x.LocNr);
+                data.DropDown = new SelectList(ordered, "Id", "LocNr", ordered.Where(p => p.Id == data.Location.Id).First().Id); 
+            }
+            return View(data); 
         }
         protected override void Initialize(RequestContext requestContext)
         {
