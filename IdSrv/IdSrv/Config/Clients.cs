@@ -23,7 +23,7 @@ namespace IdSrv.Config
                     ClientName = "Adm",
                     ClientId = "adm",
                     Flow = Flows.Hybrid,
-                    RequireConsent = true,
+                    RequireConsent = false,
 
                     RedirectUris = new List<string>
                     {
@@ -51,6 +51,7 @@ namespace IdSrv.Config
                     ClientName = "Android",
                     ClientId = "and",
                     Flow = Flows.Implicit,
+                    RequireConsent = false,
 
                     RedirectUris = new List<string>
                     {
