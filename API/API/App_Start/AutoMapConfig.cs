@@ -389,26 +389,31 @@ namespace Api
             foreach (PathPoint point in source)
             {
                 List<object> neighbours = new List<object>();
-                List<PathNeighbour> temp = pathNeighbours.Where(p => p.PathPointId1 == point.Id || p.PathPointId2 == point.Id).ToList();
 
-                Location neighbour = locations.Where(l => l.NeighbourId.Value == point.Id).FirstOrDefault();
-                if (neighbour != null)
-                    neighbours.Add(new { ID = neighbour.Id, Distance = neighbour.Distance, Coordinate = AutoMapConfig.getMapper().Map<Coordinate, CoordinateViewModel>(neighbour.Coordinate) });
+                if (point.NeighbourCount != 0) {
+                    List<PathNeighbour> temp = pathNeighbours.Where(p => p.PathPointId1 == point.Id || p.PathPointId2 == point.Id).ToList();
 
-                foreach (PathNeighbour path in temp)
-                {
-                    if (path.PathPointId1 == point.Id)
+                    Location neighbour = locations.Where(l => l.NeighbourId.Value == point.Id).FirstOrDefault();
+                    if (neighbour != null)
+                        neighbours.Add(new { ID = neighbour.Id, Distance = neighbour.Distance, Coordinate = AutoMapConfig.getMapper().Map<Coordinate, CoordinateViewModel>(neighbour.Coordinate) });
+
+                    foreach (PathNeighbour path in temp)
                     {
-                        var pathPoint = path.PathPoint2;
-                        neighbours.Add(new { ID = pathPoint.Id, Distance = path.Distance, Coordinate = AutoMapConfig.getMapper().Map<Coordinate, CoordinateViewModel>(pathPoint.Coordinate) });
-                    }
-                    else
-                    {
-                        var pathPoint = path.PathPoint1;
-                        neighbours.Add(new { ID = pathPoint.Id, Distance = path.Distance, Coordinate = AutoMapConfig.getMapper().Map<Coordinate, CoordinateViewModel>(pathPoint.Coordinate) });
+                        if (neighbours.Count == point.NeighbourCount)
+                            break;
+
+                        if (path.PathPointId1 == point.Id)
+                        {
+                            var pathPoint = path.PathPoint2;
+                            neighbours.Add(new { ID = pathPoint.Id, Distance = path.Distance, Coordinate = AutoMapConfig.getMapper().Map<Coordinate, CoordinateViewModel>(pathPoint.Coordinate) });
+                        }
+                        else
+                        {
+                            var pathPoint = path.PathPoint1;
+                            neighbours.Add(new { ID = pathPoint.Id, Distance = path.Distance, Coordinate = AutoMapConfig.getMapper().Map<Coordinate, CoordinateViewModel>(pathPoint.Coordinate) });
+                        }
                     }
                 }
-
                 dest.Add(new PathPointNeighbourViewModel()
                 {
                     Id = point.Id,

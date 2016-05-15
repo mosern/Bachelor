@@ -182,6 +182,19 @@ namespace Api.Controllers
                     if (pathPoint != null)
                     {
                         ControllerHelper.Delete<PathNeighbour>(id);
+
+                        using (var pointRepo = new LocationRepository<PathPoint>())
+                        {
+                            var point1 = pointRepo.Read(pathPoint.PathPoint1.Id);
+                            var point2 = pointRepo.Read(pathPoint.PathPoint2.Id);
+
+                            point1.NeighbourCount -= 1;
+                            point2.NeighbourCount -= 1;
+
+                            pointRepo.Update(point1);
+                            pointRepo.Update(point2);
+                        }
+
                         return Ok();
                     }
                     else
