@@ -60,7 +60,6 @@ namespace Api.Classes
                     using (var repo = new LocationRepository<UserLocation>())
                     {
                         var userC = user as ClaimsPrincipal;
-                        var test = userC.HasClaim("roles", "username");
                         string username = userC.FindFirst("username").Value;
                         var dbUser = userRepo.List().Where(u => u.Username == username).FirstOrDefault();
                         var userLoc = repo.List().Where(u => u.LocationId == loc.Id && u.User.Id == dbUser.Id).FirstOrDefault();
