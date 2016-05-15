@@ -87,7 +87,21 @@ namespace Api.Controllers
 
             try
             {
-                return Created("api/neighbours", ControllerHelper.post<PathNeighbour, NeighbourViewModel>(neighbour));
+                var created = ControllerHelper.post<PathNeighbour, NeighbourViewModel>(neighbour);
+
+                using (var repo = new LocationRepository<PathPoint>())
+                {
+                    var point1 = repo.Read(neighbour.pathPoint1.Id.Value);
+                    var point2 = repo.Read(neighbour.pathPoint2.Id.Value);
+
+                    point1.NeighbourCount += 1;
+                    point2.NeighbourCount += 1;
+
+                    repo.Update(point1);
+                    repo.Update(point2);
+                }
+
+                return Created("api/neighbours", created);
             }
             catch
             {
