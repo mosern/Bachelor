@@ -99,7 +99,7 @@ namespace Api.Helpers
                     routeValues.Add("sort", sort);
 
                     if (page != null)
-                        context.Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(PaginationHeader.Get(page.Value, pageSize.Value, obj.Count(), "objects", routeValues, request)));
+                        context.Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(PaginationHeader.Get(page.Value, pageSize.Value, obj.Count(), routeName, routeValues, request)));
 
                     var toReturn = AutoMapConfig.getMapper().Map<IEnumerable<object>, IEnumerable<X>>(temp).AsQueryable();
 
