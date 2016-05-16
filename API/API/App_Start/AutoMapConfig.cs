@@ -32,6 +32,7 @@ namespace Api
 
                 c.CreateMap<Location, LocationViewModel>().ConvertUsing<LocationViewTypeConverter>();
                 c.CreateMap<LocationViewModel, Location>().ConvertUsing<ViewLocationTypeConverter>();
+                c.CreateMap<IEnumerable<Location>, IEnumerable<LocationViewModel>>().ConvertUsing<IEnumLocationViewTypeConverter>();
 
                 c.CreateMap<Coordinate, CoordinateViewModel>();
                 c.CreateMap<CoordinateViewModel, Coordinate>();
@@ -270,6 +271,52 @@ namespace Api
                 dest.NeighbourId = source.NeighbourId.Value;
             }
                 
+
+            return dest;
+        }
+    }
+
+    public class IEnumLocationViewTypeConverter : ITypeConverter<IEnumerable<Location>, IEnumerable<LocationViewModel>>
+    {
+        public IEnumerable<LocationViewModel> Convert(ResolutionContext context)
+        {
+            IEnumerable<Location> source = (IEnumerable<Location>)context.SourceValue;
+            List<LocationViewModel> dest = new List<LocationViewModel>();
+
+            IEnumerable<Coordinate> coordinates;
+            IEnumerable<Models.EF.Type> types;
+
+            using (var repo = new LocationRepository<Coordinate>())
+                coordinates = repo.List().ToList();
+
+            using (var repo = new LocationRepository<Models.EF.Type>())
+                types = repo.List().ToList();
+
+            foreach(Location loc in source)
+            {
+                var temp = new LocationViewModel()
+                {
+                    Id = loc.Id,
+                    Name = loc.Name,
+                    Desc = loc.Desc,
+                    Hits = loc.Hits,
+                    LocNr = loc.LocNr,
+                    Coordinate = AutoMapConfig.getMapper().Map<Coordinate, CoordinateViewModel>(coordinates.Where(c => c.Id == loc.CoordinateId).FirstOrDefault()),
+                    Type = AutoMapConfig.getMapper().Map<Models.EF.Type, TypeViewModel>(types.Where(t => t.Id == loc.TypeId).FirstOrDefault()),
+                    Distance = loc.Distance
+                };
+
+                if (loc.NeighbourId == null)
+                {
+                    temp.NeighbourId = 0;
+                }
+                else
+                {
+                    temp.NeighbourId = loc.NeighbourId.Value;
+                }
+
+                dest.Add(temp);
+            }
 
             return dest;
         }
