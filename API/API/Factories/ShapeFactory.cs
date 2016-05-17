@@ -9,7 +9,7 @@ using System.Web;
 namespace Api.Factories
 {
     /// <summary>
-    /// Generic class that shapes an object, base on the spesified fields. Has methodes for both individual objects and lists of objects
+    /// Generic class that shapes an object, based on the spesified fields. Has methodes for both individual objects and lists of objects
     /// </summary>
     /// <typeparam name="X">a ViewModel</typeparam>
     public class ShapeFactory<X> where X : BaseViewModel

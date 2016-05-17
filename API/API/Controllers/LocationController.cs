@@ -33,6 +33,7 @@ namespace Api.Controllers
         /// <param name="search">Optional. search for location and/or people with a string</param>
         /// <returns>200 ok with processed list of all locations in the database</returns>
         [Route("locations", Name = "locations")]
+        [ResourceAuthorize("read", "location")]
         public IHttpActionResult Get(string fields = null, string sort = "id", int? page = null, int pageSize = stdPageSize, bool asObject = true, string objPropName = "locations", string search = null)
         {
             var mapper = AutoMapConfig.getMapper();
@@ -93,7 +94,7 @@ namespace Api.Controllers
         /// <param name="fields">Optional. The fields to include in returned object. Returns all fields if no field is specified</param>
         /// <returns>200 ok with processed location object</returns>
         [Route("locations/{id}")]
-        [ResourceAuthorize("Read", "location")]
+        [ResourceAuthorize("read", "location")]
         public IHttpActionResult Get(int id, string fields = null)
         {
             Location location;
@@ -119,6 +120,7 @@ namespace Api.Controllers
         /// <param name="location">locationViewModel with info about the location to create</param>
         /// <returns>201 created with the new object</returns>
         [Route("locations")]
+        [ResourceAuthorize("write", "location")]
         public IHttpActionResult Post(LocationViewModel location)
         {
             if (!ModelState.IsValid)
@@ -141,6 +143,7 @@ namespace Api.Controllers
         /// <param name="id">Id of the location to be updated</param>
         /// <returns>200 ok</returns>
         [Route("locations/{id}")]
+        [ResourceAuthorize("edit", "location")]
         public IHttpActionResult Put(LocationViewModel loc, int id)
         {
             if (ModelState.IsValid)
@@ -169,6 +172,7 @@ namespace Api.Controllers
         /// <param name="id">Id of the location to be updated</param>
         /// <returns>200 ok</returns>
         [Route("locations/{id}")]
+        [ResourceAuthorize("edit", "location")]
         public IHttpActionResult Patch(LocationViewModel  loc, int id)
         {
             if (loc != null)
@@ -196,6 +200,7 @@ namespace Api.Controllers
         /// <param name="id">Id of the location to remove</param>
         /// <returns>200 ok</returns>
         [Route("locations/{id}")]
+        [ResourceAuthorize("delete", "location")]
         public IHttpActionResult Delete(int id)
         {
             try
