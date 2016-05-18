@@ -7,6 +7,7 @@ public class Location extends Object {
     private Coordinate coordinate;
     private Type type;
     private String name;
+    private String desc;
     private String locNr;
     private int hits;
     private int id;
@@ -46,6 +47,14 @@ public class Location extends Object {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getDesc() {
+        return desc;
+    }
+
+    public void setDesc(String desc) {
+        this.desc = desc;
     }
 
     public String getLocNr() {

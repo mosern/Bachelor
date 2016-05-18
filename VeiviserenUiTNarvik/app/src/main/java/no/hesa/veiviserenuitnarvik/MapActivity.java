@@ -87,6 +87,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private final int POLYLINEWIDTH = 20;
     private String DEFAULT_FLOORPLAN;
 
+    public final static int SEARCH_RETURNED_COORDINATE_CODE = 1;
+    public final static int SEARCH_RETURNED_COORDINATE_RESULT = 1;
+
     /* used to decide when bitmap should be downscaled */
     private static final int MAX_DIMENSION = 2048;
 
@@ -902,7 +905,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 intent.putExtra("query", newText);
                 searchView.setQuery("", false); // clears the searchview without submitting
                 searchView.clearFocus();
-                startActivity(intent);
+                startActivityForResult(intent, SEARCH_RETURNED_COORDINATE_CODE );
                 return true;
             }
 
@@ -998,6 +1001,55 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
         else{
             super.onBackPressed();
+        }
+    }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == SEARCH_RETURNED_COORDINATE_CODE) {
+            if(resultCode == SEARCH_RETURNED_COORDINATE_RESULT){
+                LatLng latLng = new LatLng(data.getDoubleExtra("lat", 0), data.getDoubleExtra("lng", 0));
+                double floor = data.getDoubleExtra("floor", 1.0);
+
+
+                showCustomToast(getApplicationContext(), latLng.toString() + ", " + floor, Toast.LENGTH_SHORT );
+
+//              changeFloor((int)floor);
+                latLng = new LatLng(68.4358635893339, 17.434213757514954);
+                floor = 1;
+
+//                currentPosition =  new LatLng(68.43548946533, 17.4339371547);
+//                currentFloor = 1;
+                if (floor != currentFloor) {
+                    changeFloor(currentFloor);
+                }
+
+                try {
+                    path = positionLibrary.wifiPosition.plotRoute(new Point(currentPosition.latitude, currentPosition.longitude, currentFloor), new Point(latLng.latitude, latLng.longitude, (int) floor), pathPointJson);
+                    if (path != null) {
+                        // draw path for this floor if available
+                        List<Point> floorToDraw = null;
+                        if (path != null) {
+                            floorToDraw = new ArrayList<Point>();
+                            for (Point point : path) {
+                                if (point.getFloor() == currentFloor) {
+                                    floorToDraw.add(point);
+                                }
+                            }
+                        }
+                        if (floorToDraw != null) {
+                            drawFloorPath(floorToDraw);
+                            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(path.get(0).getLatitude(), path.get(0).getLongitude()), 19));
+                        }
+                    }
+                }
+                catch (PathNotFoundException ex)
+                {
+                    showCustomToast(getApplicationContext(), getResources().getString(R.string.path_not_found_exception), Toast.LENGTH_SHORT );
+                }
+
+                targetPosition = latLng;
+            }
         }
     }
 }

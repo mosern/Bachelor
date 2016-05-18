@@ -116,7 +116,7 @@ public class SearchResultsActivity extends AppCompatActivity implements ActionIn
                     listDataChild = new HashMap<String, List<? extends Object>>();
                     List<String> orderOfClassTypes = new ArrayList<>();
                     if (jsonObject != null) {
-                        jsonArray = jsonObject.getJSONArray("locations");
+                        jsonArray = jsonObject.getJSONArray("results");
 
                         for (int i = 0; i < jsonArray.length(); i++) { // iterates both arrays within Locations-array
                             if (jsonArray.getJSONArray(i) != null) {

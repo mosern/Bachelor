@@ -1,5 +1,6 @@
 package no.hesa.veiviserenuitnarvik;
 
+import android.app.Activity;
 import android.content.Intent;
 
 import java.util.HashMap;
@@ -206,7 +207,9 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         intent.putExtra("lat", location.getCoordinate().getLat());
         intent.putExtra("lng", location.getCoordinate().getLng());
         intent.putExtra("floor", location.getCoordinate().getAlt());
-        _context.startActivity(intent);
+        ((Activity)_context).setResult(MapActivity.SEARCH_RETURNED_COORDINATE_RESULT, intent);
+        ((Activity)_context).finish();
+//        _context.startActivity(intent);
 //        ((Activity) _context).finish();
     }
 
@@ -217,7 +220,9 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         intent.putExtra("lat", person.getLocation().getCoordinate().getLat());
         intent.putExtra("lng", person.getLocation().getCoordinate().getLng());
         intent.putExtra("floor", person.getLocation().getCoordinate().getAlt());
-        _context.startActivity(intent);
+        ((Activity)_context).setResult(MapActivity.SEARCH_RETURNED_COORDINATE_RESULT, intent);
+        ((Activity)_context).finish();
+        //_context.startActivity(intent);
     }
 
 //region SMS/CALL/EMAIL
