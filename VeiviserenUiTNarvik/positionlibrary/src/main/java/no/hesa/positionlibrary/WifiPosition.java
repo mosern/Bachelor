@@ -585,7 +585,14 @@ public class WifiPosition implements ActionInterface {
         da.execute(new Vertex<>(position));
         LinkedList<Vertex> path = da.getPath(new Vertex<>(destination));
 
-        List<Point> result = getPointsOnCurrentFloor(path, position.getFloor());
+//        List<Point> result = getPointsOnCurrentFloor(path, position.getFloor());
+        List<Point> result = new LinkedList<>();
+        for(int i = 0; i < path.size(); i++){
+            if (path.get(i).getPayload() instanceof Point){
+                Point pathPoint = (Point) path.get(i).getPayload();
+                result.add(pathPoint);
+            }
+        }
 
         return result;
     }

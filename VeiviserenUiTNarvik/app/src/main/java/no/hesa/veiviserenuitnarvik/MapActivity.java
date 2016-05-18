@@ -283,14 +283,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         mMap.setMapType(mapType);
 
         pathPointJson = sharedPreferences.getString("PathPointJson", null);
-        /*
+
         String pathJson = sharedPreferences.getString("PathJson", null);
         Gson gson = new Gson();
-
         java.lang.reflect.Type listType = new TypeToken<List<Point>>(){}.getType();
-
-        path = gson.toJson(pathJson, listType);
-        */
+        path = gson.fromJson(pathJson, listType);
 
         // TODO: 28/04/2016 first run only, maybe change to users position via GPS
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lng), zoomLevel));
@@ -303,16 +300,18 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                         LatLng latLng = new LatLng(returnedCoordsFromSearchIntent.getDoubleExtra("lat", 0), returnedCoordsFromSearchIntent.getDoubleExtra("lng", 0));
                         double floor = returnedCoordsFromSearchIntent.getDoubleExtra("floor", 1.0);
 //                        changeFloor((int)floor);
-                        latLng = new LatLng(68.4358635893339, 17.434213757514954);
-                        //floor = 1;
+                        //latLng = new LatLng(68.4358635893339, 17.434213757514954);
+                        latLng = new LatLng(68.4361961798715, 17.434284836053848);
+                        floor = 2;
 
-                        //currentPosition =  new LatLng(68.43548946533, 17.4339371547);
-                        // currentFloor = 1;
+                        currentPosition =  new LatLng(68.43607812865787, 17.43459329009056);
+                        currentFloor = 1;
                         if (floor != currentFloor) {
                             changeFloor(currentFloor);
                         }
 
                         try {
+                            //path = positionLibrary.wifiPosition.plotRoute(new Point(currentPosition.latitude, currentPosition.longitude, currentFloor), new Point(latLng.latitude, latLng.longitude, (int) floor), pathPointJson);
                             path = positionLibrary.wifiPosition.plotRoute(new Point(currentPosition.latitude, currentPosition.longitude, currentFloor), new Point(latLng.latitude, latLng.longitude, (int) floor), pathPointJson);
                             if (path != null) {
                                 // draw path for this floor if available
