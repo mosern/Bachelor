@@ -79,7 +79,7 @@ namespace Api.Classes
             {
                 case "read": return Eval(true);
                 case "write": return Eval(context.Principal.HasClaim("roles", "Administrator"));
-                case "edit": return Eval(context.Principal.HasClaim("http://schemas.microsoft.com/ws/2008/06/identity/claims/role", "Administrator"));
+                case "edit": return Eval(context.Principal.HasClaim("roles", "Administrator"));
                 case "delete": return Eval(context.Principal.HasClaim("roles", "Administrator"));
                 default: return Nok();
             }
