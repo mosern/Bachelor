@@ -34,8 +34,8 @@ namespace IdSrv.Config
 
                         Claims = new List<ScopeClaim>
                         {
-                            new ScopeClaim("role"),
-                            new ScopeClaim("name")
+                            new ScopeClaim("name"),
+                            new ScopeClaim("role")
                         }
                     },
 
