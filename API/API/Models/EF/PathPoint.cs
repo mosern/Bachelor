@@ -11,7 +11,8 @@ namespace Api.Models.EF
     {
         [ForeignKey("Coordinate")]
         public override int Id { get; set; }
-        
+        public int NeighbourCount { get; set; }
+
         public int CoordinateId { get; set; }
         public virtual Coordinate Coordinate { get; set; }
     }

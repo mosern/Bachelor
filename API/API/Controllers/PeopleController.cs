@@ -9,6 +9,7 @@ using System.Net;
 using System.Net.Http;
 using System.Web;
 using System.Web.Http;
+using Thinktecture.IdentityModel.WebApi;
 
 namespace Api.Controllers
 {
@@ -28,6 +29,7 @@ namespace Api.Controllers
         /// <param name="objPropName">Optional, standard value is "people". Name of object if asObject is true</param>
         /// <returns>200 ok with processed list of all people in the database</returns>
         [Route("people", Name = "people")]
+        [ResourceAuthorize("read", "people")]
         public IHttpActionResult Get(string fields = null, string sort = "id", int? page = null, int pageSize = stdPageSize, bool asObject = true, string objPropName = "people")
         {
             IQueryable<People> people;
@@ -57,6 +59,7 @@ namespace Api.Controllers
         /// <param name="fields">Optional. The fields to include in returned object. Returns all fields if no field is specified</param>
         /// <returns>200 ok with processed people object</returns>
         [Route("people/{id}")]
+        [ResourceAuthorize("read", "people")]
         public IHttpActionResult Get(int id, string fields = null)
         {
             People people;
@@ -82,6 +85,7 @@ namespace Api.Controllers
         /// <param name="people">peopleViewModel with info about the people to create</param>
         /// <returns>201 created with the new object</returns>
         [Route("people")]
+        [ResourceAuthorize("write", "people")]
         public IHttpActionResult Post(PeopleViewModel people)
         {
             if (people.Id == null)
@@ -114,6 +118,7 @@ namespace Api.Controllers
         /// <param name="id">Id of the people to be updated</param>
         /// <returns>200 ok</returns>
         [Route("people/{id}")]
+        [ResourceAuthorize("edit", "people")]
         public IHttpActionResult Put(PeopleViewModel people, int id)
         {
             if (people.Id == null)
@@ -152,6 +157,7 @@ namespace Api.Controllers
         /// <param name="id">Id of the people to be updated</param>
         /// <returns>200 ok</returns>
         [Route("people/{id}")]
+        [ResourceAuthorize("edit", "people")]
         public IHttpActionResult Patch(PeopleViewModel people, int id)
         {
             if (people.Id == null)
@@ -182,6 +188,7 @@ namespace Api.Controllers
         /// <param name="id">Id of the people to remove</param>
         /// <returns>200 ok</returns>
         [Route("people/{id}")]
+        [ResourceAuthorize("delete", "people")]
         public IHttpActionResult Delete(int id)
         {
             try

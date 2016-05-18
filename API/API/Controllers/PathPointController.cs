@@ -10,6 +10,7 @@ using System.Net;
 using System.Net.Http;
 using System.Web;
 using System.Web.Http;
+using Thinktecture.IdentityModel.WebApi;
 
 namespace Api.Controllers
 {
@@ -29,6 +30,7 @@ namespace Api.Controllers
         /// <param name="objPropName">Optional, standard value is "PathPoints". Name of object if asObject is true</param>
         /// <returns>200 ok with processed list of all pathPoints in the database</returns>
         [Route("pathPoints", Name = "pathPoints")]
+        [ResourceAuthorize("read", "pathPoint")]
         public IHttpActionResult Get(string fields = null, string sort = "id", int? page = null, int pageSize = stdPageSize, bool asObject = true, string objPropName = "pathPoints")
         {
             IQueryable<PathPoint> pathPoints;
@@ -58,6 +60,7 @@ namespace Api.Controllers
         /// <param name="fields">Optional. The fields to include in returned object. Returns all fields if no field is specified</param>
         /// <returns>200 ok with processed pathPoint object</returns>
         [Route("pathPoints/{id}")]
+        [ResourceAuthorize("read", "pathPoint")]
         public IHttpActionResult Get(int id, string fields = null)
         {
             PathPoint pathPoint;
@@ -83,6 +86,7 @@ namespace Api.Controllers
         /// <param name="pathPoint">pathPointViewModel with info about the pathPoint to create</param>
         /// <returns>201 created with the new object</returns>
         [Route("pathPoints")]
+        [ResourceAuthorize("write", "pathPoint")]
         public IHttpActionResult Post(PathPointViewModel pathPoint)
         {
             if (!ModelState.IsValid)
@@ -105,6 +109,7 @@ namespace Api.Controllers
         /// <param name="id">Id of the pathPoint to be updated</param>
         /// <returns>200 ok</returns>
         [Route("pathPoints/{id}")]
+        [ResourceAuthorize("edit", "pathPoint")]
         public IHttpActionResult Put(PathPointViewModel pathPoint, int id)
         {
             if (ModelState.IsValid)
@@ -133,6 +138,7 @@ namespace Api.Controllers
         /// <param name="id">Id of the pathPoint to be updated</param>
         /// <returns>200 ok</returns>
         [Route("pathPoints/{id}")]
+        [ResourceAuthorize("edit", "pathPoint")]
         public IHttpActionResult Patch(PathPointViewModel pathPoint, int id)
         {
             if (pathPoint != null)
@@ -160,6 +166,7 @@ namespace Api.Controllers
         /// <param name="id">Id of the pathPoint to remove</param>
         /// <returns>200 ok</returns>
         [Route("pathpoints/{id}")]
+        [ResourceAuthorize("delete", "pathPoint")]
         public IHttpActionResult Delete(int id)
         {
             try

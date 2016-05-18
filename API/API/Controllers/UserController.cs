@@ -12,6 +12,7 @@ using System.Web.Http;
 using UserDB;
 using Api.Factories;
 using Api.Helpers;
+using Thinktecture.IdentityModel.WebApi;
 
 namespace Api.Controllers
 {
@@ -34,6 +35,7 @@ namespace Api.Controllers
         /// <param name="objPropName">Optional, standard value is "users". Name of object if asObject is true</param>
         /// <returns>200 ok with processed list of all users in the database</returns>
         [Route("users", Name = "users")]
+        [ResourceAuthorize("read", "user")]
         public IHttpActionResult Get(string fields = null, string sort = "id", int? page = null, int pageSize = stdPageSize, bool asObject = true, string objPropName = "users")
         {
 
@@ -65,6 +67,7 @@ namespace Api.Controllers
         /// <param name="fields">Optional. The fields to include in returned object. Returns all fields if no field is specified</param>
         /// <returns>200 ok with processed user object</returns>
         [Route("users/{id}")]
+        [ResourceAuthorize("read", "user")]
         public IHttpActionResult Get(int id, string fields = null)
         {
             User user;
@@ -97,6 +100,7 @@ namespace Api.Controllers
         /// <param name="objPropName">Optional, standard value is "userLocations". Name of object if asObject is true</param>
         /// <returns>200 ok with processed list of all locations in the database, that the spesified user has visited. Hits field in these location objects is spesific to the user</returns>
         [Route("users/{id}/locations/", Name="userlocations")]
+        [ResourceAuthorize("read", "user")]
         public IHttpActionResult Get(int id, string fields = null, string sort = "id", int? page = null, int pageSize = stdPageSize, bool asObject = true, string objPropName = "userLocations")
         {
             IQueryable<UserLocation> locations;
@@ -126,6 +130,7 @@ namespace Api.Controllers
         /// <param name="fields">Optional. The fields to include in returned object. Returns all fields if no field is specified</param>
         /// <returns>200 ok with processed location object</returns>
         [Route("users/{id}/locations/{locid}")]
+        [ResourceAuthorize("read", "user")]
         public IHttpActionResult Get(int id, int locId, string fields = null)
         {
             UserLocation userLocation;
@@ -150,6 +155,7 @@ namespace Api.Controllers
         /// <param name="user">UserViewModel with info about the user to create</param>
         /// <returns>201 created with the new object</returns>
         [Route("users")]
+        [ResourceAuthorize("write", "user")]
         public IHttpActionResult Post(User user)
         {
             //TODO update user to use viewmodel
@@ -173,6 +179,7 @@ namespace Api.Controllers
         /// <param name="id">Id of the user to be updated</param>
         /// <returns>200 ok</returns>
         [Route("users/{id}")]
+        [ResourceAuthorize("edit", "user")]
         public IHttpActionResult Put(User user, int id)
         {
             if(user.Username != null && user.Password != null)
@@ -201,6 +208,7 @@ namespace Api.Controllers
         /// <param name="id">Id of the user to be updated</param>
         /// <returns>200 ok</returns>
         [Route("users/{id}")]
+        [ResourceAuthorize("edit", "user")]
         public IHttpActionResult Patch(User user, int id)
         {
             if (user != null)
@@ -228,6 +236,7 @@ namespace Api.Controllers
         /// <param name="id">Id of the user to remove</param>
         /// <returns>200 ok</returns>
         [Route("users/{id}")]
+        [ResourceAuthorize("delete", "user")]
         public IHttpActionResult Delete(int id)
         {
             try

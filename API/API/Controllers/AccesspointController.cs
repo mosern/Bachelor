@@ -9,6 +9,7 @@ using System.Net;
 using System.Net.Http;
 using System.Web;
 using System.Web.Http;
+using Thinktecture.IdentityModel.WebApi;
 
 namespace Api.Controllers
 {
@@ -31,6 +32,7 @@ namespace Api.Controllers
         /// <param name="objPropName">Optional, standard value is "accesspoints". Name of object if asObject is true</param>
         /// <returns>200 ok with processed list of all accesspoints in the database</returns>
         [Route("accesspoints", Name = "accesspoints")]
+        [ResourceAuthorize("read", "accesspoint")]
         public IHttpActionResult Get(string fields = null, string sort = "id", int? page = null, int pageSize = stdPageSize, bool asObject = true, string objPropName = "accesspoints")
         {
             IQueryable<Accesspoint> accs;
@@ -59,6 +61,7 @@ namespace Api.Controllers
         /// <param name="fields">Optional. The fields to include in returned object. Returns all fields if no field is specified</param>
         /// <returns>200 ok with processed accesspoint object</returns>
         [Route("accesspoints/{id}")]
+        [ResourceAuthorize("read", "accesspoint")]
         public IHttpActionResult Get(int id, string fields = null)
         {
             Accesspoint acc;
@@ -85,6 +88,7 @@ namespace Api.Controllers
         /// <param name="acc">AccesspointViewModel with info about the accesspoint to create</param>
         /// <returns>201 created with the new object</returns>
         [Route("accesspoints")]
+        [ResourceAuthorize("write", "accesspoint")]
         public IHttpActionResult Post(AccesspointViewModel acc)
         {
             if (!ModelState.IsValid)
@@ -107,6 +111,7 @@ namespace Api.Controllers
         /// <param name="id">Id of the accesspoint to be updated</param>
         /// <returns>200 ok</returns>
         [Route("accesspoints/{id}")]
+        [ResourceAuthorize("edit", "accesspoint")]
         public IHttpActionResult Put(AccesspointViewModel acc, int id)
         {
             if (ModelState.IsValid)
@@ -135,6 +140,7 @@ namespace Api.Controllers
         /// <param name="id">Id of the accesspoint to be updated</param>
         /// <returns>200 ok</returns>
         [Route("accesspoints/{id}")]
+        [ResourceAuthorize("edit", "accesspoint")]
         public IHttpActionResult Patch(AccesspointViewModel acc, int id)
         {
             if (acc != null)
@@ -162,6 +168,7 @@ namespace Api.Controllers
         /// <param name="id">Id of the accespoint to remove</param>
         /// <returns>200 ok</returns>
         [Route("accesspoints/{id}")]
+        [ResourceAuthorize("delete", "accesspoint")]
         public IHttpActionResult Delete(int id)
         {
             try

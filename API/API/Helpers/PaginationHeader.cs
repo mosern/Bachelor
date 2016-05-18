@@ -13,12 +13,12 @@ namespace Api.Classes
     /// </summary>
     public class PaginationHeader
     {
-        int page;
-        int pageSize;
-        int totalCount;
-        int totalPages;
-        string previousPageLink;
-        string nextPageLink;
+        public int page;
+        public int pageSize;
+        public int totalCount;
+        public int totalPages;
+        public string previousPageLink;
+        public string nextPageLink;
 
         private PaginationHeader(int _page, int _pageSize, int _totalCount, string routeName, IDictionary<string, object> _routeValues, HttpRequestMessage request)
         {

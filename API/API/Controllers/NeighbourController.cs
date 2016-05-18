@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Http;
+using Thinktecture.IdentityModel.WebApi;
 
 namespace Api.Controllers
 {
@@ -26,6 +27,7 @@ namespace Api.Controllers
         /// <param name="objPropName">Optional, standard value is "neighbours". Name of object if asObject is true</param>
         /// <returns>200 ok with processed list of all neighbours in the database</returns>
         [Route("neighbours", Name = "neighbour")]
+        [ResourceAuthorize("read", "neighbour")]
         public IHttpActionResult Get(string fields = null, string sort = "id", int? page = null, int pageSize = stdPageSize, bool asObject = true, string objPropName = "neighbours")
         {
             IQueryable<PathNeighbour> pathPoints;
@@ -55,6 +57,7 @@ namespace Api.Controllers
         /// <param name="fields">Optional. The fields to include in returned object. Returns all fields if no field is specified</param>
         /// <returns>200 ok with processed neighbour object</returns>
         [Route("neighbours/{id}")]
+        [ResourceAuthorize("read", "neighbour")]
         public IHttpActionResult Get(int id, string fields = null)
         {
             PathNeighbour pathPoint;
@@ -80,6 +83,7 @@ namespace Api.Controllers
         /// <param name="neighbour">neighbourViewModel with info about the neighbour to create</param>
         /// <returns>201 created with the new object</returns>
         [Route("neighbours")]
+        [ResourceAuthorize("write", "neighbour")]
         public IHttpActionResult Post(NeighbourViewModel neighbour)
         {
             if (!ModelState.IsValid)
@@ -87,7 +91,21 @@ namespace Api.Controllers
 
             try
             {
-                return Created("api/neighbours", ControllerHelper.post<PathNeighbour, NeighbourViewModel>(neighbour));
+                var created = ControllerHelper.post<PathNeighbour, NeighbourViewModel>(neighbour);
+
+                using (var repo = new LocationRepository<PathPoint>())
+                {
+                    var point1 = repo.Read(neighbour.pathPoint1.Id.Value);
+                    var point2 = repo.Read(neighbour.pathPoint2.Id.Value);
+
+                    point1.NeighbourCount += 1;
+                    point2.NeighbourCount += 1;
+
+                    repo.Update(point1);
+                    repo.Update(point2);
+                }
+
+                return Created("api/neighbours", created);
             }
             catch
             {
@@ -102,6 +120,7 @@ namespace Api.Controllers
         /// <param name="id">Id of the neighbour to be updated</param>
         /// <returns>200 ok</returns>
         [Route("neighbours/{id}")]
+        [ResourceAuthorize("edit", "neighbour")]
         public IHttpActionResult Put(NeighbourViewModel neighbour, int id)
         {
             if (ModelState.IsValid)
@@ -130,6 +149,7 @@ namespace Api.Controllers
         /// <param name="id">Id of the neighbour to be updated</param>
         /// <returns>200 ok</returns>
         [Route("neighbours/{id}")]
+        [ResourceAuthorize("edit", "neighbour")]
         public IHttpActionResult Patch(NeighbourViewModel neighbour, int id)
         {
             if (neighbour != null)
@@ -157,6 +177,7 @@ namespace Api.Controllers
         /// <param name="id">Id of the neighbour to remove</param>
         /// <returns>200 ok</returns>
         [Route("neighbours/{id}")]
+        [ResourceAuthorize("delete", "neighbour")]
         public IHttpActionResult Delete(int id)
         {
             try
@@ -168,6 +189,19 @@ namespace Api.Controllers
                     if (pathPoint != null)
                     {
                         ControllerHelper.Delete<PathNeighbour>(id);
+
+                        using (var pointRepo = new LocationRepository<PathPoint>())
+                        {
+                            var point1 = pointRepo.Read(pathPoint.PathPoint1.Id);
+                            var point2 = pointRepo.Read(pathPoint.PathPoint2.Id);
+
+                            point1.NeighbourCount -= 1;
+                            point2.NeighbourCount -= 1;
+
+                            pointRepo.Update(point1);
+                            pointRepo.Update(point2);
+                        }
+
                         return Ok();
                     }
                     else

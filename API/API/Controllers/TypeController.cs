@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Http;
+using Thinktecture.IdentityModel.WebApi;
 
 namespace Api.Controllers
 {
@@ -29,6 +30,7 @@ namespace Api.Controllers
         /// <param name="objPropName">Optional, standard value is "Types". Name of object if asObject is true</param>
         /// <returns>200 ok with processed list of all types in the database</returns>
         [Route("types", Name = "types")]
+        [ResourceAuthorize("read", "type")]
         public IHttpActionResult Get(string fields = null, string sort = "id", int? page = null, int pageSize = stdPageSize, bool asObject = true, string objPropName = "types")
         {
             IQueryable<Models.EF.Type> types;
@@ -59,6 +61,7 @@ namespace Api.Controllers
         /// <param name="fields">Optional. The fields to include in returned object. Returns all fields if no field is specified</param>
         /// <returns>200 ok with processed type object</returns>
         [Route("types/{id}")]
+        [ResourceAuthorize("read", "type")]
         public IHttpActionResult Get(int id, string fields = null)
         {
             Models.EF.Type type;
@@ -84,6 +87,7 @@ namespace Api.Controllers
         /// <param name="type">TypeViewModel with info about the type to create</param>
         /// <returns>201 created with the new object</returns>
         [Route("types")]
+        [ResourceAuthorize("write", "type")]
         public IHttpActionResult Post(TypeViewModel type)
         {
             if (!ModelState.IsValid)
@@ -106,6 +110,7 @@ namespace Api.Controllers
         /// <param name="id">Id of the type to be updated</param>
         /// <returns>200 ok</returns>
         [Route("types/{id}")]
+        [ResourceAuthorize("edit", "type")]
         public IHttpActionResult Put(TypeViewModel type, int id)
         {
             if (ModelState.IsValid)
@@ -134,6 +139,7 @@ namespace Api.Controllers
         /// <param name="id">Id of the type to be updated</param>
         /// <returns>200 ok</returns>
         [Route("types/{id}")]
+        [ResourceAuthorize("edit", "type")]
         public IHttpActionResult Patch(TypeViewModel type, int id)
         {
             if (type != null)
@@ -161,6 +167,7 @@ namespace Api.Controllers
         /// <param name="id">Id of the type to remove</param>
         /// <returns>200 ok</returns>
         [Route("types/{id}")]
+        [ResourceAuthorize("delete", "type")]
         public IHttpActionResult Delete(int id)
         {
             try

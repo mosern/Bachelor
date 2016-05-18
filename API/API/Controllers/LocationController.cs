@@ -33,132 +33,51 @@ namespace Api.Controllers
         /// <param name="search">Optional. search for location and/or people with a string</param>
         /// <returns>200 ok with processed list of all locations in the database</returns>
         [Route("locations", Name = "locations")]
+        [ResourceAuthorize("read", "location")]
         public IHttpActionResult Get(string fields = null, string sort = "id", int? page = null, int pageSize = stdPageSize, bool asObject = true, string objPropName = "locations", string search = null)
         {
+            var mapper = AutoMapConfig.getMapper();
             string name = objPropName;
             SearchViewModel result = new SearchViewModel();
+            IQueryable<Location> locations;
+            IQueryable<People> people;
 
-            if (search != null)
+            if(search != null)
             {
                 name = "results";
                 result = Search.Location(search, User);
-                if (page != null)
-                {
-                    result.LocationViewModel = result.LocationViewModel.ApplySort(sort).Skip(pageSize * (page.Value - 1)).Take(pageSize);
-                    result.PeopleViewModel = result.PeopleViewModel.ApplySort(sort).Skip(pageSize * (page.Value - 1)).Take(pageSize);
-                }
-                else
-                {
-                    result.LocationViewModel = result.LocationViewModel.ApplySort(sort);
-                    result.PeopleViewModel = result.PeopleViewModel.ApplySort(sort);
-                }
+                locations = mapper.Map<IEnumerable<LocationViewModel>, IEnumerable<Location>>(result.LocationViewModel.AsEnumerable()).AsQueryable();
+                people = mapper.Map<IEnumerable<PeopleViewModel>, IEnumerable<People>>(result.PeopleViewModel.AsEnumerable()).AsQueryable();
             }
             else
             {
-                if (page != null)
-                {
-                    using (var repo = new LocationRepository<Location>())
-                        result.LocationViewModel = AutoMapConfig.getMapper().Map<IEnumerable<Location>, IEnumerable<LocationViewModel>>(repo.List().ApplySort(sort).Skip(pageSize * (page.Value - 1)).Take(pageSize)).AsQueryable();
-                    result.PeopleViewModel = new List<PeopleViewModel>().AsQueryable();
-                }
-                else
-                {
-                    using (var repo = new LocationRepository<Location>())
-                        result.LocationViewModel = AutoMapConfig.getMapper().Map<IEnumerable<Location>, IEnumerable<LocationViewModel>>(repo.List().ApplySort(sort).ToList()).AsQueryable();
-                    result.PeopleViewModel = new List<PeopleViewModel>().AsQueryable();
-                }
+                using (var repo = new LocationRepository<Location>())
+                    locations = repo.List().ToList().AsQueryable();
+
+                people = new List<People>().AsQueryable();
             }
 
-            if (result.LocationViewModel.Any() || result.PeopleViewModel.Any())
+            if (locations.Any() || people.Any())
             {
-                IDictionary<string, object> routeValues = new Dictionary<string, object>();
-
-                if(fields != null)
-                routeValues.Add("fields", fields);
-
-                routeValues.Add("sort", sort);
-
-                if(page != null)
-                HttpContext.Current.Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(PaginationHeader.Get(page.Value, pageSize, result.LocationViewModel.Count() + result.PeopleViewModel.Count(), "locations", routeValues, Request)));
-
-                if(search == null)
+                if (search != null)
                 {
-                    if (fields != null)
+                    List<object> toReturn = new List<object>();
+
+                    toReturn.Add(ControllerHelper.get<LocationViewModel>(locations, HttpContext.Current, Request, "locations", false, name, fields, sort, page, pageSize));
+                    toReturn.Add(ControllerHelper.get<PeopleViewModel>(people, HttpContext.Current, Request, "people", false, name, fields, sort, page, pageSize));
+
+                    if (asObject)
                     {
-                        IEnumerable<object> loc = new List<object>();
-
-                        if (asObject)
-                        {
-                            loc = ShapeFactory<LocationViewModel>.ShapeList(result.LocationViewModel, fields.ToLower().Split(',').ToList());
-
-                            return Ok(JsonHelper.listToObject(loc, objPropName));
-                        }
-                        else
-                        {
-                            loc = ShapeFactory<LocationViewModel>.ShapeList(result.LocationViewModel, fields.ToLower().Split(',').ToList());
-
-                            return Ok(loc);
-                        }
+                        return Ok(JsonHelper.listToObject(toReturn, name));
                     }
                     else
                     {
-                        if (asObject)
-                        {
-                            return Ok(JsonHelper.listToObject(result.LocationViewModel, objPropName));
-                        }
-                        else
-                        {
-                            return Ok(result.LocationViewModel);
-                        }
+                        return Ok(toReturn);
                     }
                 }
                 else
                 {
-                    if (fields != null)
-                    {
-                        IEnumerable<object> loc = new List<object>();
-                        IEnumerable<object> peo = new List<object>();
-
-                        if (asObject)
-                        {
-                            loc = ShapeFactory<LocationViewModel>.ShapeList(result.LocationViewModel, fields.ToLower().Split(',').ToList());
-                            peo = ShapeFactory<PeopleViewModel>.ShapeList(result.PeopleViewModel, fields.ToLower().Split(',').ToList());
-
-                            List<object> toReturn = new List<object>();
-
-                            if (peo.Any())
-                                toReturn.Add(peo);
-
-                            toReturn.Add(loc);
-
-                            return Ok(JsonHelper.listToObject(toReturn, objPropName));
-                        }
-                        else
-                        {
-                            loc = ShapeFactory<LocationViewModel>.ShapeList(result.LocationViewModel, fields.ToLower().Split(',').ToList());
-                            peo = ShapeFactory<LocationViewModel>.ShapeList(result.LocationViewModel, fields.ToLower().Split(',').ToList());
-
-                            List<object> toReturn = new List<object>();
-
-                            if (peo.Any())
-                                toReturn.Add(peo);
-
-                            toReturn.Add(loc);
-
-                            return Ok(toReturn);
-                        }
-                    }
-                    else
-                    {
-                        if (asObject)
-                        {
-                            return Ok(JsonHelper.listToObject(AutoMapConfig.getMapper().Map<SearchViewModel, IEnumerable<object>>(result), objPropName));
-                        }
-                        else
-                        {
-                            return Ok(AutoMapConfig.getMapper().Map<SearchViewModel, IEnumerable<object>>(result));
-                        }
-                    }
+                    return Ok(ControllerHelper.get<LocationViewModel>(locations, HttpContext.Current, Request, "locations", asObject, name, fields, sort, page, pageSize));
                 }
                 
             }
@@ -175,31 +94,24 @@ namespace Api.Controllers
         /// <param name="fields">Optional. The fields to include in returned object. Returns all fields if no field is specified</param>
         /// <returns>200 ok with processed location object</returns>
         [Route("locations/{id}")]
-        [ResourceAuthorize("Read", "location")]
+        [ResourceAuthorize("read", "location")]
         public IHttpActionResult Get(int id, string fields = null)
         {
             Location location;
 
             using (var repo = new LocationRepository<Location>())
+            {
                 location = repo.Read(id);
 
-            if (location != null)
-            {
-                if(fields != null)
+                if (location != null)
                 {
-                    return Ok(ShapeFactory<LocationViewModel>.Shape(AutoMapConfig.getMapper().Map <Location, LocationViewModel>(location), fields.ToLower().Split(',').ToList()));
+                    return Ok(ControllerHelper.get<LocationViewModel>(location, fields));
                 }
                 else
                 {
-                    return Ok(AutoMapConfig.getMapper().Map<Location, LocationViewModel>(location));
+                    return BadRequest("No location found");
                 }
-                
             }
-            else
-            {
-                return BadRequest("No location found");
-            }
-            
         }
 
         /// <summary>
@@ -208,6 +120,7 @@ namespace Api.Controllers
         /// <param name="location">locationViewModel with info about the location to create</param>
         /// <returns>201 created with the new object</returns>
         [Route("locations")]
+        [ResourceAuthorize("write", "location")]
         public IHttpActionResult Post(LocationViewModel location)
         {
             if (!ModelState.IsValid)
@@ -230,6 +143,7 @@ namespace Api.Controllers
         /// <param name="id">Id of the location to be updated</param>
         /// <returns>200 ok</returns>
         [Route("locations/{id}")]
+        [ResourceAuthorize("edit", "location")]
         public IHttpActionResult Put(LocationViewModel loc, int id)
         {
             if (ModelState.IsValid)
@@ -258,6 +172,7 @@ namespace Api.Controllers
         /// <param name="id">Id of the location to be updated</param>
         /// <returns>200 ok</returns>
         [Route("locations/{id}")]
+        [ResourceAuthorize("edit", "location")]
         public IHttpActionResult Patch(LocationViewModel  loc, int id)
         {
             if (loc != null)
@@ -285,6 +200,7 @@ namespace Api.Controllers
         /// <param name="id">Id of the location to remove</param>
         /// <returns>200 ok</returns>
         [Route("locations/{id}")]
+        [ResourceAuthorize("delete", "location")]
         public IHttpActionResult Delete(int id)
         {
             try

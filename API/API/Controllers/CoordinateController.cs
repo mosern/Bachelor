@@ -11,6 +11,7 @@ using System.Net;
 using System.Net.Http;
 using System.Web;
 using System.Web.Http;
+using Thinktecture.IdentityModel.WebApi;
 
 namespace Api.Controllers
 {
@@ -33,6 +34,7 @@ namespace Api.Controllers
         /// <param name="objPropName">Optional, standard value is "coordiantes". Name of object if asObject is true</param>
         /// <returns>200 ok with processed list of all coordinatess in the database</returns>
         [Route("coordinates", Name = "coordinates")]
+        [ResourceAuthorize("read", "coordinate")]
         public IHttpActionResult Get(string fields = null, string sort = "id", int? page = null, int pageSize = stdPageSize, bool asObject = true, string objPropName = "coordinates")
         {
             IQueryable<Coordinate> coors;
@@ -62,6 +64,7 @@ namespace Api.Controllers
         /// <param name="fields">Optional. The fields to include in returned object. Returns all fields if no field is specified</param>
         /// <returns>200 ok with processed coordinates object</returns>
         [Route("coordinates/{id}")]
+        [ResourceAuthorize("read", "coordinate")]
         public IHttpActionResult Get(int id, string fields = null)
         {
             Coordinate coor;
@@ -88,6 +91,7 @@ namespace Api.Controllers
         /// <param name="cor">CoordinateViewModel with info about the coordnate to create</param>
         /// <returns>201 created with the new object</returns>
         [Route("coordinates")]
+        [ResourceAuthorize("write", "coordinate")]
         public IHttpActionResult Post(CoordinateViewModel cor)
         {
             if (!ModelState.IsValid)
@@ -110,6 +114,7 @@ namespace Api.Controllers
         /// <param name="id">Id of the coordinate to be updated</param>
         /// <returns>200 ok</returns>
         [Route("coordinates/{id}")]
+        [ResourceAuthorize("edit", "coordinate")]
         public IHttpActionResult Put(CoordinateViewModel cor, int id)
         {
             if (ModelState.IsValid)
@@ -138,6 +143,7 @@ namespace Api.Controllers
         /// <param name="id">Id of the coordiante to be updated</param>
         /// <returns>200 ok</returns>
         [Route("coordinates/{id}")]
+        [ResourceAuthorize("edit", "coordinate")]
         public IHttpActionResult Patch(CoordinateViewModel cor, int id)
         {
             if (cor != null)
@@ -165,6 +171,7 @@ namespace Api.Controllers
         /// <param name="id">Id of the coordinate to remove</param>
         /// <returns>200 ok</returns>
         [Route("coordinates/{id}")]
+        [ResourceAuthorize("delete", "coordinate")]
         public IHttpActionResult Delete(int id)
         {
             try
