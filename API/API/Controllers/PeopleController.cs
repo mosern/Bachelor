@@ -119,6 +119,13 @@ namespace Api.Controllers
             if (people.Id == null)
                 people.Id = 0;
 
+            var peopleError = ModelState.Keys.Where(k => k.Contains("people.Location.")).ToList();
+
+            foreach (string error in peopleError)
+            {
+                ModelState.Remove(error);
+            }
+
             if (ModelState.IsValid)
             {
                 try
