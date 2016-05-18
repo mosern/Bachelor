@@ -31,6 +31,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import com.google.android.gms.common.api.BooleanResult;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -42,13 +43,11 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.GroundOverlay;
 import com.google.android.gms.maps.model.GroundOverlayOptions;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.gson.Gson;
-import java.lang.reflect.Type;
 
 
 import com.google.gson.reflect.TypeToken;
@@ -63,10 +62,10 @@ import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
 import com.squareup.picasso.Target;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import no.hesa.positionlibrary.Point;
@@ -74,8 +73,6 @@ import no.hesa.positionlibrary.PositionLibrary;
 import no.hesa.positionlibrary.api.ActionInterface;
 import no.hesa.positionlibrary.api.Api;
 import no.hesa.positionlibrary.dijkstra.exception.PathNotFoundException;
-import no.hesa.positionlibrary.dijkstra.model.Edge;
-import no.hesa.positionlibrary.dijkstra.model.Vertex;
 
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback,ActionInterface{
@@ -100,34 +97,22 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private IAResourceManager mResourceManager;
     private IATask<IAFloorPlan> mFetchFloorPlanTask;
     private Target mLoadTarget;
-    private Intent returnedCoordsFromSearchIntent;
     private PositionLibrary positionLibrary = null;
 
     private BroadcastReceiver positionLibOutputReceiver = null;
-    private BroadcastReceiver pathPositionLibReceiver = null;
-    private BroadcastReceiver searchLocationReceiver = null;
 
     private LatLng currentPosition = null;
-    private LatLng targetPosition = null;
-
-    private Polyline polyline = null;
 
     private Menu menuRef = null;
 
-    private LatLngBounds elevationChangeBounds = null;
-
     private String currentFloorPlan;
     private int currentFloor = -100;
-    private ArrayList<ArrayList<Point>> receivedPath = null;
 
     private ProgressBar fetchMapSpinner;
     private boolean positioningEnabled = false;
 
-    private long lastPress;
-
-    private Circle circleThree;
-    private Circle circleTwo;
-    private Circle circleOne;
+    private long backPressedTimeStamp;
+    private Circle userPositionMarker;
 
     ArrayList<Polyline> polylineList = new ArrayList<Polyline>();
     ArrayList<LatLng> latLngList = new ArrayList<LatLng>();
@@ -141,6 +126,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private boolean pathPointsDownloading = false;
 
     private List<Point> path;
+    private ArrayList<List<Point>> fullSegmentedPath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -156,7 +142,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         mResourceManager = IAResourceManager.create(this);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        setSupportActionBar(toolbar); // TODO: crashes pre android 5.0
 
         getSupportActionBar().setDisplayShowTitleEnabled(true);
         getSupportActionBar().setTitle("ARGH!");
@@ -173,54 +159,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         fetchMapSpinner = (ProgressBar)findViewById(R.id.fetch_map_progress_bar);
         positionLibrary = new PositionLibrary();
-        registerButtonListeners();
-/*
-        //Api api = new Api(this, getApplicationContext().getResources());
-
-        api.allUsers();
-*/
-
         api = new Api(this);
-        returnedCoordsFromSearchIntent = getIntent();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-
-        if (mMap != null) {
-            SharedPreferences.Editor sharedPreferences = getSharedPreferences("MapActivityPrefs", MODE_PRIVATE).edit();
-
-            float zoomLevel = mMap.getCameraPosition().zoom;
-            sharedPreferences.putFloat("ZoomLevel", zoomLevel);
-            sharedPreferences.putInt("MapType", mapType);
-
-            if (currentPosition != null) {
-                float lat = (float) currentPosition.latitude;
-                float lng = (float) currentPosition.longitude;
-                sharedPreferences.putFloat("CurrentLat", lat);
-                sharedPreferences.putFloat("CurrentLng", lng);
-            }
-
-            if (!currentFloorPlan.isEmpty()) {
-                sharedPreferences.putString("CurrentFloorPlan", currentFloorPlan);
-            }
-
-            if (currentFloor != -100)
-            {
-                sharedPreferences.putInt("CurrentFloor", currentFloor);
-            }
-
-            if (path != null)
-            {
-                Gson gson = new Gson();
-//                java.lang.reflect.Type listType = new TypeToken<List<Point>>(){}.getType();
-                String json = gson.toJson(path /*, listType */);
-
-                sharedPreferences.putString("PathJson", json);
-            }
-            sharedPreferences.apply();
-        }
     }
 
     @Override
@@ -246,6 +190,35 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     protected void onStop()
     {
         super.onStop();
+
+        if (mMap != null) {
+            SharedPreferences.Editor sharedPreferences = getSharedPreferences("MapActivityPrefs", MODE_PRIVATE).edit();
+
+            float zoomLevel = mMap.getCameraPosition().zoom;
+            sharedPreferences.putFloat("ZoomLevel", zoomLevel);
+            sharedPreferences.putInt("MapType", mapType);
+
+            if (currentPosition != null) {
+                float lat = (float) currentPosition.latitude;
+                float lng = (float) currentPosition.longitude;
+                sharedPreferences.putFloat("CurrentLat", lat);
+                sharedPreferences.putFloat("CurrentLng", lng);
+            }
+
+            if (!currentFloorPlan.isEmpty()) {
+                sharedPreferences.putString("CurrentFloorPlan", currentFloorPlan);
+            }
+
+            sharedPreferences.putInt("CurrentFloor", currentFloor);
+
+//            if (fullSegmentedPath != null) {
+//                Gson gson = new Gson();
+//                String json = gson.toJson(fullSegmentedPath);
+//                sharedPreferences.putString("FullSegmentedPathJson", json);
+//            }
+
+            sharedPreferences.apply();
+        }
         /*
         if (positionLibrary != null) {
             positionLibrary.wifiPosition.unRegisterBroadcast(this);
@@ -254,46 +227,41 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         if (positionLibOutputReceiver != null) {
             unregisterReceiver(positionLibOutputReceiver);
         }
-
-        if (pathPositionLibReceiver != null) {
-            unregisterReceiver(pathPositionLibReceiver);
-        }
-
-        if (searchLocationReceiver != null) {
-            unregisterReceiver(searchLocationReceiver);
-        }
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
+        // retrieve various sharedPreferences
         SharedPreferences sharedPreferences = getSharedPreferences("MapActivityPrefs",MODE_PRIVATE);
 
         mapType = sharedPreferences.getInt("MapType", googleMap.MAP_TYPE_NONE);
-        float zoomLevel = sharedPreferences.getFloat("ZoomLevel", 17.0f);
+        mMap.setMapType(mapType);
+
+        float zoomLevel = sharedPreferences.getFloat("ZoomLevel", UIT_NARVIK_ZOOMLEVEL);
         float lat = sharedPreferences.getFloat("CurrentLat", (float)UIT_NARVIK_POSITION.latitude);
         float lng = sharedPreferences.getFloat("CurrentLng", (float)UIT_NARVIK_POSITION.longitude);
         currentFloor = sharedPreferences.getInt("CurrentFloor", UIT_NARVIK_DEFAULTFLOOR);
         currentPosition = new LatLng(lat, lng);
 
+        pathPointJson = sharedPreferences.getString("PathPointJson", null);
+
         positioningEnabled = sharedPreferences.getBoolean("PositioningEnabled", false);
         enablePositioning(positioningEnabled, false);
 
-        mMap.setMapType(mapType);
-
-        pathPointJson = sharedPreferences.getString("PathPointJson", null);
-
-        String pathJson = sharedPreferences.getString("PathJson", null);
         Gson gson = new Gson();
-        java.lang.reflect.Type listType = new TypeToken<List<Point>>(){}.getType();
-        path = gson.fromJson(pathJson, listType);
+//        String pathJson = sharedPreferences.getString("PathJson", null);
+//        java.lang.reflect.Type pathListType = new TypeToken<List<Point>>(){}.getType();
+//        path = gson.fromJson(pathJson, pathListType);
 
-        // TODO: 28/04/2016 first run only, maybe change to users position via GPS
+//        String fullSegmentedPathJson = sharedPreferences.getString("FullSegmentedPathJson", null);
+//        java.lang.reflect.Type fullSegmentedListType = new TypeToken<List<List<Point>>>(){}.getType();
+//        fullSegmentedPath = gson.fromJson(fullSegmentedPathJson, fullSegmentedListType);
+
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lng), zoomLevel));
 
         if (pathPointJson == null) {
-//            showCustomToast(getApplicationContext(), "USING CACHED PATHPOINTS", Toast.LENGTH_SHORT);
             /*
             Pathpoints are potentially a substantial download, and to avoid downloading them via
             the positioning-library they are retrieved and cached in this activity better suited for handling
@@ -307,9 +275,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
 
         registerOnMapClickReceiver();
-//        registerPositionReceiver();
-//        registerPathReceiver();
-//        registerSearchLocationReceiver();
+        registerButtonListeners();
+
+//        if (fullSegmentedPath != null) {
+//            drawFloorPath(fullSegmentedPath);
+//        }
     }
 
     /**
@@ -319,7 +289,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
      * @param coordinateList
      * @return LatLang containing the last point added
      */
-    private LatLng drawFloorPath(List<Point> coordinateList)
+    private LatLng drawFloorPath(List<List<Point>> coordinateList)
     {
         clearDrawnPaths();
 
@@ -330,62 +300,75 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         final double DOTRADIUS = 0.20;
         final double SMALLCIRCLERADIUS = 0.10;
 
-        for(int i = 0; i < coordinateList.size(); i++)
-        {
-            currentPoint = new LatLng(coordinateList.get(i).getLatitude(), coordinateList.get(i).getLongitude());
-            latLngList.add(currentPoint);
+        for(List<Point> pointList : coordinateList){
+            for(int i = 0; i < pointList.size(); i++)
+            {
+                if (pointList.get(i).getFloor() == currentFloor) {
+                    currentPoint = new LatLng(pointList.get(i).getLatitude(), pointList.get(i).getLongitude());
+                    latLngList.add(currentPoint);
 
-            // first point
-            if (latLngList.size() == 1) {
-                drawUserPosition(currentPoint);
-            }
+                    // first point
+                    if (latLngList.size() == 1) {
+//                        drawUserPosition(currentPoint);
+                        CircleOptions co = new CircleOptions()
+                                .center(currentPoint)
+                                .radius(CIRCLERADIUS)
+                                .strokeColor(getResources().getColor(R.color.route_circle_end_border_color))
+                                .fillColor(getResources().getColor(R.color.route_circle_end_color))
+                                .zIndex(0.61f);
 
-            if (latLngList.size() > 1) {
-                previousPoint = new LatLng(coordinateList.get(i - 1).getLatitude(), coordinateList.get(i - 1).getLongitude());
+                        circleList.add(mMap.addCircle(co));
+                    }
 
-                PolylineOptions po = new PolylineOptions()
-                        .add(previousPoint, currentPoint)
-                        .width(POLYLINEWIDTH)
-                        .color(getResources().getColor(R.color.route_polyline_color))
-                        .geodesic(false)
-                        .zIndex(0.45f);
+                    if (latLngList.size() > 1) {
+                        previousPoint = new LatLng(pointList.get(i - 1).getLatitude(), pointList.get(i - 1).getLongitude());
 
-                polylineList.add(mMap.addPolyline(po));
+                        PolylineOptions po = new PolylineOptions()
+                                .add(previousPoint, currentPoint)
+                                .width(POLYLINEWIDTH)
+                                .color(getResources().getColor(R.color.route_polyline_color))
+                                .geodesic(false)
+                                .zIndex(0.45f);
 
-                // all points except first and last
-                if (latLngList.size() < coordinateList.size()) {
-                    CircleOptions co = new CircleOptions()
-                            .center(currentPoint)
-                            .radius(SMALLCIRCLERADIUS)
-                            .strokeColor(getResources().getColor(R.color.route_circle_color))
-                            .fillColor(getResources().getColor(R.color.route_circle_color))
-                            .zIndex(0.61f);
+                        polylineList.add(mMap.addPolyline(po));
 
-                    circleList.add(mMap.addCircle(co));
+                        // all points except first and last
+                        if (latLngList.size() < pointList.size()) {
+                            CircleOptions co = new CircleOptions()
+                                    .center(currentPoint)
+                                    .radius(SMALLCIRCLERADIUS)
+                                    .strokeColor(getResources().getColor(R.color.route_circle_color))
+                                    .fillColor(getResources().getColor(R.color.route_circle_color))
+                                    .zIndex(0.61f);
+
+                            circleList.add(mMap.addCircle(co));
+                        } else { // last point
+                            CircleOptions co = new CircleOptions()
+                                    .center(currentPoint)
+                                    .radius(CIRCLERADIUS)
+                                    .strokeColor(getResources().getColor(R.color.route_circle_end_border_color))
+                                    .fillColor(getResources().getColor(R.color.route_circle_end_color))
+                                    .zIndex(0.61f);
+
+                            circleList.add(mMap.addCircle(co));
+
+                            co = new CircleOptions()
+                                    .center(currentPoint)
+                                    .radius(DOTRADIUS)
+                                    .strokeColor(getResources().getColor(R.color.route_circle_end_border_color))
+                                    .fillColor(getResources().getColor(R.color.route_circle_end_border_color))
+                                    .zIndex(0.61f);
+
+                            circleList.add(mMap.addCircle(co));
+                        }
+                    }
                 }
-                else { // last point
-                    CircleOptions co = new CircleOptions()
-                            .center(currentPoint)
-                            .radius(CIRCLERADIUS)
-                            .strokeColor(getResources().getColor(R.color.route_circle_end_border_color))
-                            .fillColor(getResources().getColor(R.color.route_circle_end_color))
-                            .zIndex(0.61f);
-
-                    circleList.add(mMap.addCircle(co));
-
-                    co = new CircleOptions()
-                            .center(currentPoint)
-                            .radius(DOTRADIUS)
-                            .strokeColor(getResources().getColor(R.color.route_circle_end_border_color))
-                            .fillColor(getResources().getColor(R.color.route_circle_end_border_color))
-                            .zIndex(0.61f);
-
-                    circleList.add(mMap.addCircle(co));
-                }
             }
+            latLngList.clear();
         }
         return currentPoint;
     }
+
 
     private void clearDrawnPaths()
     {
@@ -402,10 +385,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         circleList.clear();
     }
 
-    private void drawUserPosition(LatLng currentPosition)
+    private void drawUserPosition()
     {
-        if (circleOne != null)
-            circleOne.remove();
+        clearDrawnUserPosition();
 
         CircleOptions co = new CircleOptions()
                 .center(currentPosition)
@@ -414,7 +396,14 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 .fillColor(getResources().getColor(R.color.route_circle_end_color))
                 .zIndex(0.50f);
 
-        circleOne = mMap.addCircle(co);
+        userPositionMarker = mMap.addCircle(co);
+    }
+
+    private void clearDrawnUserPosition()
+    {
+        if (userPositionMarker != null) {
+            userPositionMarker.remove();
+        }
     }
 
     private void changeFloor(int floor)
@@ -423,14 +412,14 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             case 0:
                 break;
             case 1:
-                fetchFloorPlan(getResources().getString(R.string.indooratlas_floor_1_floorplanid));
                 currentFloorPlan = getResources().getString(R.string.indooratlas_floor_1_floorplanid);
                 currentFloor = 1;
+                fetchFloorPlan(getResources().getString(R.string.indooratlas_floor_1_floorplanid));
                 break;
             case 2:
-                fetchFloorPlan(getResources().getString(R.string.indooratlas_floor_2_floorplanid));
                 currentFloorPlan = getResources().getString(R.string.indooratlas_floor_2_floorplanid);
                 currentFloor = 2;
+                fetchFloorPlan(getResources().getString(R.string.indooratlas_floor_2_floorplanid));
                 break;
             case 3:
                 break;
@@ -461,19 +450,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             public void onClick(View view) {                
                 if (currentFloorPlan.compareTo(getResources().getString(R.string.indooratlas_floor_1_floorplanid)) == 0) {
                     changeFloor(2);
-                    mMap.clear();
-                    // draw path for this floor if availableList
-                    List<Point> floorToDraw = null;
-                    if (path != null) {
-                        floorToDraw = new ArrayList<Point>();
-                        for (Point point : path) {
-                            if (point.getFloor() == currentFloor) {
-                                floorToDraw.add(point);
-                            }
-                        }
-                    }
-                    if (floorToDraw != null) {
-                        drawFloorPath(floorToDraw);
+                    clearDrawnPaths();
+                    clearDrawnUserPosition();
+                    // draw path for this floor if available
+                    if (fullSegmentedPath != null) {
+                        drawFloorPath(fullSegmentedPath);
                     }
                 }
             }
@@ -485,19 +466,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             public void onClick(View view) {
                 if (currentFloorPlan.compareTo(getResources().getString(R.string.indooratlas_floor_2_floorplanid)) == 0) {
                     changeFloor(1);
-                    mMap.clear();
-                    // draw path for this floor if availableList
-                    List<Point> floorToDraw = null;
-                    if (path != null) {
-                        floorToDraw = new ArrayList<Point>();
-                        for (Point point : path) {
-                            if (point.getFloor() == currentFloor) {
-                                floorToDraw.add(point);
-                            }
-                        }
-                    }
-                    if (floorToDraw != null) {
-                        drawFloorPath(floorToDraw);
+                    clearDrawnPaths();
+                    clearDrawnUserPosition();
+                    // draw path for this floor if available
+                    if (fullSegmentedPath != null) {
+                        drawFloorPath(fullSegmentedPath);
                     }
                 }
             }
@@ -535,8 +508,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         myLocationFab.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                currentPosition = UIT_NARVIK_POSITION;
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentPosition, UIT_NARVIK_ZOOMLEVEL));
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(UIT_NARVIK_POSITION, UIT_NARVIK_ZOOMLEVEL));
                 return true;
             }
         });
@@ -608,13 +580,13 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         sharedPreferences.apply();
     }
 
-//region BROADCASTRECEIVERS
     private void registerOnMapClickReceiver()
     {
         // adds a marker
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng point) {
+                // TODO: remove marker for launch)
                 if (mMarker != null) {
                     mMarker.remove();
                 }
@@ -623,8 +595,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 mMarker.setDraggable(true);
                 mMarker.showInfoWindow();
                 currentPosition = new LatLng(point.latitude, point.longitude);
+//                fullSegmentedPath = null;
                 clearDrawnPaths();
-                drawUserPosition(currentPosition);
+                drawUserPosition();
             }
         });
     }
@@ -641,28 +614,23 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     {
                         LatLng latLng = new LatLng(pos[0], pos[1]);
 
-                        currentPosition = latLng;
-
-                        drawUserPosition(currentPosition);
-                        //TODO: set to current zoom level, but have the first update zoom to 19
-                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentPosition, 19));
-
                         if (floor != currentFloor) {
                             changeFloor(floor);
-                            mMap.clear();
-                        }
-
-                        currentFloor = floor;
-/*
-                        if (elevationChangeBounds != null) {
-                            if (elevationChangeBounds.contains(latLng)) {
-                                drawNextFloor(); // loads the next map and draws the path when end point is reached
+                            clearDrawnPaths();
+                            clearDrawnUserPosition();
+                            if (fullSegmentedPath != null) {
+                                drawFloorPath(fullSegmentedPath);
                             }
                         }
-*/
+
+                        currentPosition = latLng;
+                        drawUserPosition();
+                        currentFloor = floor;
+
+                        //TODO: set to current zoom level, but have the first update zoom to 19
+                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentPosition, 19));
                     }
-                    else
-                    {
+                    else {
                         showCustomToast(MapActivity.this, getResources().getString(R.string.positioning_unable_to_locate_user), Toast.LENGTH_LONG);
                     }
                 }
@@ -672,35 +640,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         registerReceiver(positionLibOutputReceiver, new IntentFilter("no.hesa.positionlibrary.Output"));
     }
 
-    private void registerPathReceiver()
-    {
-
-    }
-
-/*
-    private void registerSearchLocationReceiver()
-    {
-     //   searchLocationReceiver = new BroadcastReceiver() {
-        class SearchLocationReceiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals("no.hesa.veiviserennarvik.LAT_LNG_RETURN")) {
-                Toast.makeText(MapActivity.this, "intentReceiver onReceive method", Toast.LENGTH_LONG).show();
-                LatLng latLng = new LatLng(intent.getDoubleExtra("lat",0),intent.getDoubleExtra("lng",0));
-                mMap.addMarker(new MarkerOptions().position(latLng).title("TestLocFromBR"));
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
-                mMap.addCircle(new CircleOptions().center(latLng).radius(3.0).fillColor(R.color.radiusfillcolor).strokeColor(R.color.radiusstrokecolor).strokeWidth(2));
-                targetPosition = latLng;
-                }
-            }
-        };
-        searchLocationReceiver = new SearchLocationReceiver();
-        registerReceiver(searchLocationReceiver, new IntentFilter("no.hesa.veiviserennarvik.LAT_LNG_RETURN"));
-    }
-    */
-//endregion
-
 //region INDOORATLAS METHODS
+    // TODO: GIVE CREDIT! important.
         /**
          * Sets bitmap of floor plan as ground overlay on Google Maps
          */
@@ -720,7 +661,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     .zIndex(0.1f);
 
             mGroundOverlay = mMap.addGroundOverlay(fpOverlay);
-            fetchMapSpinner.setVisibility(View.GONE); // hide loading spinner, load complete
         }
     }
 
@@ -740,6 +680,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     Log.d(TAG, "onBitmap loaded with dimensions: " + bitmap.getWidth() + "x"
                             + bitmap.getHeight());
                     setupGroundOverlay(floorPlan, bitmap);
+                    fetchMapSpinner.setVisibility(View.GONE); // hide loading spinner, map loaded successfully
                 }
 
                 @Override
@@ -752,7 +693,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 public void onBitmapFailed(Drawable placeHolderDraweble)
                 {
                     showCustomToast(getApplicationContext(), getResources().getString(R.string.failed_to_load_map), Toast.LENGTH_SHORT);
-                    fetchMapSpinner.setVisibility(View.GONE);
+                    fetchMapSpinner.setVisibility(View.GONE); // hide loading spinner, map load failed
                 }
             };
         }
@@ -775,7 +716,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
      * Fetches floor plan data from IndoorAtlas server.
      */
     private void fetchFloorPlan(String id) {
-        fetchMapSpinner.setVisibility(View.VISIBLE); // show loading spinner
+        fetchMapSpinner.setVisibility(View.VISIBLE); // show loading spinner, start of map loading
 
         // if there is already running task, cancel it
         cancelPendingNetworkCalls();
@@ -868,7 +809,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         });
         return true;
-
     }
 
     @Override
@@ -947,9 +887,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     @Override
     public void onBackPressed() {
         long currentTime = System.currentTimeMillis();
-        if(currentTime - lastPress > 5000){
+        if(currentTime - backPressedTimeStamp > 5000){
             showCustomToast(getApplicationContext(), getResources().getString(R.string.close_mapactivity_backpress_confirmation), Toast.LENGTH_SHORT);
-            lastPress = currentTime;
+            backPressedTimeStamp = currentTime;
         }
         else{
             super.onBackPressed();
@@ -963,12 +903,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 LatLng latLng = new LatLng(data.getDoubleExtra("lat", 0), data.getDoubleExtra("lng", 0));
                 double floor = data.getDoubleExtra("floor", 1.0);
 
-
                 showCustomToast(getApplicationContext(), latLng.toString() + ", " + floor, Toast.LENGTH_SHORT );
 
-//              changeFloor((int)floor);
+                changeFloor((int)floor);
                 latLng = new LatLng(68.4358635893339, 17.434213757514954);
                 floor = 1;
+
 
 //                currentPosition =  new LatLng(68.43548946533, 17.4339371547);
 //                currentFloor = 1;
@@ -976,31 +916,43 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     changeFloor(currentFloor);
                 }
 
+//                HashMap<Integer, Boolean> visitedFloors = new HashMap<>();
+
                 try {
                     path = positionLibrary.wifiPosition.plotRoute(new Point(currentPosition.latitude, currentPosition.longitude, currentFloor), new Point(latLng.latitude, latLng.longitude, (int) floor), pathPointJson);
+//                    Gson gson = new Gson();
+//                    String json = gson.toJson(path);
+//                    SharedPreferences.Editor sharedPreferences = getSharedPreferences("MapActivityPrefs", MODE_PRIVATE).edit();
+//                    sharedPreferences.putString("PathJson", json);
+//                    sharedPreferences.apply();
                     if (path != null) {
                         // draw path for this floor if available
-                        List<Point> floorToDraw = null;
-                        if (path != null) {
-                            floorToDraw = new ArrayList<Point>();
-                            for (Point point : path) {
-                                if (point.getFloor() == currentFloor) {
-                                    floorToDraw.add(point);
+                        int nextFloor = -100;
+                        List<Point> singleFloorPath = new ArrayList<Point>();
+                        fullSegmentedPath = new ArrayList<List<Point>>();
+
+                        for (int i = 0; i < path.size(); i++) { // iterate path
+                            singleFloorPath.add(path.get(i)); // add current point to singleFloorPath
+                            if (path.size() > (i + 1)) { // check if we are on the last point of the path
+                                nextFloor = path.get(i + 1).getFloor(); // add the floor of the next point
+                                if (nextFloor != path.get(i).getFloor()) { // if the next point is different than the current point
+//                                    List<Point> tempList = new ArrayList<Point>(singleFloorPath);
+                                    fullSegmentedPath.add(new ArrayList<Point>(singleFloorPath)); // add the list of points to the fullSegmentedPath list
+                                    singleFloorPath.clear(); // clear the current list
                                 }
                             }
+                            else {
+                                fullSegmentedPath.add(singleFloorPath); // add the list of points to the fullSegmentedPath list
+                            }
                         }
-                        if (floorToDraw != null) {
-                            drawFloorPath(floorToDraw);
-                            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(path.get(0).getLatitude(), path.get(0).getLongitude()), 19));
-                        }
+
+                        drawFloorPath(fullSegmentedPath);
+                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(path.get(0).getLatitude(), path.get(0).getLongitude()), 19));
                     }
                 }
-                catch (PathNotFoundException ex)
-                {
+                catch (PathNotFoundException ex) {
                     showCustomToast(getApplicationContext(), getResources().getString(R.string.path_not_found_exception), Toast.LENGTH_SHORT );
                 }
-
-                targetPosition = latLng;
             }
         }
     }
