@@ -13,6 +13,8 @@ namespace Api.Controllers
 {
     /// <summary>
     /// Controller that handels crud for Types
+    /// 
+    /// Written by: Andreas Mosvoll
     /// </summary>
     [RoutePrefix("api")]
     public class TypeController : ApiController

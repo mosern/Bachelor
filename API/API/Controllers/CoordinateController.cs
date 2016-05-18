@@ -17,6 +17,8 @@ namespace Api.Controllers
 {
     /// <summary>
     /// Controller that handels crud for Coordinates
+    /// 
+    /// Written by: Andreas Mosvoll
     /// </summary>
     [RoutePrefix("api")]
     public class CoordinateController : ApiController

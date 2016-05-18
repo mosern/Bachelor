@@ -14,6 +14,11 @@ using Thinktecture.IdentityModel.WebApi;
 
 namespace Api.Controllers
 {
+    /// <summary>
+    /// Controller that handels crud for PathPoints
+    /// 
+    /// Written by: Andreas Mosvoll
+    /// </summary>
     [RoutePrefix("api")]
     public class PathPointController : ApiController
     {

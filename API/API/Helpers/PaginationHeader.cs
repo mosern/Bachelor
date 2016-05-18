@@ -10,6 +10,11 @@ namespace Api.Classes
 {
     /// <summary>
     /// PaginationHeader object and static metode for creating it.
+    /// 
+    /// Inspired by the course "Building and Securing a RESTful API for Multiple Clients in ASP.NET by Kevin Dockx" at pluralsight.
+    /// https://app.pluralsight.com/library/courses/building-securing-restful-api-aspdotnet/description
+    /// 
+    /// Written by: Andreas Mosvoll
     /// </summary>
     public class PaginationHeader
     {
@@ -29,14 +34,6 @@ namespace Api.Classes
 
 
             UrlHelper urlHelper = new UrlHelper(request);
-
-            ExpandoObject routeValues = new ExpandoObject();
-
-            //TODO Check what this is about!
-            //foreach (KeyValuePair<string, object> entry in _routeValues)
-            //{
-            //    _routeValues.Add(entry.Key, entry.Value);
-            //}
 
             _routeValues.Add("page", page - 1);
             _routeValues.Add("pageSize", pageSize);

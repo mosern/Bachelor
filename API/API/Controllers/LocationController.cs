@@ -16,6 +16,11 @@ using System.Web.Http.ModelBinding;
 using Thinktecture.IdentityModel.WebApi;
 namespace Api.Controllers
 {
+    /// <summary>
+    /// Controller that handels crud for Locations
+    /// 
+    /// Written by: Andreas Mosvoll
+    /// </summary>
     [RoutePrefix("api")]
     public class LocationController : ApiController
     {

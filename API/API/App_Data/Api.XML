@@ -6,7 +6,7 @@
     <members>
         <member name="T:Api.AutoMapConfig">
             <summary>
-            Configuration of automapper, used to convert between db models to viewmodels
+            Configuration of automapper, used to convert between db models and viewmodels
             </summary>
         </member>
         <member name="M:Api.Areas.HelpPage.ApiDescriptionExtensions.GetFriendlyId(System.Web.Http.Description.ApiDescription)">
@@ -486,6 +486,13 @@
             </summary>
             <param name="documentPath">The physical path to XML document.</param>
         </member>
+        <member name="T:Api.Controllers.NeighbourController">
+            <summary>
+            Controller that handels crud for Neighbours
+            
+            Written by: Andreas Mosvoll
+            </summary>
+        </member>
         <member name="M:Api.Controllers.NeighbourController.Get(System.String,System.String,System.Nullable{System.Int32},System.Int32,System.Boolean,System.String)">
             <summary>
             Gets a list of Neighbours
@@ -536,6 +543,13 @@
             <param name="id">Id of the neighbour to remove</param>
             <returns>200 ok</returns>
         </member>
+        <member name="T:Api.Controllers.PathPointController">
+            <summary>
+            Controller that handels crud for PathPoints
+            
+            Written by: Andreas Mosvoll
+            </summary>
+        </member>
         <member name="M:Api.Controllers.PathPointController.Get(System.String,System.String,System.Nullable{System.Int32},System.Int32,System.Boolean,System.String)">
             <summary>
             Gets a list of PathPoints
@@ -585,6 +599,13 @@
             </summary>
             <param name="id">Id of the pathPoint to remove</param>
             <returns>200 ok</returns>
+        </member>
+        <member name="T:Api.Controllers.PeopleController">
+            <summary>
+            Controller that handels crud for People
+            
+            Written by: Andreas Mosvoll
+            </summary>
         </member>
         <member name="M:Api.Controllers.PeopleController.Get(System.String,System.String,System.Nullable{System.Int32},System.Int32,System.Boolean,System.String)">
             <summary>
@@ -639,6 +660,8 @@
         <member name="T:Api.Controllers.TypeController">
             <summary>
             Controller that handels crud for Types
+            
+            Written by: Andreas Mosvoll
             </summary>
         </member>
         <member name="M:Api.Controllers.TypeController.Get(System.String,System.String,System.Nullable{System.Int32},System.Int32,System.Boolean,System.String)">
@@ -694,6 +717,8 @@
         <member name="T:Api.Controllers.AccesspointController">
             <summary>
             Controller that handels crud for Accesspoints
+            
+            Written by: Andreas Mosvoll
             </summary>
         </member>
         <member name="M:Api.Controllers.AccesspointController.Get(System.String,System.String,System.Nullable{System.Int32},System.Int32,System.Boolean,System.String)">
@@ -749,6 +774,8 @@
         <member name="T:Api.Controllers.CoordinateController">
             <summary>
             Controller that handels crud for Coordinates
+            
+            Written by: Andreas Mosvoll
             </summary>
         </member>
         <member name="M:Api.Controllers.CoordinateController.Get(System.String,System.String,System.Nullable{System.Int32},System.Int32,System.Boolean,System.String)">
@@ -800,6 +827,13 @@
             </summary>
             <param name="id">Id of the coordinate to remove</param>
             <returns>200 ok</returns>
+        </member>
+        <member name="T:Api.Controllers.LocationController">
+            <summary>
+            Controller that handels crud for Locations
+            
+            Written by: Andreas Mosvoll
+            </summary>
         </member>
         <member name="M:Api.Controllers.LocationController.Get(System.String,System.String,System.Nullable{System.Int32},System.Int32,System.Boolean,System.String,System.String)">
             <summary>
@@ -855,6 +889,8 @@
         <member name="T:Api.Controllers.UserController">
             <summary>
             Controller that handels crud for Users
+            
+            Written by: Andreas Mosvoll
             </summary>
         </member>
         <member name="M:Api.Controllers.UserController.Get(System.String,System.String,System.Nullable{System.Int32},System.Int32,System.Boolean,System.String)">
@@ -932,8 +968,22 @@
         <member name="T:Api.Factories.ShapeFactory`1">
             <summary>
             Generic class that shapes an object, based on the spesified fields. Has methodes for both individual objects and lists of objects
+            
+            Inspired by the course "Building and Securing a RESTful API for Multiple Clients in ASP.NET by Kevin Dockx" at pluralsight.
+            https://app.pluralsight.com/library/courses/building-securing-restful-api-aspdotnet/description
+            
+            Written by: Andreas Mosvoll
             </summary>
             <typeparam name="X">a ViewModel</typeparam>
+        </member>
+        <member name="T:Api.Classes.AuthorizationManager">
+            <summary>
+            Implementation of Identityservers resourceAutorization
+            Inspired by https://identityserver.github.io/Documentation/docsv2/overview/mvcGettingStarted.html
+            We have not utilized the potential here, due to limited time everything regarding user administration was a low priority.
+            
+            Written by: Andreas Mosvoll
+            </summary>
         </member>
         <member name="T:Api.Classes.ILocationRepository`1">
             <summary>
@@ -954,6 +1004,8 @@
             Helper class for making objects. 
             Needed because Android differentiates JsonArray and JsonObject.
             Therefor having the returned data as JsonObjects only, makes it easier for the Android develpers.
+            
+            Written by: Andreas Mosvoll
             </summary>
         </member>
         <member name="T:Api.Classes.LocationRepository`1">
@@ -968,6 +1020,8 @@
         <member name="T:Api.Classes.Search">
             <summary>
             Handles search fuctionality
+            
+            Written by: Andreas Mosvoll
             </summary>
         </member>
         <member name="M:Api.Classes.Search.Location(System.String,System.Security.Principal.IPrincipal)">
@@ -1043,6 +1097,11 @@
         <member name="T:Api.Classes.PaginationHeader">
             <summary>
             PaginationHeader object and static metode for creating it.
+            
+            Inspired by the course "Building and Securing a RESTful API for Multiple Clients in ASP.NET by Kevin Dockx" at pluralsight.
+            https://app.pluralsight.com/library/courses/building-securing-restful-api-aspdotnet/description
+            
+            Written by: Andreas Mosvoll
             </summary>
         </member>
         <member name="T:Api.Helpers.ControllerHelper">

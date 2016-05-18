@@ -13,6 +13,11 @@ using Thinktecture.IdentityModel.WebApi;
 
 namespace Api.Controllers
 {
+    /// <summary>
+    /// Controller that handels crud for People
+    /// 
+    /// Written by: Andreas Mosvoll
+    /// </summary>
     [RoutePrefix("api")]
     public class PeopleController : ApiController
     {

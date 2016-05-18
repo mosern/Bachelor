@@ -7,9 +7,15 @@ using Thinktecture.IdentityModel.Owin.ResourceAuthorization;
 
 namespace Api.Classes
 {
-    //Implementation of Identityservers resourceAutorization
-    //https://identityserver.github.io/Documentation/docsv2/overview/mvcGettingStarted.html
-    //We have not utilized the potential here, due to limited time everything regarding user administration was a low priority. 
+
+
+    /// <summary>
+    /// Implementation of Identityservers resourceAutorization
+    /// Inspired by https://identityserver.github.io/Documentation/docsv2/overview/mvcGettingStarted.html
+    /// We have not utilized the potential here, due to limited time everything regarding user administration was a low priority.
+    /// 
+    /// Written by: Andreas Mosvoll
+    /// </summary>
     public class AuthorizationManager : ResourceAuthorizationManager
     {
         public override Task<bool> CheckAccessAsync(ResourceAuthorizationContext context)
@@ -73,7 +79,7 @@ namespace Api.Classes
             {
                 case "read": return Eval(true);
                 case "write": return Eval(context.Principal.HasClaim("roles", "Administrator"));
-                case "edit": return Eval(context.Principal.HasClaim("roles", "Administrator"));
+                case "edit": return Eval(context.Principal.HasClaim("http://schemas.microsoft.com/ws/2008/06/identity/claims/role", "Administrator"));
                 case "delete": return Eval(context.Principal.HasClaim("roles", "Administrator"));
                 default: return Nok();
             }

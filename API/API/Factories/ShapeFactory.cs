@@ -10,6 +10,11 @@ namespace Api.Factories
 {
     /// <summary>
     /// Generic class that shapes an object, based on the spesified fields. Has methodes for both individual objects and lists of objects
+    /// 
+    /// Inspired by the course "Building and Securing a RESTful API for Multiple Clients in ASP.NET by Kevin Dockx" at pluralsight.
+    /// https://app.pluralsight.com/library/courses/building-securing-restful-api-aspdotnet/description
+    /// 
+    /// Written by: Andreas Mosvoll
     /// </summary>
     /// <typeparam name="X">a ViewModel</typeparam>
     public class ShapeFactory<X> where X : BaseViewModel

@@ -15,6 +15,8 @@ namespace Api.Controllers
 {
     /// <summary>
     /// Controller that handels crud for Accesspoints
+    /// 
+    /// Written by: Andreas Mosvoll
     /// </summary>
     [RoutePrefix("api")]
     public class AccesspointController : ApiController

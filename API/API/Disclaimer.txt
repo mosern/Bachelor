@@ -1,0 +1,5 @@
+﻿    This Api is inspired by the course "Building and Securing a RESTful API for Multiple Clients in ASP.NET by Kevin Dockx" at pluralsight.
+    https://app.pluralsight.com/library/courses/building-securing-restful-api-aspdotnet/description
+
+	Autentication users our Identity server that is based on IdentityServer 3. All code releated to autentication is inspired by the documentation:
+	https://identityserver.github.io/Documentation/docsv2/overview/mvcGettingStarted.html

@@ -16,6 +16,8 @@ namespace Api.Classes
 {
     /// <summary>
     /// Handles search fuctionality
+    /// 
+    /// Written by: Andreas Mosvoll
     /// </summary>
     public class Search
     {

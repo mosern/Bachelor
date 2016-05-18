@@ -11,6 +11,8 @@ namespace Api.Classes
     /// Helper class for making objects. 
     /// Needed because Android differentiates JsonArray and JsonObject.
     /// Therefor having the returned data as JsonObjects only, makes it easier for the Android develpers.
+    /// 
+    /// Written by: Andreas Mosvoll
     /// </summary>
     public class JsonHelper
     {

@@ -18,6 +18,8 @@ namespace Api.Controllers
 {
     /// <summary>
     /// Controller that handels crud for Users
+    /// 
+    /// Written by: Andreas Mosvoll
     /// </summary>
     [RoutePrefix("api")]
     public class UserController : ApiController
