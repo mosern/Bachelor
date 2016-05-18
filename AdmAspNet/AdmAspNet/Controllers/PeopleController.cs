@@ -20,6 +20,7 @@ namespace AdmAspNet.Controllers
 
         public PeopleController()
         {
+            //Setup all maps for automapper
             mapConfig = new MapperConfiguration(cfg => {
                 cfg.CreateMap<PeopleViewModel, People>();
                 cfg.CreateMap<People, PeopleViewModel>();
@@ -31,7 +32,11 @@ namespace AdmAspNet.Controllers
                 cfg.CreateMap<Coordinate, CoordinateViewModel>(); 
             }); 
         }
-        // GET: Person
+
+        /// <summary>
+        /// Show all people in a list
+        /// </summary>
+        /// <returns></returns>
         public ActionResult Index()
         {
             List<People> peopleList = api.GetAllPeople();
@@ -40,6 +45,10 @@ namespace AdmAspNet.Controllers
             return View(viewModel);
         }
 
+        /// <summary>
+        /// Create a new person (GET) 
+        /// </summary>
+        /// <returns></returns>
         public ActionResult Create()
         {
             PeopleViewModel model = new PeopleViewModel(); 
@@ -56,6 +65,11 @@ namespace AdmAspNet.Controllers
             return View(model); 
         }
 
+        /// <summary>
+        /// Create a new person (POST) 
+        /// </summary>
+        /// <param name="input">The person object to create</param>
+        /// <returns></returns>
         [HttpPost]
         public ActionResult Create(PeopleViewModel input)
         {
@@ -89,6 +103,11 @@ namespace AdmAspNet.Controllers
             return View(baseModel); 
         }
 
+        /// <summary>
+        /// Edit a person (GET)
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public ActionResult Edit(int? id)
         {
             if (id == null)
@@ -118,6 +137,12 @@ namespace AdmAspNet.Controllers
             return View(viewModel);  
         }
 
+        /// <summary>
+        /// Edit a person (POST) 
+        /// </summary>
+        /// <param name="id">The id of the person to edit</param>
+        /// <param name="data">The people object with updated fields</param>
+        /// <returns></returns>
         [HttpPost]
         public ActionResult Edit(int id, PeopleViewModel data)
         {
@@ -149,6 +174,84 @@ namespace AdmAspNet.Controllers
             }
             return View(data); 
         }
+
+        /// <summary>
+        /// Returns all the details about a person
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public ActionResult Details(int? id)
+        {
+            if (id == null)
+            {
+                ViewBag.ErrorMessage = "Du må angi en ID";
+                return View("ErrorView"); 
+            }
+            People data; 
+            if ((data = api.GetPeopleById(id.Value)) == null)
+            {
+                ViewBag.ErrorMessage = "Kan ikke finne personen du forespurte";
+                return View("ErrorView"); 
+            }
+            var mapper = mapConfig.CreateMapper();
+            PeopleViewModel viewModel = mapper.Map<PeopleViewModel>(data);
+            return View(viewModel); 
+        } 
+
+        /// <summary>
+        /// Delete a particular person (GET) 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public ActionResult Delete(int? id)
+        {
+            if (id == null)
+            {
+                ViewBag.ErrorMessage = "Du må angi en ID";
+                return View("ErrorView"); 
+            }
+            People data; 
+            if ((data = api.GetPeopleById(id.Value)) == null)
+            {
+                ViewBag.ErrorMessage = "Kan ikke finne personen du forespurte";
+                return View("ErrorView"); 
+            }
+            var mapper = mapConfig.CreateMapper();
+            PeopleViewModel viewModel = mapper.Map<PeopleViewModel>(data);
+            return View(viewModel); 
+        }
+
+        /// <summary>
+        /// Delete a particular person (POST) 
+        /// </summary>
+        /// <param name="id">The id of the person to delete</param>
+        /// <returns></returns>
+        [HttpPost]
+        public ActionResult Delete(int id)
+        {
+            People data; 
+            if ((data = api.GetPeopleById(id)) == null)
+            {
+                ViewBag.ErrorMessage = "Kan ikke finne personen du forespurte";
+                return View("ErrorView"); 
+            }
+            if (api.DeletePeople(id))
+            {
+                ViewBag.SuccessMessage = "Personen ble slettet"; 
+            }
+            else
+            {
+                ViewBag.ErrorMessage = "En feil oppstod, kontakt systemadministrator"; 
+            }
+            var mapper = mapConfig.CreateMapper();
+            PeopleViewModel viewModel = mapper.Map<PeopleViewModel>(data);
+            return View(viewModel); 
+        }
+
+        /// <summary>
+        /// Overrided method that runs when the httpcontext is initialized 
+        /// </summary>
+        /// <param name="requestContext"></param>
         protected override void Initialize(RequestContext requestContext)
         {
             base.Initialize(requestContext);

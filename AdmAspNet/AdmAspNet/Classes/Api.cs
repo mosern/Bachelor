@@ -307,7 +307,7 @@ namespace AdmAspNet.Classes
 
         #endregion
 
-        #region PersonMethods
+        #region PeopleMethods
         public List<People> GetAllPeople()
         {
             string url = ConfigurationManager.AppSettings["apiPeople"] + "/?asObject=false";
@@ -330,6 +330,12 @@ namespace AdmAspNet.Classes
         {
             string url = ConfigurationManager.AppSettings["apiPeople"] + "/" + id;
             return PutApi(url, data); 
+        }
+
+        public bool DeletePeople(int id)
+        {
+            string url = ConfigurationManager.AppSettings["apiPeople"] + "/" + id;
+            return DeleteObject(url); 
         }
         #endregion
 

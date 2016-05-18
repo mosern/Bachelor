@@ -1,0 +1,76 @@
+﻿@model AdmAspNet.Models.ViewModels.PeopleViewModel
+
+@{
+    ViewBag.Title = "Detaljer person";
+}
+@section sidebar {
+    @Html.Partial("_SidebarPartial")
+}
+<h2>Detaljer</h2>
+
+<div>
+    <h4>Person</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.JobTitle)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.JobTitle)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Desc)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Desc)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.TlfOffice)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.TlfOffice)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.TlfMobile)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.TlfMobile)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Email)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Email)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Location)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Location.LocNr)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Rediger", "Edit", new { id = Model.Id }) |
+    @Html.ActionLink("Tilbake til oversikt", "Index")
+</p>

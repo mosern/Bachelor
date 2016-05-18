@@ -1,0 +1,82 @@
+﻿@model AdmAspNet.Models.ViewModels.PeopleViewModel
+
+@{
+    ViewBag.Title = "Slett person";
+}
+@section sidebar {
+    @Html.Partial("_SidebarPartial")
+}
+<h2>Slett</h2>
+
+<h3>Er du sikker på at du vil slette?</h3>
+<div>
+    <h4>Person</h4>
+    @if (ViewBag.SuccessMessage != null)
+    {
+        Html.RenderPartial("_SuccessPartial");
+    }
+    @if (ViewBag.ErrorMessage != null)
+    {
+        Html.RenderPartial("_ErrorPartial");
+    }
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.JobTitle)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.JobTitle)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Desc)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Desc)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.TlfOffice)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.TlfOffice)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.TlfMobile)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.TlfMobile)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Email)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Email)
+        </dd>
+
+    </dl>
+
+    @using (Html.BeginForm()) {
+        @Html.AntiForgeryToken()
+
+        <div class="form-actions no-color">
+            <input type="submit" value="Slett" class="btn btn-default" /> |
+            @Html.ActionLink("Tilbake til oversikt", "Index")
+        </div>
+    }
+</div>
