@@ -292,55 +292,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         // TODO: 28/04/2016 first run only, maybe change to users position via GPS
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lng), zoomLevel));
 
-        if (pathPointJson != null) {
+        if (pathPointJson == null) {
 //            showCustomToast(getApplicationContext(), "USING CACHED PATHPOINTS", Toast.LENGTH_SHORT);
-            if (returnedCoordsFromSearchIntent != null) {
-                if (returnedCoordsFromSearchIntent.getAction() != null) {
-                    if (returnedCoordsFromSearchIntent.getAction().equals("no.hesa.veiviserennarvik.LAT_LNG_RETURN")) {
-                        LatLng latLng = new LatLng(returnedCoordsFromSearchIntent.getDoubleExtra("lat", 0), returnedCoordsFromSearchIntent.getDoubleExtra("lng", 0));
-                        double floor = returnedCoordsFromSearchIntent.getDoubleExtra("floor", 1.0);
-//                        changeFloor((int)floor);
-                        //latLng = new LatLng(68.4358635893339, 17.434213757514954);
-                        latLng = new LatLng(68.4361961798715, 17.434284836053848);
-                        floor = 2;
-
-                        currentPosition =  new LatLng(68.43607812865787, 17.43459329009056);
-                        currentFloor = 1;
-                        if (floor != currentFloor) {
-                            changeFloor(currentFloor);
-                        }
-
-                        try {
-                            //path = positionLibrary.wifiPosition.plotRoute(new Point(currentPosition.latitude, currentPosition.longitude, currentFloor), new Point(latLng.latitude, latLng.longitude, (int) floor), pathPointJson);
-                            path = positionLibrary.wifiPosition.plotRoute(new Point(currentPosition.latitude, currentPosition.longitude, currentFloor), new Point(latLng.latitude, latLng.longitude, (int) floor), pathPointJson);
-                            if (path != null) {
-                                // draw path for this floor if available
-                                List<Point> floorToDraw = null;
-                                if (path != null) {
-                                    floorToDraw = new ArrayList<Point>();
-                                    for (Point point : path) {
-                                        if (point.getFloor() == currentFloor) {
-                                            floorToDraw.add(point);
-                                        }
-                                    }
-                                }
-                                if (floorToDraw != null) {
-                                    drawFloorPath(floorToDraw);
-                                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(path.get(0).getLatitude(), path.get(0).getLongitude()), 19));
-                                }
-                            }
-                        }
-                        catch (PathNotFoundException ex)
-                        {
-                            showCustomToast(getApplicationContext(), getResources().getString(R.string.path_not_found_exception), Toast.LENGTH_SHORT );
-                        }
-
-                        targetPosition = latLng;
-                    }
-                }
-            }
-        }
-        else {
             /*
             Pathpoints are potentially a substantial download, and to avoid downloading them via
             the positioning-library they are retrieved and cached in this activity better suited for handling
