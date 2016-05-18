@@ -13,7 +13,7 @@ using UserDB;
 namespace Api
 {
     /// <summary>
-    /// Configuration of automapper, used to convert between db models to viewmodels
+    /// Configuration of automapper, used to convert between db models and viewmodels
     /// </summary>
     public class AutoMapConfig
     {
@@ -21,7 +21,7 @@ namespace Api
         {
             var config = new MapperConfiguration(c =>
             {
-                c.CreateMap<User, UserViewModel>().ConvertUsing<UserTypeConverter>();
+                c.CreateMap<User, UserViewModel>().ConvertUsing<UserTypeViewConverter>();
                 c.CreateMap<UserViewModel, User>();
 
                 c.CreateMap<Models.EF.Type, TypeViewModel>();
@@ -37,22 +37,21 @@ namespace Api
                 c.CreateMap<Coordinate, CoordinateViewModel>();
                 c.CreateMap<CoordinateViewModel, Coordinate>();
 
-                c.CreateMap<Accesspoint, AccesspointViewModel>().ConvertUsing<AccesspointTypeCoverter>();
-                c.CreateMap<AccesspointViewModel, Accesspoint>().ConvertUsing<AccesspointViewTypeConverter>();
+                c.CreateMap<Accesspoint, AccesspointViewModel>().ConvertUsing<AccesspointViewTypeConverter>();
+                c.CreateMap<AccesspointViewModel, Accesspoint>().ConvertUsing<ViewAccesspointTypeConverter>();
+                c.CreateMap<IEnumerable<Accesspoint>, IEnumerable<AccesspointViewModel>>().ConvertUsing<IEnumAccesspointViewTypeConverter>();
 
-                c.CreateMap<PathPoint, PathPointViewModel>().ConvertUsing<PathPointTypeConverter>();
-                c.CreateMap<PathPointViewModel, PathPoint>().ConvertUsing<PathPointViewTypeConverter>();
+                c.CreateMap<PathPoint, PathPointViewModel>().ConvertUsing<PathPointViewTypeConverter>();
+                c.CreateMap<PathPointViewModel, PathPoint>().ConvertUsing<ViewPathPointTypeConverter>();
 
-                c.CreateMap<PathNeighbour, NeighbourViewModel>().ConvertUsing<PathNeighbourTypeConverter>();
-                c.CreateMap<NeighbourViewModel, PathNeighbour>().ConvertUsing<PathNeighbourViewTypeConverter>();
+                c.CreateMap<PathNeighbour, NeighbourViewModel>().ConvertUsing<PathNeighbourViewTypeConverter>();
+                c.CreateMap<NeighbourViewModel, PathNeighbour>().ConvertUsing<ViewPathNeighbourTypeConverter>();
 
-                c.CreateMap<PathPoint, PathPointNeighbourViewModel>().ConvertUsing<PathPointNeighbourTypeConverter>();
-                c.CreateMap<IEnumerable<PathPoint>, IEnumerable<PathPointNeighbourViewModel>>().ConvertUsing<IEnumPathPointNeighbourTypeConverter>();
+                c.CreateMap<PathPoint, PathPointNeighbourViewModel>().ConvertUsing<PathPointNeighbourViewTypeConverter>();
+                c.CreateMap<IEnumerable<PathPoint>, IEnumerable<PathPointNeighbourViewModel>>().ConvertUsing<IEnumPathPointNeighbourViewTypeConverter>();
 
-                c.CreateMap<UserLocation, LocationViewModel>().ConvertUsing<UserLocationTypeConverter>();
-                c.CreateMap<PathPoint, IEnumerable<NeighbourViewModel>>().ConvertUsing<NeighbourTypeConverter>();
-
-                //c.CreateMap<PathPointViewModel, PathNeighbour>().ConvertUsing<PathNeighbourTypeConverter>();
+                c.CreateMap<UserLocation, LocationViewModel>().ConvertUsing<UserLocationViewTypeConverter>();
+                c.CreateMap<PathPoint, IEnumerable<NeighbourViewModel>>().ConvertUsing<PathPointIEnumNeighbourViewTypeConverter>();
 
                 c.CreateMap<SearchViewModel, IEnumerable<object>>().ConvertUsing<SearchTypeConverter>();
             });
@@ -61,7 +60,7 @@ namespace Api
         }         
     }
 
-    public class UserTypeConverter : ITypeConverter<User, UserViewModel>
+    public class UserTypeViewConverter : ITypeConverter<User, UserViewModel>
     {
         public UserViewModel Convert(ResolutionContext context)
         {
@@ -139,7 +138,7 @@ namespace Api
         }
     }
 
-    public class UserLocationTypeConverter : ITypeConverter<UserLocation, LocationViewModel>
+    public class UserLocationViewTypeConverter : ITypeConverter<UserLocation, LocationViewModel>
     {
         public LocationViewModel Convert(ResolutionContext context)
         {
@@ -324,7 +323,7 @@ namespace Api
         }
     }
 
-    public class AccesspointTypeCoverter : ITypeConverter<Accesspoint, AccesspointViewModel>
+    public class AccesspointViewTypeConverter : ITypeConverter<Accesspoint, AccesspointViewModel>
     {
         public AccesspointViewModel Convert(ResolutionContext context)
         {
@@ -345,7 +344,35 @@ namespace Api
         }
     }
 
-    public class AccesspointViewTypeConverter : ITypeConverter<AccesspointViewModel, Accesspoint>
+    public class IEnumAccesspointViewTypeConverter : ITypeConverter<IEnumerable<Accesspoint>, IEnumerable<AccesspointViewModel>>
+    {
+        public IEnumerable<AccesspointViewModel> Convert(ResolutionContext context)
+        {
+            IEnumerable<Accesspoint> source = (IEnumerable<Accesspoint>)context.SourceValue;
+
+            List<AccesspointViewModel> dest = new List<AccesspointViewModel>();
+
+            IEnumerable<Coordinate> coordinates;
+            using (var repo = new LocationRepository<Coordinate>())
+                coordinates = repo.List().ToList();
+
+            foreach(Accesspoint acc in source)
+            {
+                dest.Add(new AccesspointViewModel()
+                {
+                    Id = acc.Id,
+                    Desc = acc.Desc,
+                    MacAddress = acc.MacAddress,
+                    Coordinate = AutoMapConfig.getMapper().Map<Coordinate, CoordinateViewModel>(coordinates.Where(c => c.Id == acc.CoordinateId).FirstOrDefault())
+
+                });
+            }
+
+            return dest;
+        }
+    }
+
+    public class ViewAccesspointTypeConverter : ITypeConverter<AccesspointViewModel, Accesspoint>
     {
         public Accesspoint Convert(ResolutionContext context)
         {
@@ -380,7 +407,7 @@ namespace Api
         }
     }
 
-    public class PathPointNeighbourTypeConverter : ITypeConverter<PathPoint, PathPointNeighbourViewModel>
+    public class PathPointNeighbourViewTypeConverter : ITypeConverter<PathPoint, PathPointNeighbourViewModel>
     {
         public PathPointNeighbourViewModel Convert(ResolutionContext context)
         {
@@ -420,7 +447,7 @@ namespace Api
         }
     }
 
-    public class IEnumPathPointNeighbourTypeConverter : ITypeConverter<IEnumerable<PathPoint>, IEnumerable<PathPointNeighbourViewModel>>
+    public class IEnumPathPointNeighbourViewTypeConverter : ITypeConverter<IEnumerable<PathPoint>, IEnumerable<PathPointNeighbourViewModel>>
     {
         public IEnumerable<PathPointNeighbourViewModel> Convert(ResolutionContext context)
         {
@@ -480,7 +507,7 @@ namespace Api
         }
     }
 
-    public class PathNeighbourTypeConverter : ITypeConverter<PathNeighbour, NeighbourViewModel>
+    public class PathNeighbourViewTypeConverter : ITypeConverter<PathNeighbour, NeighbourViewModel>
     {
         public NeighbourViewModel Convert(ResolutionContext context)
         {
@@ -500,7 +527,7 @@ namespace Api
         }
     }
 
-    public class PathNeighbourViewTypeConverter : ITypeConverter<NeighbourViewModel, PathNeighbour>
+    public class ViewPathNeighbourTypeConverter : ITypeConverter<NeighbourViewModel, PathNeighbour>
     {
         public PathNeighbour Convert(ResolutionContext context)
         {
@@ -521,7 +548,7 @@ namespace Api
         }
     }
 
-    public class NeighbourTypeConverter : ITypeConverter<PathPoint, IEnumerable<NeighbourViewModel>>
+    public class PathPointIEnumNeighbourViewTypeConverter : ITypeConverter<PathPoint, IEnumerable<NeighbourViewModel>>
     {
         public IEnumerable<NeighbourViewModel> Convert(ResolutionContext context)
         {
@@ -547,7 +574,7 @@ namespace Api
         }
     }
 
-    public class PathPointTypeConverter : ITypeConverter<PathPoint, PathPointViewModel>
+    public class PathPointViewTypeConverter : ITypeConverter<PathPoint, PathPointViewModel>
     {
         public PathPointViewModel Convert(ResolutionContext context)
         {
@@ -567,7 +594,7 @@ namespace Api
         }
     }
 
-    public class PathPointViewTypeConverter : ITypeConverter<PathPointViewModel, PathPoint>
+    public class ViewPathPointTypeConverter : ITypeConverter<PathPointViewModel, PathPoint>
     {
         public PathPoint Convert(ResolutionContext context)
         {
