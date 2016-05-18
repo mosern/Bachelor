@@ -429,11 +429,15 @@ namespace Api
 
             List<PathNeighbour> pathNeighbours;
             using (var repo = new LocationRepository<PathNeighbour>())
-                pathNeighbours = repo.List().Include(p => p.PathPoint1.Coordinate).Include(p => p.PathPoint2.Coordinate).ToList();
+                pathNeighbours = repo.List().Include(p => p.PathPoint1).Include(p => p.PathPoint2).ToList();
 
             List<Location> locations;
             using (var repo = new LocationRepository<Location>())
-                locations = repo.List().Where(l => l.NeighbourId != null).Include(l => l.Coordinate).ToList();
+                locations = repo.List().Where(l => l.NeighbourId != null).ToList();
+
+            List<Coordinate> coordinates;
+            using (var repo = new LocationRepository<Coordinate>())
+                coordinates = repo.List().ToList();
 
             foreach (PathPoint point in source)
             {
@@ -444,7 +448,7 @@ namespace Api
 
                     Location neighbour = locations.Where(l => l.NeighbourId.Value == point.Id).FirstOrDefault();
                     if (neighbour != null)
-                        neighbours.Add(new { ID = neighbour.Id, Distance = neighbour.Distance, Coordinate = AutoMapConfig.getMapper().Map<Coordinate, CoordinateViewModel>(neighbour.Coordinate) });
+                        neighbours.Add(new { ID = neighbour.Id, Distance = neighbour.Distance, Coordinate = AutoMapConfig.getMapper().Map<Coordinate, CoordinateViewModel>(coordinates.Where(c => c.Id == neighbour.CoordinateId).FirstOrDefault()) });
 
                     foreach (PathNeighbour path in temp)
                     {
@@ -454,12 +458,12 @@ namespace Api
                         if (path.PathPointId1 == point.Id)
                         {
                             var pathPoint = path.PathPoint2;
-                            neighbours.Add(new { ID = pathPoint.Id, Distance = path.Distance, Coordinate = AutoMapConfig.getMapper().Map<Coordinate, CoordinateViewModel>(pathPoint.Coordinate) });
+                            neighbours.Add(new { ID = pathPoint.Id, Distance = path.Distance, Coordinate = AutoMapConfig.getMapper().Map<Coordinate, CoordinateViewModel>(coordinates.Where(c => c.Id == pathPoint.CoordinateId).FirstOrDefault()) });
                         }
                         else
                         {
                             var pathPoint = path.PathPoint1;
-                            neighbours.Add(new { ID = pathPoint.Id, Distance = path.Distance, Coordinate = AutoMapConfig.getMapper().Map<Coordinate, CoordinateViewModel>(pathPoint.Coordinate) });
+                            neighbours.Add(new { ID = pathPoint.Id, Distance = path.Distance, Coordinate = AutoMapConfig.getMapper().Map<Coordinate, CoordinateViewModel>(coordinates.Where(c => c.Id == pathPoint.CoordinateId).FirstOrDefault()) });
                         }
                     }
                 }
@@ -467,7 +471,7 @@ namespace Api
                 {
                     Id = point.Id,
                     Neighbours = neighbours,
-                    Coordinate = AutoMapConfig.getMapper().Map<Coordinate, CoordinateViewModel>(point.Coordinate)
+                    Coordinate = AutoMapConfig.getMapper().Map<Coordinate, CoordinateViewModel>(coordinates.Where(c => c.Id == point.CoordinateId).FirstOrDefault())
                 });
             }
 

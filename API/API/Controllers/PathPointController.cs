@@ -38,7 +38,7 @@ namespace Api.Controllers
             using (var repo = new LocationRepository<PathPoint>())
             {
                 var temp = repo.List().ToList();
-                pathPoints = repo.List().Include(p => p.Coordinate).AsQueryable();
+                pathPoints = repo.List().AsQueryable();
 
                 toReturn = ControllerHelper.get<PathPointNeighbourViewModel>(pathPoints, HttpContext.Current, Request, "pathPoints", asObject, objPropName, fields, sort, page, pageSize);
             }
