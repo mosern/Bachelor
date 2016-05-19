@@ -469,17 +469,21 @@ namespace Api
             foreach (PathPoint point in source)
             {
                 List<object> neighbours = new List<object>();
+                int neighbourCount = point.NeighbourCount;
 
                 if (point.NeighbourCount != 0) {
                     List<PathNeighbour> temp = pathNeighbours.Where(p => p.PathPointId1 == point.Id || p.PathPointId2 == point.Id).ToList();
 
                     Location neighbour = locations.Where(l => l.NeighbourId.Value == point.Id).FirstOrDefault();
                     if (neighbour != null)
+                    {
                         neighbours.Add(new { ID = neighbour.Id, Distance = neighbour.Distance, Coordinate = AutoMapConfig.getMapper().Map<Coordinate, CoordinateViewModel>(coordinates.Where(c => c.Id == neighbour.CoordinateId).FirstOrDefault()) });
+                        neighbourCount += 1;
+                    }
 
                     foreach (PathNeighbour path in temp)
                     {
-                        if (neighbours.Count == point.NeighbourCount)
+                        if (neighbours.Count == neighbourCount)
                             break;
 
                         if (path.PathPointId1 == point.Id)
@@ -501,6 +505,11 @@ namespace Api
                     Coordinate = AutoMapConfig.getMapper().Map<Coordinate, CoordinateViewModel>(coordinates.Where(c => c.Id == point.CoordinateId).FirstOrDefault())
                 });
             }
+
+            //foreach(Location loc in locations)
+            //{
+
+            //}
 
             return dest;
 
