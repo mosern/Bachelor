@@ -317,10 +317,6 @@
     <Compile Include="Migrations\LocationConfiguration\201605151527426_pathpointneighbourcounter.Designer.cs">
       <DependentUpon>201605151527426_pathpointneighbourcounter.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\LocationConfiguration\201605141355564_LazyLoadingtest.cs" />
-    <Compile Include="Migrations\LocationConfiguration\201605141355564_LazyLoadingtest.Designer.cs">
-      <DependentUpon>201605141355564_LazyLoadingtest.cs</DependentUpon>
-    </Compile>
     <Compile Include="Migrations\LocationConfiguration\Configuration.cs" />
     <Compile Include="Models\Api\AccesspointViewModel.cs" />
     <Compile Include="Models\Api\BaseViewModel.cs" />
@@ -442,9 +438,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\LocationConfiguration\201605151527426_pathpointneighbourcounter.resx">
       <DependentUpon>201605151527426_pathpointneighbourcounter.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\LocationConfiguration\201605141355564_LazyLoadingtest.resx">
-      <DependentUpon>201605141355564_LazyLoadingtest.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
