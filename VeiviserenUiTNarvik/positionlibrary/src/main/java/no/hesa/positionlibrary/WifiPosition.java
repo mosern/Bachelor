@@ -612,9 +612,13 @@ public class WifiPosition implements ActionInterface {
                 Location.distanceBetween(position.getLatitude(), position.getLongitude(), allPathPoints.get(i).getLatitude(), allPathPoints.get(i).getLongitude(), dist);
                 distances.add(dist[0]);
             }
+            else
+                distances.add(1000f);
         }
 
         Float minDist = Collections.min(distances);
+        int tmp = distances.indexOf(minDist);
+        Point p = allPathPoints.get(tmp);
         result.put(allPathPoints.get(distances.indexOf(minDist)), Double.valueOf(minDist));
         return result;
     }

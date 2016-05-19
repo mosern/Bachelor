@@ -43,6 +43,7 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.GroundOverlay;
 import com.google.android.gms.maps.model.GroundOverlayOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
@@ -51,6 +52,7 @@ import com.google.gson.Gson;
 
 
 import com.google.gson.reflect.TypeToken;
+import com.google.maps.android.SphericalUtil;
 import com.indooratlas.android.sdk.IALocationManager;
 import com.indooratlas.android.sdk.resources.IAFloorPlan;
 import com.indooratlas.android.sdk.resources.IALatLng;
@@ -101,12 +103,17 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     private BroadcastReceiver positionLibOutputReceiver = null;
 
-    private LatLng currentPosition = null;
+
 
     private Menu menuRef = null;
 
     private String currentFloorPlan;
+
+    private LatLng currentPosition = null;
     private int currentFloor = -100;
+
+    private LatLng targetPosition = null;
+    private int targetFloor = -101;
 
     private ProgressBar fetchMapSpinner;
     private boolean positioningEnabled = false;
@@ -282,6 +289,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 //        }
     }
 
+//region DRAW/CLEAR METHODS
     /**
      * Places markers (circles) with polylines connecting them along provided path.
      * Colors first and last circle differently.
@@ -405,6 +413,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             userPositionMarker.remove();
         }
     }
+//endregion
 
     private void changeFloor(int floor)
     {
@@ -431,15 +440,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 break;
         }
     }
-/*
-    // http://stackoverflow.com/questions/15319431/how-to-convert-a-latlng-and-a-radius-to-a-latlngbounds-in-android-google-maps-ap
-    // http://googlemaps.github.io/android-maps-utils/
-    public LatLngBounds toBounds(LatLng center, double radius) {
-        LatLng southwest = SphericalUtil.computeOffset(center, radius * Math.sqrt(2.0), 225);
-        LatLng northeast = SphericalUtil.computeOffset(center, radius * Math.sqrt(2.0), 45);
-        return new LatLngBounds(southwest, northeast);
-    }
-    */
+
 //region BUTTON LISTENERS
     //// TODO: 28/04/2016 hardcoded floor values when changing floor with buttons 
     private void registerButtonListeners()
@@ -549,10 +550,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     private void enablePositioning(boolean positioningEnabled, boolean showToast)
     {
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_automatic_positioning);
         SharedPreferences.Editor sharedPreferences = getSharedPreferences("MapActivityPrefs", MODE_PRIVATE).edit();
         if (!positioningEnabled) // turn on
         {
-            FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_automatic_positioning);
             fab.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_location_on_white_24dp));
             this.positioningEnabled = true;
             sharedPreferences.putBoolean("PositioningEnabled", positioningEnabled);
@@ -564,7 +565,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
         else // turn off
         {
-            FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_automatic_positioning);
             fab.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_location_off_white_24dp));
             this.positioningEnabled = false;
             sharedPreferences.putBoolean("PositioningEnabled", positioningEnabled);
@@ -617,15 +617,31 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                         if (floor != currentFloor) {
                             changeFloor(floor);
                             clearDrawnPaths();
-                            clearDrawnUserPosition();
-                            if (fullSegmentedPath != null) {
-                                drawFloorPath(fullSegmentedPath);
-                            }
                         }
 
+                        clearDrawnUserPosition();
+
                         currentPosition = latLng;
-                        drawUserPosition();
                         currentFloor = floor;
+
+                        if (targetPosition != null && targetFloor > -100) {
+                            path = requestPathFromPosLib(targetPosition, targetFloor);
+                            fullSegmentedPath = generateFullSegmentedPath(path);
+                        }
+
+                        if (fullSegmentedPath != null) {
+                            drawFloorPath(fullSegmentedPath);
+                        }
+                        else {
+                            drawUserPosition();
+                        }
+                        if (path != null) {
+                            Point currentPoint = new Point(latLng.latitude, latLng.longitude, floor);
+                            if (arrivedAtFinalLocation(currentPoint, path.get(path.size() - 1))) //gets final point
+                            {
+                                // unbind targetPosition etc etc
+                            }
+                        }
 
                         //TODO: set to current zoom level, but have the first update zoom to 19
                         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentPosition, 19));
@@ -639,6 +655,27 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         positionLibrary.wifiPosition.registerBroadcast(this);
         registerReceiver(positionLibOutputReceiver, new IntentFilter("no.hesa.positionlibrary.Output"));
     }
+
+    public boolean arrivedAtFinalLocation(Point userPoint, Point finalLocation)
+    {
+        double radius = 4; // in meters
+        LatLngBounds llb = toBounds(new LatLng((float)finalLocation.getLatitude(), (float)finalLocation.getLongitude()), radius);
+        if (userPoint.getFloor() == finalLocation.getFloor()) {
+            if (llb.contains(new LatLng((float) userPoint.getLatitude(), (float) userPoint.getLongitude()))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // http://stackoverflow.com/questions/15319431/how-to-convert-a-latlng-and-a-radius-to-a-latlngbounds-in-android-google-maps-ap
+    // http://googlemaps.github.io/android-maps-utils/
+    public LatLngBounds toBounds(LatLng center, double radius) {
+        LatLng southwest = SphericalUtil.computeOffset(center, radius * Math.sqrt(2.0), 225);
+        LatLng northeast = SphericalUtil.computeOffset(center, radius * Math.sqrt(2.0), 45);
+        return new LatLngBounds(southwest, northeast);
+    }
+
 
 //region INDOORATLAS METHODS
     // TODO: GIVE CREDIT! important.
@@ -668,7 +705,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
      * Download floor plan using Picasso library.
      */
     private void fetchFloorPlanBitmap(final IAFloorPlan floorPlan) {
-
         final String url = floorPlan.getUrl();
 
         if (mLoadTarget == null) {
@@ -760,7 +796,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 
 //endregion
-
+//region MENU METHODS
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         menuRef = menu;
@@ -834,10 +870,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
         return super.onOptionsItemSelected(item);
     }
+//endregion
 
     @Override
     public void onCompletedAction(JSONObject jsonObject, String actionString) {
-
         switch (actionString) {
             case Api.ALL_USERS:
                 //JSONObject dummyObject = jsonObject;
@@ -899,61 +935,58 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == SEARCH_RETURNED_COORDINATE_CODE) {
-            if(resultCode == SEARCH_RETURNED_COORDINATE_RESULT){
-                LatLng latLng = new LatLng(data.getDoubleExtra("lat", 0), data.getDoubleExtra("lng", 0));
-                double floor = data.getDoubleExtra("floor", 1.0);
+            if(resultCode == SEARCH_RETURNED_COORDINATE_RESULT) {
+                targetPosition = new LatLng(data.getDoubleExtra("lat", 0), data.getDoubleExtra("lng", 0));
+                targetFloor = (int) data.getDoubleExtra("floor", 1.0);
 
-                showCustomToast(getApplicationContext(), latLng.toString() + ", " + floor, Toast.LENGTH_SHORT );
+                showCustomToast(getApplicationContext(), targetPosition.toString() + ", " + targetFloor, Toast.LENGTH_SHORT);
 
-                changeFloor((int)floor);
-                latLng = new LatLng(68.4358635893339, 17.434213757514954);
-                floor = 1;
-
-
-//                currentPosition =  new LatLng(68.43548946533, 17.4339371547);
-//                currentFloor = 1;
-                if (floor != currentFloor) {
+                if (targetFloor != currentFloor) {
                     changeFloor(currentFloor);
                 }
 
-//                HashMap<Integer, Boolean> visitedFloors = new HashMap<>();
+                path = requestPathFromPosLib(targetPosition, (int) targetFloor);
+                fullSegmentedPath = generateFullSegmentedPath(path);
 
-                try {
-                    path = positionLibrary.wifiPosition.plotRoute(new Point(currentPosition.latitude, currentPosition.longitude, currentFloor), new Point(latLng.latitude, latLng.longitude, (int) floor), pathPointJson);
-//                    Gson gson = new Gson();
-//                    String json = gson.toJson(path);
-//                    SharedPreferences.Editor sharedPreferences = getSharedPreferences("MapActivityPrefs", MODE_PRIVATE).edit();
-//                    sharedPreferences.putString("PathJson", json);
-//                    sharedPreferences.apply();
-                    if (path != null) {
-                        // draw path for this floor if available
-                        int nextFloor = -100;
-                        List<Point> singleFloorPath = new ArrayList<Point>();
-                        fullSegmentedPath = new ArrayList<List<Point>>();
+                drawFloorPath(fullSegmentedPath);
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(path.get(0).getLatitude(), path.get(0).getLongitude()), 19));
+            }
+        }
+    }
 
-                        for (int i = 0; i < path.size(); i++) { // iterate path
-                            singleFloorPath.add(path.get(i)); // add current point to singleFloorPath
-                            if (path.size() > (i + 1)) { // check if we are on the last point of the path
-                                nextFloor = path.get(i + 1).getFloor(); // add the floor of the next point
-                                if (nextFloor != path.get(i).getFloor()) { // if the next point is different than the current point
-//                                    List<Point> tempList = new ArrayList<Point>(singleFloorPath);
-                                    fullSegmentedPath.add(new ArrayList<Point>(singleFloorPath)); // add the list of points to the fullSegmentedPath list
-                                    singleFloorPath.clear(); // clear the current list
-                                }
-                            }
-                            else {
-                                fullSegmentedPath.add(singleFloorPath); // add the list of points to the fullSegmentedPath list
-                            }
-                        }
+    public List<Point> requestPathFromPosLib(LatLng targetPosition, int targetFloor) {
+        List<Point> pathList = new ArrayList<>();
+        try {
+            pathList = positionLibrary.wifiPosition.plotRoute(new Point(currentPosition.latitude, currentPosition.longitude, currentFloor), new Point(targetPosition.latitude, targetPosition.longitude, targetFloor), pathPointJson);
+        } catch (PathNotFoundException ex) {
+            showCustomToast(getApplicationContext(), getResources().getString(R.string.path_not_found_exception), Toast.LENGTH_SHORT);
+        }
 
-                        drawFloorPath(fullSegmentedPath);
-                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(path.get(0).getLatitude(), path.get(0).getLongitude()), 19));
+        return pathList;
+    }
+
+    public ArrayList<List<Point>> generateFullSegmentedPath(List<Point> pathList)
+    {
+        ArrayList<List<Point>> segmentedPathList = new ArrayList<List<Point>>();
+        if (pathList != null) {
+            // draw path for this floor if available
+            int nextFloor = -100;
+            List<Point> singleFloorPath = new ArrayList<Point>();
+            segmentedPathList = new ArrayList<List<Point>>();
+
+            for (int i = 0; i < pathList.size(); i++) { // iterate path
+                singleFloorPath.add(pathList.get(i)); // add current point to singleFloorPath
+                if (pathList.size() > (i + 1)) { // check if we are on the last point of the path
+                    nextFloor = pathList.get(i + 1).getFloor(); // add the floor of the next point
+                    if (nextFloor != pathList.get(i).getFloor()) { // if the next point is different than the current point
+                        segmentedPathList.add(new ArrayList<Point>(singleFloorPath)); // add the list of points to the fullSegmentedPath list
+                        singleFloorPath.clear(); // clear the current list
                     }
-                }
-                catch (PathNotFoundException ex) {
-                    showCustomToast(getApplicationContext(), getResources().getString(R.string.path_not_found_exception), Toast.LENGTH_SHORT );
+                } else {
+                    segmentedPathList.add(singleFloorPath); // add the list of points to the fullSegmentedPath list
                 }
             }
         }
+        return segmentedPathList;
     }
 }
