@@ -899,6 +899,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                         sharedPreferences.apply();
                     }
                 } catch (Exception e) {
+                    showCustomToast(getApplicationContext(), "Exception when trying to fetch pathpoints from API: " + e.toString(), Toast.LENGTH_LONG);
                     e.printStackTrace();
                 }
                 break;
@@ -946,10 +947,16 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 }
 
                 path = requestPathFromPosLib(targetPosition, (int) targetFloor);
-                fullSegmentedPath = generateFullSegmentedPath(path);
+                if(path.size() != 0) {
+                    fullSegmentedPath = generateFullSegmentedPath(path);
 
-                drawFloorPath(fullSegmentedPath);
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(path.get(0).getLatitude(), path.get(0).getLongitude()), 19));
+                    drawFloorPath(fullSegmentedPath);
+                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(path.get(0).getLatitude(), path.get(0).getLongitude()), 19));
+                }
+                else
+                {
+                    showCustomToast(getApplicationContext(), getResources().getString(R.string.path_not_found_exception), Toast.LENGTH_SHORT);
+                }
             }
         }
     }

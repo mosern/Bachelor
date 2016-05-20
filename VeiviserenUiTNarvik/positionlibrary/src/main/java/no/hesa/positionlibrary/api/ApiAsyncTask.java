@@ -84,7 +84,7 @@ public class ApiAsyncTask extends AsyncTask<List<Pair<String,String>>,Void,JSONO
                 urlObject = new URL(buildGetUrl(params[0]));
             }
             HttpsURLConnection conn = (HttpsURLConnection) urlObject.openConnection();
-            conn.setReadTimeout(10000);
+            conn.setReadTimeout(60000);
             conn.setConnectTimeout(15000);
             conn.setRequestMethod(dataType);
             conn.setDoInput(true);
