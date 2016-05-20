@@ -506,10 +506,19 @@ namespace Api
                 });
             }
 
-            //foreach(Location loc in locations)
-            //{
+            foreach (Location loc in locations)
+            {
+                List<object> neighbours = new List<object>();
+                PathPoint pathPoint = source.Where(p => p.Id == loc.NeighbourId).FirstOrDefault();
+                neighbours.Add(new { ID = pathPoint.Id, Distance = loc.Distance, Coordinate = AutoMapConfig.getMapper().Map<Coordinate, CoordinateViewModel>(coordinates.Where(c => c.Id == pathPoint.CoordinateId).FirstOrDefault()) });
 
-            //}
+                dest.Add(new PathPointNeighbourViewModel()
+                {
+                    Id = loc.Id,
+                    Neighbours = neighbours,
+                    Coordinate = AutoMapConfig.getMapper().Map<Coordinate, CoordinateViewModel>(coordinates.Where(c => c.Id == loc.CoordinateId).FirstOrDefault())
+                });
+            }
 
             return dest;
 
@@ -610,9 +619,18 @@ namespace Api
             PathPointViewModel source = (PathPointViewModel)context.SourceValue;
             PathPoint dest;
             Coordinate cor;
+            int neighbourCount;
 
             if (source.Id == null)
+            {
                 source.Id = 0;
+                neighbourCount = 0;
+            }
+            else
+            {
+                using (var repo = new LocationRepository<PathPoint>())
+                    neighbourCount = repo.Read(source.Id.Value).NeighbourCount;
+            }  
 
             if (source.Coordinate == null)
                 source.Coordinate = new CoordinateViewModel { Id = 0 };
@@ -633,6 +651,7 @@ namespace Api
             dest = new PathPoint()
             {
                 Id = source.Id.Value,
+                NeighbourCount = neighbourCount,
                 Coordinate = cor,
                 CoordinateId = cor.Id,
             };

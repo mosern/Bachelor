@@ -68,7 +68,7 @@ namespace Api.Helpers
                 }
                 else
                 {
-                    temp = obj.ApplySort(sort);
+                    temp = obj;
                 }
 
                 IDictionary<string, object> routeValues = new Dictionary<string, object>();
@@ -82,7 +82,7 @@ namespace Api.Helpers
                         context.Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(PaginationHeader.Get(page.Value, pageSize.Value, obj.Count(), routeName, routeValues, request)));
 
                     var toShape = AutoMapConfig.getMapper().Map<IEnumerable<object>, IEnumerable<X>>(temp);
-                    IQueryable<object> toReturn = ShapeFactory<X>.ShapeList(toShape, fields.ToLower().Split(',').ToList()).AsQueryable();
+                    IQueryable<object> toReturn = ShapeFactory<X>.ShapeList(toShape, fields.ToLower().Split(',').ToList()).AsQueryable().ApplySort(sort);
 
                     if (asObject)
                     {
@@ -101,7 +101,7 @@ namespace Api.Helpers
                     if (page != null)
                         context.Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(PaginationHeader.Get(page.Value, pageSize.Value, obj.Count(), routeName, routeValues, request)));
 
-                    var toReturn = AutoMapConfig.getMapper().Map<IEnumerable<object>, IEnumerable<X>>(temp).AsQueryable();
+                    var toReturn = AutoMapConfig.getMapper().Map<IEnumerable<object>, IEnumerable<X>>(temp).AsQueryable().ApplySort(sort);
 
                     if (asObject)
                     {
