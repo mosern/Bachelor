@@ -595,9 +595,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 mMarker.setDraggable(true);
                 mMarker.showInfoWindow();
                 currentPosition = new LatLng(point.latitude, point.longitude);
-//                fullSegmentedPath = null;
+                //todo: set currentFloor
                 clearDrawnPaths();
                 drawUserPosition();
+
             }
         });
     }
@@ -624,9 +625,15 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                         currentPosition = latLng;
                         currentFloor = floor;
 
-                        if (targetPosition != null && targetFloor > -100) {
-                            path = requestPathFromPosLib(targetPosition, targetFloor);
-                            fullSegmentedPath = generateFullSegmentedPath(path);
+                        if (targetPosition != null && targetFloor > -100) { // if target position has been set by ex. searching
+                            if (path != null) {
+                                path = requestPathFromPosLib(targetPosition, targetFloor);
+                                if (path.size() != 0) {
+                                    fullSegmentedPath = generateFullSegmentedPath(path);
+                                } else {
+                                    showCustomToast(getApplicationContext(), getResources().getString(R.string.path_not_found_exception), Toast.LENGTH_SHORT);
+                                }
+                            }
                         }
 
                         if (fullSegmentedPath != null) {
@@ -636,10 +643,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                             drawUserPosition();
                         }
                         if (path != null) {
-                            Point currentPoint = new Point(latLng.latitude, latLng.longitude, floor);
-                            if (arrivedAtFinalLocation(currentPoint, path.get(path.size() - 1))) //gets final point
-                            {
-                                // unbind targetPosition etc etc
+                            if (path.size() != 0) {
+                                Point currentPoint = new Point(latLng.latitude, latLng.longitude, floor);
+                                if (arrivedAtFinalLocation(currentPoint, path.get(path.size() - 1))) //gets final point
+                                {
+                                    // unbind targetPosition etc etc
+                                }
                             }
                         }
 
@@ -947,15 +956,15 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 }
 
                 path = requestPathFromPosLib(targetPosition, (int) targetFloor);
-                if(path.size() != 0) {
-                    fullSegmentedPath = generateFullSegmentedPath(path);
+                if (path != null) {
+                    if (path.size() != 0) {
+                        fullSegmentedPath = generateFullSegmentedPath(path);
 
-                    drawFloorPath(fullSegmentedPath);
-                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(path.get(0).getLatitude(), path.get(0).getLongitude()), 19));
-                }
-                else
-                {
-                    showCustomToast(getApplicationContext(), getResources().getString(R.string.path_not_found_exception), Toast.LENGTH_SHORT);
+                        drawFloorPath(fullSegmentedPath);
+                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(path.get(0).getLatitude(), path.get(0).getLongitude()), 19));
+                    } else {
+                        showCustomToast(getApplicationContext(), getResources().getString(R.string.path_not_found_exception), Toast.LENGTH_SHORT);
+                    }
                 }
             }
         }
