@@ -451,7 +451,7 @@ namespace Api
     {
         public IEnumerable<PathPointNeighbourViewModel> Convert(ResolutionContext context)
         {
-            IEnumerable<PathPoint> source = (IEnumerable<PathPoint>)context.SourceValue;
+            IEnumerable<PathPoint> source = ((IEnumerable<PathPoint>)context.SourceValue).ToList();
             List<PathPointNeighbourViewModel> dest = new List<PathPointNeighbourViewModel>();
 
             List<PathNeighbour> pathNeighbours;
