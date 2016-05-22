@@ -33,7 +33,7 @@ namespace IdSrv.Services
         public override Task AuthenticateLocalAsync(LocalAuthenticationContext context)
         {
             //TODO Password salt
-            var user = UsersL.SingleOrDefault(x => x.Username == context.UserName && x.Password + x.Salt == context.Password.Sha512());
+            var user = UsersL.SingleOrDefault(x => x.Username == context.UserName && x.Password == (context.Password + x.Salt).Sha512());
             if (user != null)
             {
                 context.AuthenticateResult = new AuthenticateResult(user.Id.ToString(), user.Username);
@@ -65,8 +65,9 @@ namespace IdSrv.Services
             {
                 User newUser = new User();
                 newUser.Username = RandomString(10);
-                newUser.Password = RandomString(10).Sha512();
                 newUser.Salt = RandomString(10);
+                newUser.Password = (RandomString(10) + newUser.Salt).Sha512();
+                
 
                 User createdUser = Users.Create(newUser);
 
