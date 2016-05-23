@@ -51,7 +51,7 @@ namespace IdSrv.Services
         public override Task AuthenticateExternalAsync(ExternalAuthenticationContext context)
         {
             //TODO Make user registration (and hash Providerid and local userid?)
-            var userProvider = UserProviders.List().FirstOrDefault(u => u.Identifier == context.ExternalIdentity.ProviderId.Sha512());
+            var userProvider = UserProviders.List().FirstOrDefault(u => u.Identifier == (context.ExternalIdentity.ProviderId.Sha512()));
             User user = null;
 
             if (userProvider != null)
