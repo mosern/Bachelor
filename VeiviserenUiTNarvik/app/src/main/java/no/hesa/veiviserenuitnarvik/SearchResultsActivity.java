@@ -30,17 +30,16 @@ import no.hesa.veiviserenuitnarvik.dataclasses.Person;
 
 public class SearchResultsActivity extends AppCompatActivity implements ActionInterface, SimpleGestureFilter.SimpleGestureListener{
 
-    // http://www.androidhive.info/2013/07/android-expandable-list-view-tutorial/
-
     private JSONArray jsonArray = null;
 
+    // ExpandableListView variables
     private ExpandableListAdapter listAdapter;
     private ExpandableListView expListView;
     private List<String> listDataHeader;
     private HashMap<String, List<? extends Object>> listDataChild;
 
-    private SimpleGestureFilter detector;
-    private ProgressBar search_spinner;
+    private SimpleGestureFilter detector; // gesture detector
+    private ProgressBar search_spinner; // loading spinner
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,12 +47,11 @@ public class SearchResultsActivity extends AppCompatActivity implements ActionIn
         //overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
         setContentView(R.layout.activity_search_results);
 
-        // Detect touched area
-        detector = new SimpleGestureFilter(this,this);
-        search_spinner = (ProgressBar)findViewById(R.id.search_progress_bar);
-        handleIntent(getIntent());
-        expListView = (ExpandableListView) findViewById(R.id.exlv_search_results);
 
+        detector = new SimpleGestureFilter(this,this); // gesture detector
+        search_spinner = (ProgressBar)findViewById(R.id.search_progress_bar);
+        handleIntent(getIntent()); // handle passed intent
+        expListView = (ExpandableListView) findViewById(R.id.exlv_search_results);
     }
 
     @Override
@@ -62,6 +60,7 @@ public class SearchResultsActivity extends AppCompatActivity implements ActionIn
         handleIntent(intent);
     }
 
+    // NOT USED: But, not removed due to possible future use
     private void startExtvListeners() {
 /*
         // Listview on child click listener
@@ -97,15 +96,26 @@ public class SearchResultsActivity extends AppCompatActivity implements ActionIn
         */
     }
 
+    /**
+     * Handles received search query by requesting all matching search result from API
+     *
+     * @param intent
+     */
     private void handleIntent(Intent intent) {
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String query = intent.getStringExtra(SearchManager.QUERY);
             Api api = new Api(this);
-            search_spinner.setVisibility(View.VISIBLE);
+            search_spinner.setVisibility(View.VISIBLE); // shows loading spinner, indicating that the API is generating search results
             api.doSearch(query);
         }
     }
 
+    /**
+     * Handles returned
+     *
+     * @param jsonObject
+     * @param actionString
+     */
     @Override
     public void onCompletedAction(JSONObject jsonObject, String actionString) {
         switch (actionString) {

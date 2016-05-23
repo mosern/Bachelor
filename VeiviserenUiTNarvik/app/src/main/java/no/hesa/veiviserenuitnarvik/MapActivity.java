@@ -77,63 +77,65 @@ import no.hesa.positionlibrary.api.Api;
 import no.hesa.positionlibrary.dijkstra.exception.PathNotFoundException;
 
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
-public class MapActivity extends AppCompatActivity implements OnMapReadyCallback,ActionInterface{
+public class MapActivity extends AppCompatActivity implements OnMapReadyCallback, ActionInterface{
 
+    // constants
     private static final String TAG = "MapActivity";
-    private final LatLng UIT_NARVIK_POSITION = new LatLng(68.43590708f, 17.43452958f);
-    private final float UIT_NARVIK_ZOOMLEVEL = 17.4f;
-    private final int UIT_NARVIK_DEFAULTFLOOR = 1;
-    private final int POLYLINEWIDTH = 20;
-    private String DEFAULT_FLOORPLAN;
+    private final LatLng UIT_NARVIK_POSITION = new LatLng(68.43590708f, 17.43452958f); // position directly in the center of UiT Campus Narvik
+    private final float UIT_NARVIK_ZOOMLEVEL = 17.4f; // default zoom level
+    private final int UIT_NARVIK_DEFAULTFLOOR = 1; // default floor
+    private final int POLYLINEWIDTH = 20; // width of route generated
+    public final static int SEARCH_RETURNED_COORDINATE_CODE = 1; // startActivityForResult request code to search activity
+    public final static int SEARCH_RETURNED_COORDINATE_RESULT = 1; // startActivityForResult returned result code from search activity
+    private String DEFAULT_FLOORPLAN; // default floorplan, set from resource in onCreate()
 
-    public final static int SEARCH_RETURNED_COORDINATE_CODE = 1;
-    public final static int SEARCH_RETURNED_COORDINATE_RESULT = 1;
-
-    /* used to decide when bitmap should be downscaled */
-    private static final int MAX_DIMENSION = 2048;
-
-    private GoogleMap mMap; // Might be null if Google Play services APK is not available.
-    private Marker mMarker;
+    // IndoorAtlas variables and class instances
+    private static final int MAX_DIMENSION = 2048; // used to decide when bitmap should be downscaled
     private GroundOverlay mGroundOverlay;
     private IALocationManager mIALocationManager;
     private IAResourceManager mResourceManager;
     private IATask<IAFloorPlan> mFetchFloorPlanTask;
     private Target mLoadTarget;
-    private PositionLibrary positionLibrary = null;
 
-    private BroadcastReceiver positionLibOutputReceiver = null;
+    // google maps elements
+    private GoogleMap mMap; // Might be null if Google Play services APK is not available.
+    private Marker mMarker; //todo: remove after removing marker from onMapClick
+    private int mapType; // type of google map to display
 
-
-
-    private Menu menuRef = null;
-
-    private String currentFloorPlan;
-
-    private LatLng currentPosition = null;
-    private int currentFloor = -100;
-
-    private LatLng targetPosition = null;
-    private int targetFloor = -101;
-
-    private ProgressBar fetchMapSpinner;
-    private boolean positioningEnabled = false;
-
-    private long backPressedTimeStamp;
-    private Circle userPositionMarker;
-
+    // lists containing drawn elements, used for removing them on demand
     ArrayList<Polyline> polylineList = new ArrayList<Polyline>();
     ArrayList<LatLng> latLngList = new ArrayList<LatLng>();
     ArrayList<Circle> circleList = new ArrayList<Circle>();
 
-    private int mapType;
-    private String pathPointJson;
-
-    private SearchView searchView;
+    // class instances
+    private PositionLibrary positionLibrary = null;
+    private BroadcastReceiver positionLibOutputReceiver = null;
     private Api api;
-    private boolean pathPointsDownloading = false;
+
+    // global variables (necessary due to lifecycle changes, used in many methods, etc)
+    private Menu menuRef = null;
+    private String currentFloorPlan;
+
+    private LatLng currentPosition = null;
+    private int currentFloor = -100; // unlikely number
+
+    private LatLng targetPosition = null;
+    private int targetFloor = -101; // unlikely number
+
+    private ProgressBar fetchMapSpinner; // loading spinner
+    private boolean positioningEnabled = false; // indicator of automatic positioning is enabled or not
+
+    private long backPressedTimeStamp;
+    private Circle userPositionMarker;
 
     private List<Point> path;
     private ArrayList<List<Point>> fullSegmentedPath;
+
+    private boolean pathPointsDownloading = false; // indicator if pathpoints are being downloaded or not
+
+    private SearchView searchView;
+
+    private String pathPointJson; // list of all pathpoints retrieved from API
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -142,9 +144,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         setContentView(R.layout.activity_map);
 
-        DEFAULT_FLOORPLAN = getResources().getString(R.string.indooratlas_floor_2_floorplanid);
+        DEFAULT_FLOORPLAN = getResources().getString(R.string.indooratlas_floor_1_floorplanid);
 
-        // instantiate IALocationManager and IAResourceManager
+        // instantiate IALocationManager and IAResourceManager (IndoorAtlas)
         mIALocationManager = IALocationManager.create(this);
         mResourceManager = IAResourceManager.create(this);
 
@@ -155,12 +157,13 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         getSupportActionBar().setTitle("ARGH!");
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
+        // changes the UiT logo based on system locale
         if(getResources().getConfiguration().locale.getISO3Country().compareTo("NOR") == 0) {
-            showCustomToast(getApplicationContext(), "Norsk locale", Toast.LENGTH_SHORT);
+//            showCustomToast(getApplicationContext(), "Norsk locale", Toast.LENGTH_SHORT);
             getSupportActionBar().setIcon(R.mipmap.ic_uit_logo_nor);
         }
         else {
-            showCustomToast(getApplicationContext(), getResources().getConfiguration().locale.toString(), Toast.LENGTH_SHORT);
+//            showCustomToast(getApplicationContext(), getResources().getConfiguration().locale.toString(), Toast.LENGTH_SHORT);
             getSupportActionBar().setIcon(R.mipmap.ic_uit_logo);
         }
 
@@ -236,6 +239,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
     }
 
+    /**
+     * Is run after the googlemap is ready, meaning mMap variable is ready to use. Treat as onCreate for functions that require mMap
+     * @param googleMap
+     */
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -246,6 +253,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         mapType = sharedPreferences.getInt("MapType", googleMap.MAP_TYPE_NONE);
         mMap.setMapType(mapType);
 
+        // gets saved value from sharedpreferences, otherwise sets default values
         float zoomLevel = sharedPreferences.getFloat("ZoomLevel", UIT_NARVIK_ZOOMLEVEL);
         float lat = sharedPreferences.getFloat("CurrentLat", (float)UIT_NARVIK_POSITION.latitude);
         float lng = sharedPreferences.getFloat("CurrentLng", (float)UIT_NARVIK_POSITION.longitude);
@@ -255,7 +263,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         pathPointJson = sharedPreferences.getString("PathPointJson", null);
 
         positioningEnabled = sharedPreferences.getBoolean("PositioningEnabled", false);
-        enablePositioning(positioningEnabled, false);
+        enablePositioning(positioningEnabled, false); // turns automatic positioning on/off
 
         Gson gson = new Gson();
 //        String pathJson = sharedPreferences.getString("PathJson", null);
@@ -292,7 +300,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 //region DRAW/CLEAR METHODS
     /**
      * Places markers (circles) with polylines connecting them along provided path.
-     * Colors first and last circle differently.
+     * Indicates first and last circle differently.
      *
      * @param coordinateList
      * @return LatLang containing the last point added
@@ -377,7 +385,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         return currentPoint;
     }
 
-
+    /**
+     * Clears all markings related to pathing
+     */
     private void clearDrawnPaths()
     {
         for (Polyline polyline : polylineList) {
@@ -393,6 +403,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         circleList.clear();
     }
 
+    /**
+     * Draws the current position, update currentPosition before running
+     */
     private void drawUserPosition()
     {
         clearDrawnUserPosition();
@@ -407,6 +420,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         userPositionMarker = mMap.addCircle(co);
     }
 
+    /**
+     * Clears all marking related to the current position
+     */
     private void clearDrawnUserPosition()
     {
         if (userPositionMarker != null) {
@@ -415,6 +431,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 //endregion
 
+    /**
+     * Changes floor, meaning it loads the floorplan for the indicated floor
+     * @param floor
+     */
     private void changeFloor(int floor)
     {
         switch (floor) {
@@ -442,9 +462,14 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 
 //region BUTTON LISTENERS
-    //// TODO: 28/04/2016 hardcoded floor values when changing floor with buttons 
+    // TODO: 28/04/2016 hardcoded floor values when changing floor with buttons
+
+    /**
+     * Registers all buttonClickListeners
+     */
     private void registerButtonListeners()
     {
+        // floor up button
         FloatingActionButton floorUpFab = (FloatingActionButton) findViewById(R.id.floor_up);
         floorUpFab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -461,6 +486,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             }
         });
 
+        // floor down button
         FloatingActionButton floorDownFab = (FloatingActionButton) findViewById(R.id.floor_down);
         floorDownFab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -477,6 +503,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             }
         });
 
+        // toggle automatic positioning button, longclick to refresh pathpoints from API
         FloatingActionButton automaticPositioningFab = (FloatingActionButton) findViewById(R.id.fab_automatic_positioning);
         automaticPositioningFab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -496,6 +523,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             }
         });
 
+        // animate camera to users position button, longclick to animate camera to a view of  the entire building
         FloatingActionButton myLocationFab = (FloatingActionButton) findViewById(R.id.fab_my_location);
         myLocationFab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -514,6 +542,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             }
         });
 
+        // switch google map type button, switches between MAP_TYPE_NORMAL and MAP_TYPE_NONE
         FloatingActionButton switchMapTypeFab = (FloatingActionButton) findViewById(R.id.fab_switch_map_type);
         switchMapTypeFab.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -521,10 +550,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 FloatingActionButton switchMapTypeFab = (FloatingActionButton) findViewById(R.id.fab_switch_map_type);
 
                 if (mapType == mMap.MAP_TYPE_NORMAL) {
+                    // switches the icon to indicate which map is shown
                     switchMapTypeFab.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_location_city_white_24dp));
                     mapType = mMap.MAP_TYPE_NONE;
                 }
                 else {
+                    // switches the icon to indicate which map is shown
                     switchMapTypeFab.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_public_white_24dp));
                     mapType = mMap.MAP_TYPE_NORMAL;
                 }
@@ -534,26 +565,39 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 //endregion
 
+    /**
+     * Shows a custom toast, using toast.xml
+     * @param context Context
+     * @param msg The toast message
+     * @param length Duration, use Toast.LENGTH_SHORT or LENGTH_LONG
+     */
     private void showCustomToast(Context context, String msg, int length)
     {
+        // inflates the layout containing the elements of the custom toast, so we can access them
         LayoutInflater inflater = getLayoutInflater();
         View toastLayout = inflater.inflate(R.layout.toast, (ViewGroup) findViewById(R.id.toast_layout));
 
-        TextView text = (TextView) toastLayout.findViewById(R.id.toast_content);
-        text.setText(msg);
+        TextView text = (TextView) toastLayout.findViewById(R.id.toast_content); // reference to the now exposed textview
+        text.setText(msg); // this is where we now set the toast message
 
-        Toast t = new Toast(getApplicationContext());
-        t.setView(toastLayout);
-        t.setDuration(length);
-        t.show();
+        Toast toast = new Toast(getApplicationContext());
+        toast.setView(toastLayout); // sets the toast view to our custom view
+        toast.setDuration(length);
+        toast.show();
     }
 
+    /**
+     * Switches automatic positioning via positionlibrary on/off
+     * @param positioningEnabled True/false to turn positioning on/off
+     * @param showToast True/false to show/not show toast indicating the current state
+     */
     private void enablePositioning(boolean positioningEnabled, boolean showToast)
     {
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_automatic_positioning);
         SharedPreferences.Editor sharedPreferences = getSharedPreferences("MapActivityPrefs", MODE_PRIVATE).edit();
         if (!positioningEnabled) // turn on
         {
+            // switches the icon to indicate if positioning is on or off
             fab.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_location_on_white_24dp));
             this.positioningEnabled = true;
             sharedPreferences.putBoolean("PositioningEnabled", positioningEnabled);
@@ -561,16 +605,17 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             if (showToast) {
                 showCustomToast(getApplicationContext(), getResources().getString(R.string.positioning_automatic_on), Toast.LENGTH_SHORT);
             }
-            registerPositionReceiver();
+            registerPositionReceiver(); // register the receiver to listen for location updates
         }
         else // turn off
         {
+            // switches the icon to indicate if positioning is on or off
             fab.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_location_off_white_24dp));
             this.positioningEnabled = false;
             sharedPreferences.putBoolean("PositioningEnabled", positioningEnabled);
 
             if (positionLibOutputReceiver != null) {
-                unregisterReceiver(positionLibOutputReceiver);
+                unregisterReceiver(positionLibOutputReceiver); // unregisters the receiver that listens for location updates
                 positionLibOutputReceiver = null;
                 if (showToast) {
                     showCustomToast(getApplicationContext(), getResources().getString(R.string.positioning_automatic_off), Toast.LENGTH_SHORT);
@@ -580,9 +625,13 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         sharedPreferences.apply();
     }
 
+    /**
+     * Registers the onMapClickreceiver, which is used for setting the current position of the user
+     * to the clicked point on the map and clearing the old position
+     */
     private void registerOnMapClickReceiver()
     {
-        // adds a marker
+        // sets the current position of the user to the clicked point on the map, clearing the old position
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng point) {
@@ -590,19 +639,23 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 if (mMarker != null) {
                     mMarker.remove();
                 }
-                // new CircleOptions().center(point).radius(3.0).fillColor(R.color.radiusfillcolor).strokeColor(R.color.radiusstrokecolor).strokeWidth(2)
                 mMarker = mMap.addMarker(new MarkerOptions().position(point).title("Lat: " + point.latitude + " Lng: " + point.longitude));
                 mMarker.setDraggable(true);
                 mMarker.showInfoWindow();
+
                 currentPosition = new LatLng(point.latitude, point.longitude);
                 //todo: set currentFloor
                 clearDrawnPaths();
                 drawUserPosition();
-
             }
         });
     }
 
+    /**
+     * Registers the BroadcastReceiver which listens for position updates from positionlibrary.
+     * It then, on receiving a calcuated position based on WiFi-trilateration, draws a route
+     * to the target position if one has been selected. This works over different floors.
+     */
     private void registerPositionReceiver()
     {
         positionLibOutputReceiver = new BroadcastReceiver() {
@@ -611,24 +664,30 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 if (intent.getAction().equals("no.hesa.positionlibrary.Output")) {
                     double[] pos = intent.getDoubleArrayExtra("position");
                     int floor = intent.getIntExtra("floor", 1);
-                    if (pos[0] != 0 && pos[1] != 0)
+                    if (pos[0] != 0 && pos[1] != 0) // if a valid position is received (not 0,0)
                     {
                         LatLng latLng = new LatLng(pos[0], pos[1]);
 
+                        // if the new position is on different floor to the current position, change the floor
                         if (floor != currentFloor) {
                             changeFloor(floor);
                             clearDrawnPaths();
                         }
 
-                        clearDrawnUserPosition();
+                        clearDrawnUserPosition(); // clear markers for the last position
 
+                        // set current position to the new one
                         currentPosition = latLng;
                         currentFloor = floor;
 
+                        // if a target location exists, generate a path to it
                         if (targetPosition != null && targetFloor > -100) { // if target position has been set by ex. searching
                             if (path != null) {
+                                // requests the positioning library calculate a path between the users position and the target
                                 path = requestPathFromPosLib(targetPosition, targetFloor);
                                 if (path.size() != 0) {
+                                    // if a path is received, segments the received path (that can span different floors) into parts
+                                    // ex. a path that goes from the 1st floor, up to the second floor, and then down to the 1st floor again would generate a 3 part path
                                     fullSegmentedPath = generateFullSegmentedPath(path);
                                 } else {
                                     showCustomToast(getApplicationContext(), getResources().getString(R.string.path_not_found_exception), Toast.LENGTH_SHORT);
@@ -636,12 +695,18 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                             }
                         }
 
+                        // if a segmented path exists, either from sharedpreferences in case of lifecycle changes or just fetched from positionlibrary
+                        // send the segmented path to be drawn (only the parts on the visible floor will be drawn).
+                        // otherwise just draw the user position
                         if (fullSegmentedPath != null) {
                             drawFloorPath(fullSegmentedPath);
                         }
                         else {
                             drawUserPosition();
                         }
+
+                        // checks if the current point is within a specified radius of the last point of the path
+                        // via a LatLngBounds, and if it is, determines you have arrived at your destination
                         if (path != null) {
                             if (path.size() != 0) {
                                 Point currentPoint = new Point(latLng.latitude, latLng.longitude, floor);
@@ -653,7 +718,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                         }
 
                         //TODO: set to current zoom level, but have the first update zoom to 19
-                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentPosition, 19));
+                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentPosition, 19)); // animates the camera to the received position
                     }
                     else {
                         showCustomToast(MapActivity.this, getResources().getString(R.string.positioning_unable_to_locate_user), Toast.LENGTH_LONG);
@@ -665,6 +730,13 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         registerReceiver(positionLibOutputReceiver, new IntentFilter("no.hesa.positionlibrary.Output"));
     }
 
+    /**
+     * Creates a LatLngBounds with a specified radius around finalLocation, then checks if the
+     * LatLngBounds contains userpoint. This indicates that the user has arrived at his destination
+     * @param userPoint Point to compared to
+     * @param finalLocation Final location
+     * @return True if userPoint is within the LatLngBounds created around finalLocation
+     */
     public boolean arrivedAtFinalLocation(Point userPoint, Point finalLocation)
     {
         double radius = 4; // in meters
@@ -679,6 +751,16 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     // http://stackoverflow.com/questions/15319431/how-to-convert-a-latlng-and-a-radius-to-a-latlngbounds-in-android-google-maps-ap
     // http://googlemaps.github.io/android-maps-utils/
+
+    /**
+     * Converts a LatLng and a radius to a LatLngBounds centered on the LatLng
+     *
+     * Method from http://stackoverflow.com/questions/15319431/how-to-convert-a-latlng-and-a-radius-to-a-latlngbounds-in-android-google-maps-ap
+     * Uses http://googlemaps.github.io/android-maps-utils/
+     * @param center
+     * @param radius
+     * @return
+     */
     public LatLngBounds toBounds(LatLng center, double radius) {
         LatLng southwest = SphericalUtil.computeOffset(center, radius * Math.sqrt(2.0), 225);
         LatLng northeast = SphericalUtil.computeOffset(center, radius * Math.sqrt(2.0), 45);
@@ -687,10 +769,13 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
 
 //region INDOORATLAS METHODS
-    // TODO: GIVE CREDIT! important.
-        /**
-         * Sets bitmap of floor plan as ground overlay on Google Maps
-         */
+
+    /**
+     * Sets bitmap of floor plan as ground overlay on Google Maps
+     *
+     * Method based on IndoorAtlas examples from https://github.com/IndoorAtlas/android-sdk-examples with minor changes
+     * Specifically https://github.com/IndoorAtlas/android-sdk-examples/blob/master/Basic/src/main/java/com/indooratlas/android/sdk/examples/mapsoverlay/MapsOverlayActivity.java
+     */
     private void setupGroundOverlay(IAFloorPlan floorPlan, Bitmap bitmap) {
         if (mGroundOverlay != null) {
             mGroundOverlay.remove();
@@ -712,6 +797,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     /**
      * Download floor plan using Picasso library.
+     *
+     * Method based on IndoorAtlas examples from https://github.com/IndoorAtlas/android-sdk-examples with minor changes
+     * Specifically https://github.com/IndoorAtlas/android-sdk-examples/blob/master/Basic/src/main/java/com/indooratlas/android/sdk/examples/mapsoverlay/MapsOverlayActivity.java
      */
     private void fetchFloorPlanBitmap(final IAFloorPlan floorPlan) {
         final String url = floorPlan.getUrl();
@@ -759,6 +847,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     /**
      * Fetches floor plan data from IndoorAtlas server.
+     *
+     * Method based on IndoorAtlas examples from https://github.com/IndoorAtlas/android-sdk-examples with minor changes
+     * Specifically https://github.com/IndoorAtlas/android-sdk-examples/blob/master/Basic/src/main/java/com/indooratlas/android/sdk/examples/mapsoverlay/MapsOverlayActivity.java
      */
     private void fetchFloorPlan(String id) {
         fetchMapSpinner.setVisibility(View.VISIBLE); // show loading spinner, start of map loading
@@ -797,6 +888,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     /**
      * Helper method to cancel current task if any.
+     *
+     * Method based on IndoorAtlas examples from https://github.com/IndoorAtlas/android-sdk-examples with minor changes
+     * Specifically https://github.com/IndoorAtlas/android-sdk-examples/blob/master/Basic/src/main/java/com/indooratlas/android/sdk/examples/mapsoverlay/MapsOverlayActivity.java
      */
     private void cancelPendingNetworkCalls() {
         if (mFetchFloorPlanTask != null && !mFetchFloorPlanTask.isCancelled()) {
@@ -862,10 +956,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         switch (item.getItemId()) {
+            // logs user in, starts AuthenticationActivity
             case R.id.action_login:
                 Intent intent = new Intent(this,AuthenticationActivity.class);
                 startActivity(intent);
                 break;
+            // logs user out, removes verification-token from SharedPreferences and changes which button is shown
             case R.id.action_logout:
                 SharedPreferences sharedPreferences = getSharedPreferences("AppPref",MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -881,12 +977,20 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 //endregion
 
+    /**
+     * Is run when positionlibrary.Api-class has completed its request to the API
+     * @param jsonObject Returned data in JSON form
+     * @param actionString Identifier string to recognize which request has returned a result
+     */
     @Override
     public void onCompletedAction(JSONObject jsonObject, String actionString) {
         switch (actionString) {
+            /* // TODO: remove Api.ALL_USERS
             case Api.ALL_USERS:
                 //JSONObject dummyObject = jsonObject;
                 break;
+                */
+            // API has returned all pathpoints
             case Api.ALL_PATH_POINTS:
                 try {
                     if(jsonObject != null){
@@ -908,6 +1012,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                         sharedPreferences.apply();
                     }
                 } catch (Exception e) {
+                    // todo: create string resource
                     showCustomToast(getApplicationContext(), "Exception when trying to fetch pathpoints from API: " + e.toString(), Toast.LENGTH_LONG);
                     e.printStackTrace();
                 }
@@ -918,6 +1023,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
     }
 
+    /**
+     * Is run if authorization failed
+     */
     @Override
     public void onAuthorizationFailed() {
         //TODO: possible intent loop?
@@ -929,7 +1037,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
     }
 
-    // http://stackoverflow.com/questions/14006461/android-confirm-app-exit-with-toast/18654014#18654014
+
+    /**
+     * Overrides onBackPressed, in order to prevent the app from exiting unless back was pressed twice within 5 seconds
+     *
+     * Based on http://stackoverflow.com/questions/14006461/android-confirm-app-exit-with-toast/18654014#18654014
+     */
     @Override
     public void onBackPressed() {
         long currentTime = System.currentTimeMillis();
@@ -942,25 +1055,34 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
     }
 
+    /**
+     * Receives the coordinate returned from SearchResultsActivity if the user pressed the generate
+     * path button for a person or location, then draws generates, segments and draws a path to that
+     * location (if the user position has been set)
+     * @param requestCode
+     * @param resultCode
+     * @param data
+     */
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == SEARCH_RETURNED_COORDINATE_CODE) {
-            if(resultCode == SEARCH_RETURNED_COORDINATE_RESULT) {
+        if (requestCode == SEARCH_RETURNED_COORDINATE_CODE) { // checks the request code
+            if(resultCode == SEARCH_RETURNED_COORDINATE_RESULT) { // checks the result code
                 targetPosition = new LatLng(data.getDoubleExtra("lat", 0), data.getDoubleExtra("lng", 0));
                 targetFloor = (int) data.getDoubleExtra("floor", 1.0);
 
+                // todo: remove toast
                 showCustomToast(getApplicationContext(), targetPosition.toString() + ", " + targetFloor, Toast.LENGTH_SHORT);
 
                 if (targetFloor != currentFloor) {
                     changeFloor(currentFloor);
                 }
 
-                path = requestPathFromPosLib(targetPosition, (int) targetFloor);
+                path = requestPathFromPosLib(targetPosition, (int) targetFloor); // request path from positionlibrary
                 if (path != null) {
                     if (path.size() != 0) {
-                        fullSegmentedPath = generateFullSegmentedPath(path);
+                        fullSegmentedPath = generateFullSegmentedPath(path); // segments path
 
-                        drawFloorPath(fullSegmentedPath);
+                        drawFloorPath(fullSegmentedPath); // draws path
                         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(path.get(0).getLatitude(), path.get(0).getLongitude()), 19));
                     } else {
                         showCustomToast(getApplicationContext(), getResources().getString(R.string.path_not_found_exception), Toast.LENGTH_SHORT);
@@ -970,6 +1092,14 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
     }
 
+    /**
+     * Requests positionlibrary to calculate a path from from the users current position/floor to
+     * targetPosition/floor using Dijkstra's algorithm
+     *
+     * @param targetPosition LatLng indicating the position to generate a path to
+     * @param targetFloor The floor the LatLng you are trying to generate a path to is on
+     * @return The path to targetPosition in List<Point> form
+     */
     public List<Point> requestPathFromPosLib(LatLng targetPosition, int targetFloor) {
         List<Point> pathList = new ArrayList<>();
         try {
@@ -981,6 +1111,16 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         return pathList;
     }
 
+    /**
+     * Segments a List<Point> (the path) by segmenting it into separate lists.
+     * Every time the floor changes, a new list is started. Finally a ArrayList<List<Point>> is returned.
+     * This segmentation is necessary to allow the drawing of paths which return to an already
+     * visited floor. Ex. A path is drawn starting on the 1st floor, continues on the 2nd floor, and
+     * then returns to a different point on the 1st floor. This would be 3 segments.
+     *
+     * @param pathList List<Point> containing the path calculated by positionlibrary
+     * @return ArrayList<List<Point>> containing the generated segments (ArrayList<Point>)
+     */
     public ArrayList<List<Point>> generateFullSegmentedPath(List<Point> pathList)
     {
         ArrayList<List<Point>> segmentedPathList = new ArrayList<List<Point>>();
