@@ -61,16 +61,16 @@ public class WifiPosition implements ActionInterface {
                 scanResults = wifiManager.getScanResults();
                 calculateDistances(c);
                 //If this was first time that code was run, set up TimerTask to make WI-Fi scans every 5 s.
-                if (timer == null) {
+                /*if (timer == null) {
                     timer = new Timer();
                     initializeTimerTask(wifiManager);
                     timer.schedule(timerTask, 1000, 500);
                     counter++;
                 } else {
                     //If not...
-                    //sensorUpdateTrigger = false;
                     counter++;
-                }
+                }*/
+                counter++;
             }
         }
     };
@@ -78,6 +78,7 @@ public class WifiPosition implements ActionInterface {
     private TimerTask timerTask;
     final Handler handler = new Handler();
     private HashMap<Double, Point> wifiPointsLocationInfList = new HashMap<Double, Point>(); //list of available Wi-Fi access points with corresponding distances from several scans
+
     private SensorManager sensorManager;
     private Sensor sensor;
     private SensorEventListener sensorEventListener = new SensorEventListener() {
@@ -86,41 +87,12 @@ public class WifiPosition implements ActionInterface {
             Sensor sensor = event.sensor;
 
             if (sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-                //If it is the fist time onSensorChanged event is run, read the start data on acceleration
-                /*if(firstSensorChange){
-                    new CountDownTimer(4000, 1000) {
-                        public void onFinish() {
-                            // When timer is finished
-                            xStartValue = event.values[0];
-                            yStartValue = event.values[1];
-                        }
-
-                        public void onTick(long millisUntilFinished) {
-
-                        }
-                    }.start();
-                    firstSensorChange = false;
-                }
-                else{//If not
-                    long curentTime = System.currentTimeMillis();
-                    long timeGone = curentTime - lastUpdateTime;
-                    //Check if more than 2.3 seconds are gone since last detected movement and it is not first detected movement
-                    if(lastUpdateTime != 0 && (timeGone >= 2300)){
-                        //Check if it was significant enough movement
-                        if((Math.abs(event.values[0]) > (xStartValue + 2)) || (Math.abs(event.values[1]) > (yStartValue + 2))){
-                            moving = true;
-                            lastUpdateTime = curentTime;
-                        }
-                    }
-                    else if(lastUpdateTime == 0)
-                        lastUpdateTime = curentTime;
-                }*/
                 long curentTime = System.currentTimeMillis();
                 long timeGone = curentTime - lastUpdateTime;
-                //Check if more than 2.3 seconds are gone since last detected movement and it is not first detected movement
-                if (lastUpdateTime != 0 && (timeGone >= 2300)) {
+                //Check if more than 1 second had gone since last detected movement and it is not first detected movement
+                if (lastUpdateTime != 0 && (timeGone >= 1000)) {
                     //Check if it was significant enough movement
-                    if ((Math.abs(event.values[0]) > (xStartValue + 2)) || (Math.abs(event.values[1]) > (yStartValue + 2))) {
+                    if ((Math.abs(event.values[0]) > 2) || (Math.abs(event.values[1]) > 2)) {
                         moving = true;
                         lastUpdateTime = curentTime;
                     }
@@ -135,11 +107,9 @@ public class WifiPosition implements ActionInterface {
         }
     };
     private long lastUpdateTime = 0; //last time there was detected movement of device
-    //private boolean sensorUpdateTrigger = false;
     private boolean moving = false; //Variable that shows if device is moving (true) or not (false)
-    private boolean firstSensorChange = true; //Variable that shows if it is first time sensor data was changed
-    private double xStartValue = 0; //acceleration on x-axis at the time of first onSensorChanged run
-    private double yStartValue = 0; //acceleration on y-axis at the time of first onSensorChanged run
+    //private double xStartValue = 0; //acceleration on x-axis at the time of first onSensorChanged run
+    //private double yStartValue = 0; //acceleration on y-axis at the time of first onSensorChanged run
     TreeMap<String, Point> wifiPointsMacGeo = new TreeMap<String, Point>(); //list of MAC addresses to known Wi-Fi access point with corresponding geo coordinates
 
     private DijkstraAlgorithm da;
@@ -171,7 +141,10 @@ public class WifiPosition implements ActionInterface {
     public void registerBroadcast(Context c){
         c.registerReceiver(wifiReceiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
         WifiManager wifiManager = (WifiManager) c.getSystemService(Context.WIFI_SERVICE);
-        wifiManager.startScan();
+        //wifiManager.startScan();
+        timer = new Timer();
+        initializeTimerTask(wifiManager);
+        timer.schedule(timerTask, 10, 500);
         //Register listener to detect if device changed position
         sensorManager = (SensorManager) c.getSystemService(c.SENSOR_SERVICE);
         sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -180,7 +153,6 @@ public class WifiPosition implements ActionInterface {
         Api api = new Api(this);
         //Load list of all mapped wi-fi access points
         api.allAccessPoints();
-        //api.allPathPoints(); //TODO remove this
     }
 
     /**
@@ -189,7 +161,7 @@ public class WifiPosition implements ActionInterface {
      */
     public void unRegisterBroadcast(Context c) {
         c.unregisterReceiver(wifiReceiver);
-        //sensorManager.unregisterListener(sensorEventListener);
+        sensorManager.unregisterListener(sensorEventListener);
     }
 
     /**
@@ -249,9 +221,7 @@ public class WifiPosition implements ActionInterface {
                     wifiPointsLocationInfList.clear();
                     moving = false;
                 }
-                //sensorUpdateTrigger = true;
                 counter = 1;
-                //wifiPointsLocationInfList.clear();
             }
         }
     }
@@ -319,40 +289,30 @@ public class WifiPosition implements ActionInterface {
     }
 
     /**
-     * Calculate the distance between two geo coordinates (two last estimated positions)
-     * @param calculatedPosition geo coordinates of newly estimated position
-     * @return distance in meters
-     */
-    /*private float calculateDistance(double[] calculatedPosition){
-        float [] dist = new float[1];
-        Location.distanceBetween(lastCalculatedPosition[0], lastCalculatedPosition[1], calculatedPosition[0], calculatedPosition[1], dist);
-        return dist[0];
-    }*/
-
-    /**
      * Calculate the distance to one access point given RSSI in db and frequency in MHz
      * @param levelInDb RSSI (received signal strength indication) in decibels
      * @param freqInMHz Frequency in MHz
      * @return The distance to the access-point in meters
      */
     private double distanceToAccessPoint(double levelInDb, double freqInMHz) {
+        double K = -27.55;
         double tx_PWR = 17; //transmitter output power in dB
         double gain_TX = 4; //transmit-side antenna gain in dBi
-        double gain_RX = 0; //transmit-side antenna gain in dBi
-        double pl_1meter = 23; //reference path loss
+        double gain_RX = 0; //receiver-side antenna gain in dBi
+        double pl_1meter = 23; //reference path loss (fade margin)
         //double s = 4; //standard deviation of shadow fading
         //double n = 3.7; //path loss exponent
 
         double a = 3; //distance from phone to ceiling (rouge estimation)
 
         double FSPL = tx_PWR + gain_TX + gain_RX - levelInDb - pl_1meter; //free space path loss
-        double exp = (FSPL + 27.55 - (20 * Math.log10(freqInMHz))) / 21.66;
+        double exp = (FSPL - K - (20 * Math.log10(freqInMHz))) / 21.66;
         //double exp = (27.55 - (20 * Math.log10(freqInMHz)) + Math.abs(levelInDb)) / 20.0;
         //double exp = (tx_PWR - levelInDb + gain_TX - pl_1meter + s)/(10 * n);
         double b = Math.pow(10.0, exp);
 
-        if(b < 3)
-            a = 1.7;
+        if(b < a)
+            a = a - 1;
 
         double distance = Math.sqrt(b * b - a * a);
         return distance;
@@ -406,16 +366,6 @@ public class WifiPosition implements ActionInterface {
         HashMap<Double, Point> wifiPointsLocationInf = new HashMap<Double, Point>(wifiPointsScanInf.size());
         Double[] keys = (Double[]) wifiPointsScanInf.values().toArray(new Double[wifiPointsScanInf.size()]);
         String[] values = (String[]) wifiPointsScanInf.keySet().toArray(new String[wifiPointsScanInf.size()]);
-
-        //List of MAC addresses to known Wi-Fi access point with corresponding geo coordinates
-        //TreeMap<String, Point> wifiPointsMacGeo = new TreeMap<String, Point>();
-        //frequency: 5.0
-        /*wifiPointsMacGeo.put("ec:bd:1d:88:8d:bf", new Point(68.43611583610615, 17.43369428932667, 1));
-        wifiPointsMacGeo.put("ec:bd:1d:6b:8d:4f", new Point(68.43606297172468, 17.433767840266228, 1));
-        wifiPointsMacGeo.put("ec:bd:1d:6b:8e:7f", new Point(68.43617239716085, 17.433753423392773, 1));
-        wifiPointsMacGeo.put("ec:bd:1d:88:85:7f", new Point(68.43623622842107, 17.43380941450596, 1));
-        wifiPointsMacGeo.put("34:ab:4e:fc:5f:4f", new Point(68.4362602575168, 17.43396732956171, 1));
-        wifiPointsMacGeo.put("5c:83:8f:34:f9:5f", new Point(68.43618089979086, 17.434068247675896, 1));*/
 
         //Checking MAC addresses of available Wi-Fi access points against list of MAC addresses to known Wi-Fi access points
         for (int i = 0; i < wifiPointsScanInf.size(); i++) {
@@ -475,7 +425,7 @@ public class WifiPosition implements ActionInterface {
                 }
                 break;
             // TODO: remove the following case
-            case Api.ALL_PATH_POINTS:
+            /*case Api.ALL_PATH_POINTS:
                 try {
                     if(jsonObject != null){
                         model = new ArrayList<Edge>();
@@ -499,7 +449,7 @@ public class WifiPosition implements ActionInterface {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                break;
+                break;*/
         }
     }
 
@@ -544,9 +494,6 @@ public class WifiPosition implements ActionInterface {
      */
     public List<Point> plotRoute(Point destination, String pathPointsJson) throws PathNotFoundException {
         buildPathPointModel(pathPointsJson);
-        //Point destination = new Point(68.43609254621903, 17.434575855731964, 1);
-        //Point lastSentPosition = new Point(68.43620505217169, 17.433623000979424, 1);
-        //Point lastSentPosition = new Point(68.43614836797185, 17.433611266314983, 1)
         List<Point> result;
 
         if(lastSentPosition == null || lastSentPosition.equals(new Point(0, 0, 1))){
@@ -585,7 +532,6 @@ public class WifiPosition implements ActionInterface {
         da.execute(new Vertex<>(position));
         LinkedList<Vertex> path = da.getPath(new Vertex<>(destination));
 
-//        List<Point> result = getPointsOnCurrentFloor(path, position.getFloor());
         List<Point> result = new LinkedList<>();
         for(int i = 0; i < path.size(); i++){
             if (path.get(i).getPayload() instanceof Point){

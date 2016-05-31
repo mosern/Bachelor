@@ -417,7 +417,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 .fillColor(getResources().getColor(R.color.route_circle_end_color))
                 .zIndex(0.50f);
 
-        userPositionMarker = mMap.addCircle(co);
+        //userPositionMarker = mMap.addCircle(co);
     }
 
     /**
