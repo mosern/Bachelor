@@ -129,7 +129,7 @@ namespace IdSrv
         X509Certificate2 LoadCertificate2()
         {
             return new X509Certificate2(
-                string.Format(@"{0}\Certificates\idsrv3test.pfx", AppDomain.CurrentDomain.BaseDirectory), "idsrv3test");
+                string.Format(@"{0}Certificates\idsrv3test.pfx", AppDomain.CurrentDomain.BaseDirectory), "idsrv3test");
         }
 
     }
