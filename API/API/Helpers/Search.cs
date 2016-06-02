@@ -32,13 +32,6 @@ namespace Api.Classes
             List<LocationViewModel> locations = new List<LocationViewModel>();
             IQueryable<PeopleViewModel> people = null;
 
-            //switch (getTypeLocation(searchString))
-            //{
-            //    case 0 : locations = new List<LocationViewModel>().AsQueryable(); break;
-            //    case 1 : locations = locationByLocNr(searchString); break;
-            //    case 2 : locations = locationByName(searchString); break;
-            //}
-
             locations.AddRange(locationByLocNr(searchString));
 
             var byName = locationByName(searchString);
@@ -201,21 +194,6 @@ namespace Api.Classes
             }
         }
 
-        //TODO Remove?
-        //private static bool isLocId(string checkString)
-        //{
-        //    try
-        //    {
-        //        Convert.ToInt32(checkString);
-        //        return true;
-        //    }
-        //    catch
-        //    {
-        //        return false;
-        //    }
-
-        //}
-
         /// <summary>
         /// Checks if search string is a people name
         /// </summary>
@@ -243,7 +221,6 @@ namespace Api.Classes
             IEnumerable<People> peo;
             using (var repo = new LocationRepository<People>())
             {
-                //peo = repo.List().Where(p => p.Name.Contains(name)).ToList();
                 peo = repo.List().Where(p => p.Name.StartsWith(name)).ToList();
 
                 if (peo != null)
@@ -291,7 +268,6 @@ namespace Api.Classes
             IEnumerable<Location> loc;
             using (var repo = new LocationRepository<Location>())
             {
-                //loc = repo.List().Where(l => l.Name.Contains(name));
                 loc = repo.List().Where(l => l.Name.StartsWith(name));
 
                 if (loc != null)
