@@ -32,7 +32,6 @@ namespace IdSrv.Services
         /// <returns></returns>
         public override Task AuthenticateLocalAsync(LocalAuthenticationContext context)
         {
-            //TODO Password salt
             var user = UsersL.SingleOrDefault(x => x.Username == context.UserName && x.Password == (context.Password + x.Salt).Sha512());
             if (user != null)
             {
@@ -50,7 +49,6 @@ namespace IdSrv.Services
         /// <returns></returns>
         public override Task AuthenticateExternalAsync(ExternalAuthenticationContext context)
         {
-            //TODO Make user registration (and hash Providerid and local userid?)
             string providerIdHash = context.ExternalIdentity.ProviderId.Sha512();
             var userProvider = UserProviders.List().FirstOrDefault(u => u.Identifier == providerIdHash);
             User user = null;
