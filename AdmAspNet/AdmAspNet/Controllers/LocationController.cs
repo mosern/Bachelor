@@ -40,6 +40,7 @@ namespace AdmAspNet.Controllers
         public ActionResult Index()
         {
             List<Location> locationList = api.GetAllLocations();
+            //If there is no location, create an empty one
             if (locationList == null)
             {
                 locationList = new List<Location>(); 
@@ -55,10 +56,14 @@ namespace AdmAspNet.Controllers
         /// <returns></returns>
         public ActionResult Create()
         {
+            //Get all types 
             List<Models.DataContracts.Type> list = api.GetAllTypes();
             var mapper = mapConfig.CreateMapper();
+            //Map it to a viewmodel
             List<TypeViewModel> listViewModel = mapper.Map<List<TypeViewModel>>(list);
+            //Create an empty location view model 
             LocationViewModel locationViewModel = new LocationViewModel();
+            //Populate dropdown
             if (listViewModel.Count == 0)
             {
                 locationViewModel.DropDown = new SelectList(new List<Models.DataContracts.Type>()); 
@@ -71,9 +76,9 @@ namespace AdmAspNet.Controllers
         }
 
         /// <summary>
-        /// Allow the user to create a location 
+        /// Allow the user to create a location (POST)
         /// </summary>
-        /// <param name="input"></param>
+        /// <param name="input">The object to create</param>
         /// <returns></returns>
         [HttpPost]
         public ActionResult Create([ModelBinder(typeof(LocationBinder))]LocationViewModel input)
@@ -114,7 +119,11 @@ namespace AdmAspNet.Controllers
             return View(baseViewModel); 
         }
 
-
+        /// <summary>
+        /// Show the details of a given location
+        /// </summary>
+        /// <param name="id">The id of the location</param>
+        /// <returns></returns>
         public ActionResult Details(int? id)
         {
             if (id == null)
@@ -132,7 +141,11 @@ namespace AdmAspNet.Controllers
             return View(locationViewModel); 
         }
 
-
+        /// <summary>
+        /// Delete a given location (GET)
+        /// </summary>
+        /// <param name="id">The id of the location to delete</param>
+        /// <returns></returns>
         public ActionResult Delete(int? id)
         {
             if (id == null)
@@ -151,6 +164,11 @@ namespace AdmAspNet.Controllers
             return View(locationViewModel); 
         }
 
+        /// <summary>
+        /// Delete a given location (POST)
+        /// </summary>
+        /// <param name="id">The id of the location to delete</param>
+        /// <returns></returns>
         [HttpPost]
         public ActionResult Delete(int id)
         {
@@ -172,6 +190,12 @@ namespace AdmAspNet.Controllers
             LocationViewModel viewModel = mapper.Map<LocationViewModel>(locationObject); 
             return View(viewModel); 
         }
+
+        /// <summary>
+        /// Edit a location (GET) 
+        /// </summary>
+        /// <param name="id">The id of the location to edit</param>
+        /// <returns></returns>
         public ActionResult Edit(int? id)
         {
             if (id == null)
@@ -200,6 +224,12 @@ namespace AdmAspNet.Controllers
             return View(locationViewModel); 
         }
 
+        /// <summary>
+        /// Edit a location (POST)
+        /// </summary>
+        /// <param name="id">The id of the location to edit</param>
+        /// <param name="input">Object with updated fields</param>
+        /// <returns></returns>
         [HttpPost]
         public ActionResult Edit(int id,[ModelBinder(typeof(LocationBinder))] LocationViewModel input)
         {

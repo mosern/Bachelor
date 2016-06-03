@@ -68,7 +68,7 @@ namespace AdmAspNet
 
                             var usernameClaim = n.AuthenticationTicket.Identity.FindFirst("username");
                             var roles = n.AuthenticationTicket.Identity.FindAll("roles").ToList();
-                            roles.Add(n.AuthenticationTicket.Identity.FindFirst("username"));
+                            //roles.Add(n.AuthenticationTicket.Identity.FindFirst("username"));
 
                             var nid = new ClaimsIdentity(
                                 identity.AuthenticationType,

@@ -8,6 +8,9 @@ using System.Web.Mvc;
 
 namespace AdmAspNet.Helpers
 {
+    /// <summary>
+    /// A custom binder to prevent overposting when posting location
+    /// </summary>
     public class LocationBinder : DefaultModelBinder
     {
         public override object BindModel(ControllerContext controllerContext, ModelBindingContext bindingContext)

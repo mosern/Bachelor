@@ -31,7 +31,10 @@ namespace AdmAspNet.Controllers
             });
         }
 
-        // GET: Neighbour
+        /// <summary>
+        /// Get a list of all neighbours
+        /// </summary>
+        /// <returns></returns>
         public ActionResult Index()
         {
             List<Neighbour> list = api.GetAllNeighbours();
@@ -40,6 +43,10 @@ namespace AdmAspNet.Controllers
             return View(viewModel);
         }
 
+        /// <summary>
+        /// Create a neighbour (GET) 
+        /// </summary>
+        /// <returns></returns>
         public ActionResult Create()
         {
             List<PathPoint> pathPoints = api.GetAllPathPoints();
@@ -55,6 +62,11 @@ namespace AdmAspNet.Controllers
             return View(viewModel);
         }
 
+        /// <summary>
+        /// Create a neighbour (POST)
+        /// </summary>
+        /// <param name="input">The neighbour to create</param>
+        /// <returns></returns>
         [HttpPost]
         public ActionResult Create(NeighbourViewModel input)
         {
@@ -84,6 +96,11 @@ namespace AdmAspNet.Controllers
             return View(viewModel); 
         }
 
+        /// <summary>
+        /// Delete a specific neighbour (GET) 
+        /// </summary>
+        /// <param name="id">The id of the neighbour to delete</param>
+        /// <returns></returns>
         public ActionResult Delete(int? id)
         {
             if (id == null)
@@ -102,6 +119,11 @@ namespace AdmAspNet.Controllers
             return View(viewModel); 
         }
 
+        /// <summary>
+        /// Edit a specific neighbour (GET) 
+        /// </summary>
+        /// <param name="id">The id of the neighbour to delete</param>
+        /// <returns></returns>
         public ActionResult Edit(int? id)
         {
             if (id == null)
@@ -120,6 +142,12 @@ namespace AdmAspNet.Controllers
             return View(viewModel); 
         }
 
+        /// <summary>
+        /// Edit a specific neighbour (POST) 
+        /// </summary>
+        /// <param name="id">The id of the neighbour to delete</param>
+        /// <param name="input">Object with updated fields</param>
+        /// <returns></returns>
         [HttpPost]
         public ActionResult Edit(int id, [Bind(Include ="Distance")] NeighbourViewModel input)
         {
@@ -141,6 +169,11 @@ namespace AdmAspNet.Controllers
             return View(input); 
         }
 
+        /// <summary>
+        /// Delete a specific neighbour (POST) 
+        /// </summary>
+        /// <param name="id">The id of the neighbour to delete</param>
+        /// <returns></returns>
         [HttpPost]
         public ActionResult Delete(int id)
         {

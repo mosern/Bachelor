@@ -29,7 +29,10 @@ namespace AdmAspNet.Controllers
                 cfg.CreateMap<NeighbourViewModel, Neighbour>(); 
             });
         }
-        // GET: Path
+        /// <summary>
+        /// Shows a list of all pathpoints 
+        /// </summary>
+        /// <returns></returns>
         public ActionResult Index()
         {
             List<PathPoint> list = api.GetAllPathPoints();
@@ -38,10 +41,15 @@ namespace AdmAspNet.Controllers
             return View(viewModel);
         }
 
+        /// <summary>
+        /// Create a new pathpoint (GET) 
+        /// </summary>
+        /// <returns></returns>
         public ActionResult Create()
         {
             return View();
         }
+
 
         [HttpPost]
         public ActionResult Create([Bind(Include ="Lat,Lng,Alt")] CoordinateViewModel input)
