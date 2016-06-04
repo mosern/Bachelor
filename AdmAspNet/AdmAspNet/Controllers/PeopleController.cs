@@ -9,9 +9,12 @@ using System.Security.Claims;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
+using Thinktecture.IdentityModel.Mvc;
 
 namespace AdmAspNet.Controllers
 {
+    [ResourceAuthorize("Write", "Admin")]
+    [HandleForbidden]
     /// <summary>
     /// A controller that handles CRUD functionality for people
     /// </summary>
@@ -199,7 +202,7 @@ namespace AdmAspNet.Controllers
             var mapper = mapConfig.CreateMapper();
             PeopleViewModel viewModel = mapper.Map<PeopleViewModel>(data);
             return View(viewModel); 
-        }
+        } 
 
         /// <summary>
         /// Delete a particular person (GET) 
