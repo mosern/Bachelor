@@ -113,6 +113,10 @@ public class AuthenticationActivity extends AppCompatActivity implements SimpleG
         return new BigInteger(130,random).toString(32);
     }
 
+    /**
+     * Handles swipe events
+     * @param direction direction of the swipe
+     */
     @Override
     public void onSwipe(int direction) {
         switch (direction) {
@@ -129,11 +133,19 @@ public class AuthenticationActivity extends AppCompatActivity implements SimpleG
         }
     }
 
+    /**
+     * Handles double taps
+     */
     @Override
     public void onDoubleTap() {
 
     }
 
+    /**
+     * Handles touch events via SimpleGestureFilter-class
+     * @param me motionevent
+     * @return touch event
+     */
     @Override
     public boolean dispatchTouchEvent(MotionEvent me) {
         // Call onTouchEvent of SimpleGestureFilter class

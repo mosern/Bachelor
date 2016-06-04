@@ -5,8 +5,11 @@ import android.view.GestureDetector;
 import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.MotionEvent;
 
-// http://androidexample.com/Swipe_screen_left__right__top_bottom/index.php?view=article_discription&aid=95&aaid=118
-
+/**
+ * This class handles interpretation of swipe input. It is used mostly as is from
+ * http://androidexample.com/Swipe_screen_left__right__top_bottom/index.php?view=article_discription&aid=95&aaid=118
+ * Only variables such as treshholds have been changed and no credit for the development of this class is taken.
+ */
 public class SimpleGestureFilter extends SimpleOnGestureListener{
 
     public final static int SWIPE_UP    = 1;

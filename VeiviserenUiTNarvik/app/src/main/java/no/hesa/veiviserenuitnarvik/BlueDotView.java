@@ -10,6 +10,8 @@ import android.util.AttributeSet;
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 
 /**
+ * Part of IndoorAtlas implementation
+ *
  * Extends great ImageView library by Dave Morrissey. See more:
  * https://github.com/davemorrissey/subsampling-scale-image-view.
  */

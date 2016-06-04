@@ -374,6 +374,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
             convertView = infalInflater.inflate(R.layout.search_results_listroot, null);
         }
 
+        // applies corresponding icon to the header
         ImageView image = (ImageView) convertView.findViewById(R.id.iv_listroot_icon);
         if (image != null) {
             if (passedClass.get(groupPosition).compareTo("person") == 0) {

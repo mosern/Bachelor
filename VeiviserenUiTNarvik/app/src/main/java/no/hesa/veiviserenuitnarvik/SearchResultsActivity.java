@@ -28,6 +28,17 @@ import no.hesa.positionlibrary.api.ActionInterface;
 import no.hesa.positionlibrary.api.Api;
 import no.hesa.veiviserenuitnarvik.dataclasses.Person;
 
+/**
+ * This activity is used with a supplied search string from the starting activity.
+ * It then uses the Api-class to access the search function on HESA Application Server (HESA AS).
+ * The returned result is then iterated through and returned to it's initial dataclass-form
+ * (Location, Person, Type, Coordinate) before it then uses ExpandableListAdapter to show an
+ * expandable listview filled with data from Locations and Persons.
+ *
+ * Swiping detection is supported through the SimpleGestureFilter-class.
+ *
+ */
+
 public class SearchResultsActivity extends AppCompatActivity implements ActionInterface, SimpleGestureFilter.SimpleGestureListener{
 
     private JSONArray jsonArray = null;
@@ -60,7 +71,7 @@ public class SearchResultsActivity extends AppCompatActivity implements ActionIn
         handleIntent(intent);
     }
 
-    // NOT USED: But, not removed due to possible future use
+    // NOT USED: But not removed due to possible future use
     private void startExtvListeners() {
 /*
         // Listview on child click listener
@@ -97,7 +108,7 @@ public class SearchResultsActivity extends AppCompatActivity implements ActionIn
     }
 
     /**
-     * Handles received search query by requesting all matching search result from API
+     * Handles received search query by requesting all matching search result from HESA AS
      *
      * @param intent
      */
@@ -111,7 +122,9 @@ public class SearchResultsActivity extends AppCompatActivity implements ActionIn
     }
 
     /**
-     * Handles returned
+     * Handles returned data from HESA AS, converts it back into dataclasses (Person, Location, Coordinate, Type).
+     * Adds said classes to lists of Person and Location objects, which are then used for setup of
+     * an expandable list.
      *
      * @param jsonObject
      * @param actionString
@@ -170,7 +183,7 @@ public class SearchResultsActivity extends AppCompatActivity implements ActionIn
                     expListView.setAdapter(listAdapter);// setting list adapter
                     startExtvListeners();
 
-                    // expands groups for
+                    // autoexpands few results
                     if (countDataHeaderInsertions <= 3) {
                         for (int i = 0; i < 3; i++) {
                             expListView.expandGroup(i);
@@ -188,9 +201,14 @@ public class SearchResultsActivity extends AppCompatActivity implements ActionIn
 
     @Override
     public void onAuthorizationFailed() {
-        //Do something here..
+
     }
 
+    /**
+     * Handles touch events via SimpleGestureFilter-class
+     * @param me motionevent
+     * @return touch event
+     */
     @Override
     public boolean dispatchTouchEvent(MotionEvent me) {
         // Call onTouchEvent of SimpleGestureFilter class
@@ -198,6 +216,10 @@ public class SearchResultsActivity extends AppCompatActivity implements ActionIn
         return super.dispatchTouchEvent(me);
     }
 
+    /**
+     * Handles swipe events
+     * @param direction direction of the swipe
+     */
     @Override
     public void onSwipe(int direction) {
         switch (direction) {
@@ -214,11 +236,20 @@ public class SearchResultsActivity extends AppCompatActivity implements ActionIn
         }
     }
 
+    /**
+     * Handles double taps
+     */
     @Override
     public void onDoubleTap() {
         // Toast.makeText(this, "Double Tap", Toast.LENGTH_SHORT).show();
     }
 
+    /**
+     * Shows a custom toast, using toast.xml
+     * @param context Context
+     * @param msg The toast message
+     * @param length Duration, use Toast.LENGTH_SHORT or LENGTH_LONG
+     */
     private void showCustomToast(Context context, String msg, int length)
     {
         LayoutInflater inflater = getLayoutInflater();

@@ -1,5 +1,6 @@
 package no.hesa.veiviserenuitnarvik;
 
+
 import android.annotation.TargetApi;
 import android.app.SearchManager;
 import android.content.BroadcastReceiver;
@@ -30,8 +31,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
-import com.google.android.gms.common.api.BooleanResult;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -50,8 +49,6 @@ import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.gson.Gson;
 
-
-import com.google.gson.reflect.TypeToken;
 import com.google.maps.android.SphericalUtil;
 import com.indooratlas.android.sdk.IALocationManager;
 import com.indooratlas.android.sdk.resources.IAFloorPlan;
@@ -67,7 +64,6 @@ import com.squareup.picasso.Target;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import no.hesa.positionlibrary.Point;
@@ -75,6 +71,24 @@ import no.hesa.positionlibrary.PositionLibrary;
 import no.hesa.positionlibrary.api.ActionInterface;
 import no.hesa.positionlibrary.api.Api;
 import no.hesa.positionlibrary.dijkstra.exception.PathNotFoundException;
+
+/**
+ * MapActivity is the main activity of the application. It handles/implements:
+ *  - Displaying the Google Map
+ *  - Functions for altering the Google Map
+ *  - Downloading, caching and displaying IndoorAtlas floor maps on demand
+ *  - Searching for people or locations, starting SearchResultActivity and receiving result
+ *  - Downloading and caching of pathpoints list from HESA Application Server (HESA AS), for use in
+ *      positioning library, as this activity is better suited to handle lifecycle changes
+ *  - Receiving positioning updates from positioning library, handling drawing and resetting of position
+ *  - Enabling or disabling automatic positioning
+ *  - Functions for manually selecting the users position
+ *  - Using the positioning library to calculate the shortest path between two points over several
+ *      floors, segmenting the returned path for display purposes and displaying the parts of the
+ *      segmented path relevant for the current floor.
+ *  - Lifecycle changes, preserving variables
+ *  - Custom toast support
+ */
 
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback, ActionInterface{
@@ -154,16 +168,13 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         setSupportActionBar(toolbar); // TODO: crashes pre android 5.0
 
         getSupportActionBar().setDisplayShowTitleEnabled(true);
-        getSupportActionBar().setTitle("ARGH!");
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         // changes the UiT logo based on system locale
         if(getResources().getConfiguration().locale.getISO3Country().compareTo("NOR") == 0) {
-//            showCustomToast(getApplicationContext(), "Norsk locale", Toast.LENGTH_SHORT);
             getSupportActionBar().setIcon(R.mipmap.ic_uit_logo_nor);
         }
         else {
-//            showCustomToast(getApplicationContext(), getResources().getConfiguration().locale.toString(), Toast.LENGTH_SHORT);
             getSupportActionBar().setIcon(R.mipmap.ic_uit_logo);
         }
 
@@ -712,6 +723,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                                 Point currentPoint = new Point(latLng.latitude, latLng.longitude, floor);
                                 if (arrivedAtFinalLocation(currentPoint, path.get(path.size() - 1))) //gets final point
                                 {
+                                    // TODO: clear map after arriving at destination
                                     // unbind targetPosition etc etc
                                 }
                             }
@@ -930,6 +942,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         // listener for toolbar search submit
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 
+            /**
+             * Listener for textsubmit from search box
+             * @param newText search query
+             * @return true/false if query submitted
+             */
             @Override
             public boolean onQueryTextSubmit(String newText) {
                 Intent intent = new Intent(getApplicationContext(), SearchResultsActivity.class);
@@ -950,6 +967,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         return true;
     }
 
+    /**
+     * Handles menu item interactions
+     * @param item menu item reference
+     * @return onOptionsSelected for item
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -1059,9 +1081,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
      * Receives the coordinate returned from SearchResultsActivity if the user pressed the generate
      * path button for a person or location, then draws generates, segments and draws a path to that
      * location (if the user position has been set)
-     * @param requestCode
-     * @param resultCode
-     * @param data
+     * @param requestCode request code, identifies the request
+     * @param resultCode result code, identifies the result
+     * @param data intent carrying the returned data
      */
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);

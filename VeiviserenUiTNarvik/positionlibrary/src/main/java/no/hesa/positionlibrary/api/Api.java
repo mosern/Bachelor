@@ -62,12 +62,13 @@ public class Api {
     }
 
     /**
-     * Do a search with the specified callstring
+     * Do a search with the specified callstring, sorted by a descending amount of hits, then alphabetically
      * @param searchString The string that is used for searching
      */
     public void doSearch(String searchString) {
         List<Pair<String,String>> params = new ArrayList<>();
         params.add(new Pair<String, String>("search",searchString));
+        params.add(new Pair<String, String>("sort", "-hits,name" ));
         callAsyncTask(locationsURL,params,DO_SEARCH,"GET");
     }
 
