@@ -11,7 +11,7 @@ using Thinktecture.IdentityModel.Mvc;
 
 namespace AdmAspNet.Controllers
 {
-    [ResourceAuthorize("Write", "Admin")]
+    [Helpers.ResourceAuthorize("Write", "Admin")]
     [HandleForbidden]
     public class AccountController : Controller
     {

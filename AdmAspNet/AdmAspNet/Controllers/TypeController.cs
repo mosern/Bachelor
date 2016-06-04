@@ -12,7 +12,7 @@ using Thinktecture.IdentityModel.Mvc;
 
 namespace AdmAspNet.Controllers
 {
-    [ResourceAuthorize("Write", "Admin")]
+    [Helpers.ResourceAuthorize("Write", "Admin")]
     [HandleForbidden]
     /// <summary>
     /// A controller that handles CRUD functionality for type
