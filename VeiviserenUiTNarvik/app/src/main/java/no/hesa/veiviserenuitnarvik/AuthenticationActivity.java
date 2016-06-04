@@ -20,9 +20,13 @@ import android.widget.Toast;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 
-
+/**
+ * Defines a simple web view that allows the user to log in using OAuth and an authentication server
+ * Based on example from https://www.learn2crack.com/2014/01/android-oauth2-webview.html
+ */
 public class AuthenticationActivity extends AppCompatActivity implements SimpleGestureFilter.SimpleGestureListener {
 
+    //Set up variables needed for the webview
     private static String CLIENT_ID = "and";
     private static String REDIRECT_URI = "http://localhost:123";
     private static String OAUTH_URL = "https://bacheloridsrv3.azurewebsites.net/identity/connect/authorize";
@@ -39,7 +43,9 @@ public class AuthenticationActivity extends AppCompatActivity implements SimpleG
         WebView web = (WebView) findViewById(R.id.webv);
         web.getSettings().setJavaScriptEnabled(true);
         String nonceString = generateNonce();
+        //Set up shared prefrences to save the token in private mode
         pref = getSharedPreferences("AppPref", MODE_PRIVATE);
+        //Load the webview
         web.loadUrl(OAUTH_URL + "?redirect_uri=" + REDIRECT_URI + "&response_type=id_token%20token&client_id=" + CLIENT_ID + "&scope=" + OAUTH_SCOPE + "&nonce="+nonceString);
         web.setWebViewClient(new WebViewClient() {
 
@@ -54,6 +60,11 @@ public class AuthenticationActivity extends AppCompatActivity implements SimpleG
 
             String authCode;
 
+            /**
+             * Runs when the authentication page is loaded, checks if URL contains a token and returns
+             * @param view Specifies the view
+             * @param url Specifies the url
+             */
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
