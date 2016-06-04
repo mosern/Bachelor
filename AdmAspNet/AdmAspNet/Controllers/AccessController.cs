@@ -13,6 +13,9 @@ using System.Web.Routing;
 
 namespace AdmAspNet.Controllers
 {
+    /// <summary>
+    /// A controller that handles CRUD functionality for accesspoints
+    /// </summary>
     public class AccessController : Controller
     {
         private string tokenString = null;
@@ -46,7 +49,7 @@ namespace AdmAspNet.Controllers
         /// <summary>
         /// Create a new accesspoint 
         /// </summary>
-        /// <returns></returns>
+        /// <returns>A view that allows the user to create an accesspoint</returns>
         public ActionResult Create()
         {
             return View(); 
@@ -56,7 +59,7 @@ namespace AdmAspNet.Controllers
         /// Create a new accesspoint 
         /// </summary>
         /// <param name="input">The data for the object that should be created</param>
-        /// <returns></returns>
+        /// <returns>A view that allows the user to create an accesspoint</returns>
         [HttpPost] 
         public ActionResult Create([ModelBinder(typeof(AccessPointBinder))] AccessPointViewModel input)
         {
@@ -80,7 +83,7 @@ namespace AdmAspNet.Controllers
         /// <summary>
         /// Returns the details about one spesific accesspoint
         /// </summary>
-        /// <param name="id">The id of the access points</param>
+        /// <param name="id">The id of the access point</param>
         /// <returns></returns>
         public ActionResult Details(int? id)
         {
@@ -100,6 +103,11 @@ namespace AdmAspNet.Controllers
             return View(viewModel); 
         }
 
+        /// <summary>
+        /// Allows the user to edit accesspoint (GET)
+        /// </summary>
+        /// <param name="id">The id of the access point</param>
+        /// <returns>A view that allows the user to edit the accesspoint</returns>
         public ActionResult Edit(int? id)
         {
             if (id == null)
@@ -118,6 +126,12 @@ namespace AdmAspNet.Controllers
             return View(viewModel); 
         }
 
+        /// <summary>
+        /// Allows the user to edit accesspoint (POST)
+        /// </summary>
+        /// <param name="id">The id of the accesspoint</param>
+        /// <param name="input">Object with updated fields</param>
+        /// <returns>A view that allows the user to edit the accesspoint</returns>
         [HttpPost]
         public ActionResult Edit(int id, [ModelBinder(typeof(AccessPointBinder))] AccessPointViewModel input)
         {
@@ -151,6 +165,11 @@ namespace AdmAspNet.Controllers
             return View(input); 
         }
 
+        /// <summary>
+        /// Allows the user to delete accesspoint (GET)
+        /// </summary>
+        /// <param name="id">The id of the accesspoint</param>
+        /// <returns>A view that allows the user to delete an accesspoint</returns>
         public ActionResult Delete(int? id)
         {
             if (id == null)
@@ -169,6 +188,11 @@ namespace AdmAspNet.Controllers
             return View(viewModel); 
         }
 
+        /// <summary>
+        /// Allows the user to delete accesspoint (POST)
+        /// </summary>
+        /// <param name="id">The id of the accesspoint</param>
+        /// <returns>A view that allows the user to delete an accesspoint</returns>
         [HttpPost]
         public ActionResult Delete(int id)
         {

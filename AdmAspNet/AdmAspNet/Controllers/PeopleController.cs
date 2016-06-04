@@ -12,6 +12,9 @@ using System.Web.Routing;
 
 namespace AdmAspNet.Controllers
 {
+    /// <summary>
+    /// A controller that handles CRUD functionality for people
+    /// </summary>
     public class PeopleController : Controller
     {
         private string tokenString = null;
@@ -36,7 +39,7 @@ namespace AdmAspNet.Controllers
         /// <summary>
         /// Show all people in a list
         /// </summary>
-        /// <returns></returns>
+        /// <returns>A view that shows all people</returns>
         public ActionResult Index()
         {
             List<People> peopleList = api.GetAllPeople();
@@ -48,7 +51,7 @@ namespace AdmAspNet.Controllers
         /// <summary>
         /// Create a new person (GET) 
         /// </summary>
-        /// <returns></returns>
+        /// <returns>A view that allows the user to create a person</returns>
         public ActionResult Create()
         {
             PeopleViewModel model = new PeopleViewModel(); 
@@ -69,7 +72,7 @@ namespace AdmAspNet.Controllers
         /// Create a new person (POST) 
         /// </summary>
         /// <param name="input">The person object to create</param>
-        /// <returns></returns>
+        /// <returns>A view that allows the user to create a person</returns>
         [HttpPost]
         public ActionResult Create(PeopleViewModel input)
         {
@@ -106,8 +109,8 @@ namespace AdmAspNet.Controllers
         /// <summary>
         /// Edit a person (GET)
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
+        /// <param name="id">The id of the person to edit</param>
+        /// <returns>A view that allows the user to edit the person</returns>
         public ActionResult Edit(int? id)
         {
             if (id == null)
@@ -142,7 +145,7 @@ namespace AdmAspNet.Controllers
         /// </summary>
         /// <param name="id">The id of the person to edit</param>
         /// <param name="data">The people object with updated fields</param>
-        /// <returns></returns>
+        /// <returns>A view that allows the user to edit the person</returns>
         [HttpPost]
         public ActionResult Edit(int id, PeopleViewModel data)
         {
@@ -178,8 +181,8 @@ namespace AdmAspNet.Controllers
         /// <summary>
         /// Returns all the details about a person
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
+        /// <param name="id">The id of the person</param>
+        /// <returns>A view that shows the details about the person</returns>
         public ActionResult Details(int? id)
         {
             if (id == null)
@@ -196,13 +199,13 @@ namespace AdmAspNet.Controllers
             var mapper = mapConfig.CreateMapper();
             PeopleViewModel viewModel = mapper.Map<PeopleViewModel>(data);
             return View(viewModel); 
-        } 
+        }
 
         /// <summary>
         /// Delete a particular person (GET) 
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
+        /// <param name="id">The id of the person</param>
+        /// <returns>A view that allows the user to delete a person</returns>
         public ActionResult Delete(int? id)
         {
             if (id == null)
@@ -225,7 +228,7 @@ namespace AdmAspNet.Controllers
         /// Delete a particular person (POST) 
         /// </summary>
         /// <param name="id">The id of the person to delete</param>
-        /// <returns></returns>
+        /// <returns>A view that allows the user to delete a person</returns>
         [HttpPost]
         public ActionResult Delete(int id)
         {
@@ -248,10 +251,6 @@ namespace AdmAspNet.Controllers
             return View(viewModel); 
         }
 
-        /// <summary>
-        /// Overrided method that runs when the httpcontext is initialized 
-        /// </summary>
-        /// <param name="requestContext"></param>
         protected override void Initialize(RequestContext requestContext)
         {
             base.Initialize(requestContext);

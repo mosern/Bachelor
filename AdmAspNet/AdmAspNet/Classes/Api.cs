@@ -139,24 +139,45 @@ namespace AdmAspNet.Classes
             return returnList; 
         }
 
+        /// <summary>
+        /// Post a type to the API
+        /// </summary>
+        /// <param name="data">The type to be added</param>
+        /// <returns>True if added, false if not</returns>
         public bool PostType(Models.DataContracts.Type data)
         {
             string url = ConfigurationManager.AppSettings["apiTypes"];
             return PostApi(url, data); 
         }
 
+        /// <summary>
+        /// Get a type by id
+        /// </summary>
+        /// <param name="id">The id of the type</param>
+        /// <returns>The type that matches the ID</returns>
         public Models.DataContracts.Type GetTypeById(int id)
         {
             string url = ConfigurationManager.AppSettings["apiTypes"] + "/" + id;
             return CallApi<Models.DataContracts.Type>(url); 
         }
 
+        /// <summary>
+        /// Update a type in the database
+        /// </summary>
+        /// <param name="id">The id of the type to be updated</param>
+        /// <param name="data">The updated object</param>
+        /// <returns>True if successful, false if not</returns>
         public bool UpdateType(int id, Models.DataContracts.Type data)
         {
             string url = ConfigurationManager.AppSettings["apiTypes"] + "/" + id;
             return PutApi(url, data); 
         }
 
+        /// <summary>
+        /// Delete a type 
+        /// </summary>
+        /// <param name="id">The id of the type to be deleted</param>
+        /// <returns>True if successful, false if not</returns>
         public bool DeleteType(int id)
         {
             string url = ConfigurationManager.AppSettings["apiTypes"] + "/" + id;
@@ -256,17 +277,22 @@ namespace AdmAspNet.Classes
         }
 
         /// <summary>
-        /// Update a pathpoint
+        /// Update a pathpoint in the database
         /// </summary>
-        /// <param name="id"></param>
-        /// <param name="data"></param>
-        /// <returns></returns>
+        /// <param name="id">The id of the pathpoint to be updated</param>
+        /// <param name="data">The updated object</param>
+        /// <returns>True if successful, false if not</returns>
         public bool UpdatePathPoint(int id, PathPoint data)
         {
             string url = ConfigurationManager.AppSettings["apiPathPoints"] + "/" + id;
             return PutApi(url, data); 
         }
 
+        /// <summary>
+        /// Delete a pathpoint
+        /// </summary>
+        /// <param name="id">The id of the pathpoint to be deleted</param>
+        /// <returns>True if successful, false if not</returns>
         public bool DeletePathPoint(int id)
         {
             string url = ConfigurationManager.AppSettings["apiPathPoints"] + "/" + id;
@@ -275,30 +301,55 @@ namespace AdmAspNet.Classes
         #endregion
 
         #region NeighbourMethods
+        /// <summary>
+        /// Returns all the neighbours in the database 
+        /// </summary>
+        /// <returns>A list of all locations</returns>
         public List<Neighbour> GetAllNeighbours()
         {
             string url = ConfigurationManager.AppSettings["apiNeighbours"] + "/?asObject=false";
             return CallApi<List<Neighbour>>(url); 
         }
 
+        /// <summary>
+        /// Get a neighbour by id
+        /// </summary>
+        /// <param name="id">The id of the neighbour</param>
+        /// <returns>The neighbour that matches the ID</returns>
         public Neighbour GetNeighbourById(int id)
         {
             string url = ConfigurationManager.AppSettings["apiNeighbours"] + "/" + id;
             return CallApi<Neighbour>(url); 
         }
 
+        /// <summary>
+        /// Post a neighbour to the API
+        /// </summary>
+        /// <param name="data">The neighbour to be added</param>
+        /// <returns>True if added, false if not</returns>
         public bool PostNeighbour(Neighbour data)
         {
             string url = ConfigurationManager.AppSettings["apiNeighbours"];
             return PostApi(url, data);
         }
 
+        /// <summary>
+        /// Delete a neighbour
+        /// </summary>
+        /// <param name="id">The id of the neighbour to be deleted</param>
+        /// <returns>True if successful, false if not</returns>
         public bool DeleteNeighbour(int id)
         {
             string url = ConfigurationManager.AppSettings["apiNeighbours"]+"/"+id;
             return DeleteObject(url); 
         }
 
+        /// <summary>
+        /// Update a neighbour in the database
+        /// </summary>
+        /// <param name="id">The id of the neighbour to be updated</param>
+        /// <param name="data">The updated object</param>
+        /// <returns>True if successful, false if not</returns>
         public bool UpdateNeighbour(int id,Neighbour data)
         {
             string url = ConfigurationManager.AppSettings["apiNeighbours"] + "/" + id;
@@ -308,30 +359,55 @@ namespace AdmAspNet.Classes
         #endregion
 
         #region PeopleMethods
+        /// <summary>
+        /// Returns all the people in the database 
+        /// </summary>
+        /// <returns>A list of all people</returns>
         public List<People> GetAllPeople()
         {
             string url = ConfigurationManager.AppSettings["apiPeople"] + "/?asObject=false";
             return CallApi<List<People>>(url); 
         }
 
+        /// <summary>
+        /// Post a people object to the API
+        /// </summary>
+        /// <param name="data">The people object to be added</param>
+        /// <returns>True if added, false if not</returns>
         public bool PostPeople(People data)
         {
             string url = ConfigurationManager.AppSettings["apiPeople"];
             return PostApi(url, data); 
         }
 
+        /// <summary>
+        /// Get a people object by id
+        /// </summary>
+        /// <param name="id">The id of the people object</param>
+        /// <returns>The user that matches the ID</returns>
         public People GetPeopleById(int id)
         {
             string url = ConfigurationManager.AppSettings["apiPeople"] + "/" + id;
             return CallApi<People>(url); 
         }
 
+        /// <summary>
+        /// Update a people object in the database
+        /// </summary>
+        /// <param name="id">The id of the people object to be updated</param>
+        /// <param name="data">The updated object</param>
+        /// <returns>True if successful, false if not</returns>
         public bool UpdatePeople(int id,People data)
         {
             string url = ConfigurationManager.AppSettings["apiPeople"] + "/" + id;
             return PutApi(url, data); 
         }
 
+        /// <summary>
+        /// Delete a people object in the database
+        /// </summary>
+        /// <param name="id">The id of people object to be deleted</param>
+        /// <returns>True if successful, false if not</returns>
         public bool DeletePeople(int id)
         {
             string url = ConfigurationManager.AppSettings["apiPeople"] + "/" + id;
@@ -393,12 +469,12 @@ namespace AdmAspNet.Classes
         }
 
         /// <summary>
-        /// 
+        /// Handle the put (updating) of an object
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="url"></param>
-        /// <param name="data"></param>
-        /// <returns></returns>
+        /// <typeparam name="T">The type to put</typeparam>
+        /// <param name="url">The url to put to</param>
+        /// <param name="data">The data to put</param>
+        /// <returns>True if the data was put, false if not</returns>
         private bool PutApi<T>(string url, T data) where T : class {
             using (var client = SetupClient())
             {

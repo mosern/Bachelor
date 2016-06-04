@@ -21,7 +21,10 @@ namespace AdmAspNet.Controllers
     [HandleForbidden]*/
     public class AdminController : Controller
     {
-        // GET: Admin
+        /// <summary>
+        /// Shows the frontpage of the admin interface
+        /// </summary>
+        /// <returns>A view with information to the user</returns>
         public ActionResult Index()
         {
             return View();

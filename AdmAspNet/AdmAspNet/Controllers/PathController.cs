@@ -12,6 +12,9 @@ using System.Web.Routing;
 
 namespace AdmAspNet.Controllers
 {
+    /// <summary>
+    /// A controller that handles CRUD functionality for pathpoints
+    /// </summary>
     public class PathController : Controller
     {
         private string tokenString = null;
@@ -44,13 +47,17 @@ namespace AdmAspNet.Controllers
         /// <summary>
         /// Create a new pathpoint (GET) 
         /// </summary>
-        /// <returns></returns>
+        /// <returns>A view that allows the user to create a pathpoint</returns>
         public ActionResult Create()
         {
             return View();
         }
 
-
+        /// <summary>
+        /// Create a new pathpoint (POST) 
+        /// </summary>
+        /// <param name="input">The id of the pathpoint</param>
+        /// <returns>A view that allows the user to create a pathpoint</returns>
         [HttpPost]
         public ActionResult Create([Bind(Include ="Lat,Lng,Alt")] CoordinateViewModel input)
         {
@@ -73,6 +80,11 @@ namespace AdmAspNet.Controllers
             return View(); 
         } 
 
+        /// <summary>
+        /// Edit a pathpoint (GET)
+        /// </summary>
+        /// <param name="id">The id of the pathpoint</param>
+        /// <returns>A view that allows the user to edit the pathpoint</returns>
         public ActionResult Edit(int? id)
         {
             if (id == null)
@@ -91,6 +103,12 @@ namespace AdmAspNet.Controllers
             return View(pathPointViewModel.Coordinate); 
         }
 
+        /// <summary>
+        /// Edit a pathpoint (POST)
+        /// </summary>
+        /// <param name="id">The id of the pathpoint</param>
+        /// <param name="input">Coordinate with updated views</param>
+        /// <returns>A view that allows the user to edit the pathpoint</returns>
         [HttpPost]
         public ActionResult Edit(int id, [Bind(Include ="Lat,Lng,Alt")] CoordinateViewModel input)
         {
@@ -118,7 +136,12 @@ namespace AdmAspNet.Controllers
             }
             return View(input);
         }
-
+        
+        /// <summary>
+        /// Delete a pathpoint (GET)
+        /// </summary>
+        /// <param name="id">The id of the pathpoint</param>
+        /// <returns>A view that allows the user to delete a pathpoint</returns>
         public ActionResult Delete(int? id)
         {
             if (id == null)
@@ -137,6 +160,11 @@ namespace AdmAspNet.Controllers
             return View(viewModel); 
         }
 
+        /// <summary>
+        /// Delete a pathpoint
+        /// </summary>
+        /// <param name="id">The id of the pathpoint</param>
+        /// <returns>A view that allows the user to delete a pathpoint</returns>
         [HttpPost]
         public ActionResult Delete(int id)
         {

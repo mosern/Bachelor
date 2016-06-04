@@ -16,6 +16,9 @@ namespace AdmAspNet.Controllers
 {
     /*[ResourceAuthorize("Write","Admin")]
     [HandleForbidden]*/
+    /// <summary>
+    /// A controller that handles CRUD functionality for location
+    /// </summary>
     public class LocationController : Controller
     {
         private string tokenString = null;
@@ -53,7 +56,7 @@ namespace AdmAspNet.Controllers
         /// <summary>
         /// Allow a user to create a location
         /// </summary>
-        /// <returns></returns>
+        /// <returns>A view that allows the user to create a location</returns>
         public ActionResult Create()
         {
             //Get all types 
@@ -79,7 +82,7 @@ namespace AdmAspNet.Controllers
         /// Allow the user to create a location (POST)
         /// </summary>
         /// <param name="input">The object to create</param>
-        /// <returns></returns>
+        /// <returns>A view that allows the user to create a location</returns>
         [HttpPost]
         public ActionResult Create([ModelBinder(typeof(LocationBinder))]LocationViewModel input)
         {
@@ -123,7 +126,7 @@ namespace AdmAspNet.Controllers
         /// Show the details of a given location
         /// </summary>
         /// <param name="id">The id of the location</param>
-        /// <returns></returns>
+        /// <returns>A view that shows the details of the location</returns>
         public ActionResult Details(int? id)
         {
             if (id == null)
@@ -145,7 +148,7 @@ namespace AdmAspNet.Controllers
         /// Delete a given location (GET)
         /// </summary>
         /// <param name="id">The id of the location to delete</param>
-        /// <returns></returns>
+        /// <returns>A view that allows the user to delete a location</returns>
         public ActionResult Delete(int? id)
         {
             if (id == null)
@@ -168,7 +171,7 @@ namespace AdmAspNet.Controllers
         /// Delete a given location (POST)
         /// </summary>
         /// <param name="id">The id of the location to delete</param>
-        /// <returns></returns>
+        /// <returns>A view that allows the user to delete a location</returns>
         [HttpPost]
         public ActionResult Delete(int id)
         {
@@ -195,7 +198,7 @@ namespace AdmAspNet.Controllers
         /// Edit a location (GET) 
         /// </summary>
         /// <param name="id">The id of the location to edit</param>
-        /// <returns></returns>
+        /// <returns>A view that allows the user to edit the location</returns>
         public ActionResult Edit(int? id)
         {
             if (id == null)
@@ -229,7 +232,7 @@ namespace AdmAspNet.Controllers
         /// </summary>
         /// <param name="id">The id of the location to edit</param>
         /// <param name="input">Object with updated fields</param>
-        /// <returns></returns>
+        /// <returns>A view that allows the user to edit the location</returns>
         [HttpPost]
         public ActionResult Edit(int id,[ModelBinder(typeof(LocationBinder))] LocationViewModel input)
         {

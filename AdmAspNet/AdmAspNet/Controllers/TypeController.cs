@@ -11,6 +11,9 @@ using System.Web.Routing;
 
 namespace AdmAspNet.Controllers
 {
+    /// <summary>
+    /// A controller that handles CRUD functionality for type
+    /// </summary>
     public class TypeController : Controller
     {
         private string tokenString = null;
@@ -26,7 +29,10 @@ namespace AdmAspNet.Controllers
             });
         }
 
-        // GET: Type
+        /// <summary>
+        /// Get a list of all types
+        /// </summary>
+        /// <returns></returns>
         public ActionResult Index()
         {
             List<Models.DataContracts.Type> typeList = api.GetAllTypes();
@@ -35,11 +41,20 @@ namespace AdmAspNet.Controllers
             return View(viewModel);
         }
 
+        /// <summary>
+        /// Create a type (GET) 
+        /// </summary>
+        /// <returns>A view that allows the user to create a type</returns>
         public ActionResult Create()
         {
             return View(); 
         }
 
+        /// <summary>
+        /// Create a type (POST)
+        /// </summary>
+        /// <param name="input">Type object with data</param>
+        /// <returns>A view that allows the user to create a type</returns>
         [HttpPost]
         public ActionResult Create([Bind(Include ="Name")] TypeViewModel input)
         {
@@ -60,6 +75,11 @@ namespace AdmAspNet.Controllers
             return View(); 
         }
 
+        /// <summary>
+        /// Edit a type (GET)
+        /// </summary>
+        /// <param name="id">The id of the type</param>
+        /// <returns>A view that allows the user to edit the type</returns>
         public ActionResult Edit(int? id)
         {
             if (id == null)
@@ -78,6 +98,12 @@ namespace AdmAspNet.Controllers
             return View(viewModel); 
         }
 
+        /// <summary>
+        /// Edit a type (POST)
+        /// </summary>
+        /// <param name="id">The id of the type</param>
+        /// <param name="input">Type object with updated fields</param>
+        /// <returns>A view that allows the user to edit the type</returns>
         [HttpPost]
         public ActionResult Edit(int id, [Bind(Include ="Name")] TypeViewModel input)
         {
@@ -99,6 +125,11 @@ namespace AdmAspNet.Controllers
 
         }
 
+        /// <summary>
+        /// Delete a type (GET)
+        /// </summary>
+        /// <param name="id">The id of the type to delete</param>
+        /// <returns>A view that allows the user to delete a type</returns>
         public ActionResult Delete(int? id)
         {
             if (id == null)
@@ -117,6 +148,11 @@ namespace AdmAspNet.Controllers
             return View(viewModel); 
         }
 
+        /// <summary>
+        /// Delete a type (POST) 
+        /// </summary>
+        /// <param name="id">The id of the type to delete</param>
+        /// <returns>A view that allows the user to delete a type</returns>
         [HttpPost]
         public ActionResult Delete(int id)
         {
