@@ -223,6 +223,7 @@
     <Compile Include="Helpers\AuthorizationManager.cs" />
     <Compile Include="Helpers\LocationBinder.cs" />
     <Compile Include="Helpers\MenuExtensions.cs" />
+    <Compile Include="Helpers\ResourceAuthorizeAttribute.cs" />
     <Compile Include="Models\DataContracts\AccessPoint.cs" />
     <Compile Include="Models\DataContracts\Coordinate.cs" />
     <Compile Include="Models\DataContracts\Location.cs" />
