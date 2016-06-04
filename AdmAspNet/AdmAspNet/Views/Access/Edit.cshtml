@@ -3,7 +3,9 @@
 @{
     ViewBag.Title = "Rediger aksesspunkt";
 }
-
+@section sidebar {
+    @Html.Partial("_SidebarPartial")
+}
 <h2>Rediger</h2>
 
 @using (Html.BeginForm())
