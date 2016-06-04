@@ -14,8 +14,8 @@ using Thinktecture.IdentityModel.Mvc;
 
 namespace AdmAspNet.Controllers
 {
-    /*[ResourceAuthorize("Write","Admin")]
-    [HandleForbidden]*/
+    [ResourceAuthorize("Write","Admin")]
+    [HandleForbidden]
     public class LocationController : Controller
     {
         private string tokenString = null;

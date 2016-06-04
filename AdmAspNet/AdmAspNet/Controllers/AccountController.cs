@@ -7,9 +7,12 @@ using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.OpenIdConnect;
 using Microsoft.Owin.Security;
 using System.Configuration;
+using Thinktecture.IdentityModel.Mvc;
 
 namespace AdmAspNet.Controllers
 {
+    [ResourceAuthorize("Write", "Admin")]
+    [HandleForbidden]
     public class AccountController : Controller
     {
         public void SignIn()
