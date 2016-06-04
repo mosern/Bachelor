@@ -24,8 +24,6 @@ namespace AdmAspNet.Controllers
             return RedirectToAction("Index", "Admin"); 
         }
 
-        [ResourceAuthorize("Read","About")]
-        [HandleForbidden]
         public ActionResult About()
         {
             string test = Get();
