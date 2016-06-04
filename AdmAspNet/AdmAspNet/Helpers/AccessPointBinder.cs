@@ -8,6 +8,9 @@ using System.Web.Mvc;
 
 namespace AdmAspNet.Helpers
 {
+    /// <summary>
+    /// A custom binder to prevent overposting when posting accesspoint
+    /// </summary>
     public class AccessPointBinder : DefaultModelBinder
     {
         public override object BindModel(ControllerContext controllerContext, ModelBindingContext bindingContext)
@@ -17,7 +20,7 @@ namespace AdmAspNet.Helpers
                 HttpRequestBase request = controllerContext.HttpContext.Request;
                 string macAddress = request.Form.Get("MacAddress"); 
                 string desc = request.Form.Get("Desc");
-                //Gather everything necessary 
+                //Parse
                 double lng, lat, alt;
                 if (!double.TryParse(request.Form.Get("Coordinate.Lng"),NumberStyles.Any,CultureInfo.GetCultureInfo("nb-NO"),out lng))
                 {
@@ -32,6 +35,7 @@ namespace AdmAspNet.Helpers
                     bindingContext.ModelState.AddModelError("Coordinate.Alt", "Høyde må være en gyldig double");
                 }
 
+                //Create the object with necessary fields
                 return new AccessPointViewModel
                 {
                     Desc = desc,
