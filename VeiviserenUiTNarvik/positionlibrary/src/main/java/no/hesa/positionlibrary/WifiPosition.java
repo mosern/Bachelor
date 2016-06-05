@@ -393,10 +393,14 @@ public class WifiPosition implements ActionInterface {
         LinearLeastSquaresSolver lSolver = new LinearLeastSquaresSolver(trilaterationFunction);
         NonLinearLeastSquaresSolver nlSolver = new NonLinearLeastSquaresSolver(trilaterationFunction, new LevenbergMarquardtOptimizer());
         RealVector x = lSolver.solve();
-        LeastSquaresOptimizer.Optimum optimum = nlSolver.solve();
-
-        calculatedPosition = optimum.getPoint().toArray();
-        calculatedPosition = WifiPosition.convertToGeo(calculatedPosition);
+        try{
+            LeastSquaresOptimizer.Optimum optimum = nlSolver.solve();
+            calculatedPosition = optimum.getPoint().toArray();
+            calculatedPosition = WifiPosition.convertToGeo(calculatedPosition);
+        }
+        catch (Exception e){
+            calculatedPosition = new double[]{0, 0};
+        }
 
         return calculatedPosition;
     }
