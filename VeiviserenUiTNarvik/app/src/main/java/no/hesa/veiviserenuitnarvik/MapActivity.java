@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -428,7 +429,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 .fillColor(getResources().getColor(R.color.route_circle_end_color))
                 .zIndex(0.50f);
 
-        //userPositionMarker = mMap.addCircle(co);
+        userPositionMarker = mMap.addCircle(co);
     }
 
     /**
@@ -438,6 +439,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     {
         if (userPositionMarker != null) {
             userPositionMarker.remove();
+
         }
     }
 //endregion
@@ -650,7 +652,24 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 if (mMarker != null) {
                     mMarker.remove();
                 }
+
+                //Posisjoneringsstatistikk kode
+                /*CircleOptions c5 = new CircleOptions()
+                        .center(new LatLng(point.latitude, point.longitude))
+                        .radius(5)
+                        .strokeColor(Color.RED)
+                        .zIndex(0.5f);
+
+                CircleOptions c7 = new CircleOptions()
+                        .center(new LatLng(point.latitude, point.longitude))
+                        .radius(7)
+                        .strokeColor(Color.RED)
+                        .zIndex(0.5f);*/
+
                 mMarker = mMap.addMarker(new MarkerOptions().position(point).title("Lat: " + point.latitude + " Lng: " + point.longitude));
+                //mMap.addCircle(c5);
+                //mMap.addCircle(c7);
+
                 mMarker.setDraggable(true);
                 mMarker.showInfoWindow();
 

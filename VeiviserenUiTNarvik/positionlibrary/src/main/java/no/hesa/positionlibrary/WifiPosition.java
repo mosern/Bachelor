@@ -50,7 +50,7 @@ import no.hesa.positionlibrary.trillateration.TrilaterationFunction;
 
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 public class WifiPosition implements ActionInterface {
-    private List<ScanResult> scanResults = null;
+    private List<ScanResult> scanResults = null;//list with the results of Wi-Fi scann
     private static final double radius = 6371 * 1000; //earth radius
     private int counter = 1; //amount of times Wi-Fi scan was run
     private final BroadcastReceiver wifiReceiver = new BroadcastReceiver() {
@@ -61,7 +61,7 @@ public class WifiPosition implements ActionInterface {
                 scanResults = wifiManager.getScanResults();
                 calculateDistances(c);
                 //If this was first time that code was run, set up TimerTask to make WI-Fi scans every 5 s.
-                /*if (timer == null) {
+                if (timer == null) {
                     timer = new Timer();
                     initializeTimerTask(wifiManager);
                     timer.schedule(timerTask, 1000, 500);
@@ -69,8 +69,7 @@ public class WifiPosition implements ActionInterface {
                 } else {
                     //If not...
                     counter++;
-                }*/
-                counter++;
+                }
             }
         }
     };
@@ -89,8 +88,8 @@ public class WifiPosition implements ActionInterface {
             if (sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
                 long curentTime = System.currentTimeMillis();
                 long timeGone = curentTime - lastUpdateTime;
-                //Check if more than 1 second had gone since last detected movement and it is not first detected movement
-                if (lastUpdateTime != 0 && (timeGone >= 1000)) {
+                //Check if more than 2.3 second had gone since last detected movement and it is not first detected movement
+                if (lastUpdateTime != 0 && (timeGone >= 2300)) {
                     //Check if it was significant enough movement
                     if ((Math.abs(event.values[0]) > 2) || (Math.abs(event.values[1]) > 2)) {
                         moving = true;
@@ -108,14 +107,13 @@ public class WifiPosition implements ActionInterface {
     };
     private long lastUpdateTime = 0; //last time there was detected movement of device
     private boolean moving = false; //Variable that shows if device is moving (true) or not (false)
-    //private double xStartValue = 0; //acceleration on x-axis at the time of first onSensorChanged run
-    //private double yStartValue = 0; //acceleration on y-axis at the time of first onSensorChanged run
     TreeMap<String, Point> wifiPointsMacGeo = new TreeMap<String, Point>(); //list of MAC addresses to known Wi-Fi access point with corresponding geo coordinates
 
     private DijkstraAlgorithm da;
     private Graph graph;
     private List<Edge> model;
     private List<Point> allPathPoints= new ArrayList<Point>();
+
     private Point lastSentPosition;
 
     /**
@@ -135,16 +133,14 @@ public class WifiPosition implements ActionInterface {
     }
 
     /**
-     *
-     * @param c
+     * Register call from application
+     * @param c context from application activity
      */
     public void registerBroadcast(Context c){
         c.registerReceiver(wifiReceiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
         WifiManager wifiManager = (WifiManager) c.getSystemService(Context.WIFI_SERVICE);
-        //wifiManager.startScan();
-        timer = new Timer();
-        initializeTimerTask(wifiManager);
-        timer.schedule(timerTask, 10, 500);
+        wifiManager.startScan();
+
         //Register listener to detect if device changed position
         sensorManager = (SensorManager) c.getSystemService(c.SENSOR_SERVICE);
         sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -156,8 +152,8 @@ public class WifiPosition implements ActionInterface {
     }
 
     /**
-     *
-     * @param c
+     * Unregister broadcast receiver
+     * @param c context from application activity
      */
     public void unRegisterBroadcast(Context c) {
         c.unregisterReceiver(wifiReceiver);
@@ -165,8 +161,8 @@ public class WifiPosition implements ActionInterface {
     }
 
     /**
-     *
-     * @param c
+     * Prepare data needed to calculate position
+     * @param c context from application activity
      */
     public void calculateDistances(Context c) {
         if (scanResults != null) {
@@ -227,7 +223,7 @@ public class WifiPosition implements ActionInterface {
     }
 
     /**
-     *
+     * Calculating position til user based on results from calculateDistances(Context c)
      * @param c
      */
     private void findPosition(Context c) {
@@ -318,28 +314,28 @@ public class WifiPosition implements ActionInterface {
         return distance;
     }
 
+    /**
+     * Converte degrees to radians
+     * @param degrees
+     * @return radians
+     */
     private static double radiansFromDeg(double degrees) {
         return degrees * (Math.PI / 180);
     }
 
+    /**
+     * Converte radians to degrees
+     * @param radians
+     * @return degrees
+     */
     private static double degFromRadians(double radians) {
         return radians * (180 / Math.PI);
     }
 
-    public static double[] calculateCoordinates(double[] from, double distanceKm, double bearingDegrees) {
-        double distanceRadians = (double) distanceKm / 6371;
-        double bearingRadians = radiansFromDeg(bearingDegrees);
-        double fromLatRadians = radiansFromDeg(from[0]);
-        double fromLonRadians = radiansFromDeg(from[1]);
-        double toLatRadians = Math.asin(Math.sin(fromLatRadians) * Math.cos(distanceRadians) + Math.cos(fromLatRadians) * Math.sin(distanceRadians) * Math.cos(bearingRadians));
-        double toLonRadians = fromLonRadians + Math.atan2(Math.sin(bearingRadians) * Math.sin(distanceRadians) * Math.cos(fromLatRadians), Math.cos(distanceRadians) - Math.sin(fromLatRadians) * Math.sin(toLatRadians));
-
-        toLonRadians = ((toLonRadians + 3 * Math.PI) % (2 * Math.PI)) - Math.PI;
-        return new double[]{degFromRadians(toLatRadians), degFromRadians(toLonRadians)};
-    }
-
     /**
      * Calculate from geo coordinates too cartesian coordinates
+     * @param coordinates geo coordinates
+     * @return cartesian coordinates
      */
     public static double[] convertFromGeo(double[] coordinates) {
         double x_cartesian = radius * Math.cos(coordinates[0] * Math.PI / 180) * Math.cos(coordinates[1] * Math.PI / 180);
@@ -350,6 +346,8 @@ public class WifiPosition implements ActionInterface {
 
     /**
      * Calculate from cartesian coordinates to geo coordinates
+     * @param coordinates cartesian coordinates
+     * @return geo coordinates
      */
     public static double[] convertToGeo(double[] coordinates) {
         double x_deg = (180 / Math.PI) * Math.asin(coordinates[2] / radius);
@@ -377,7 +375,7 @@ public class WifiPosition implements ActionInterface {
     }
 
     /**
-     * Calculate current geo coordinates
+     * Calculate current geo coordinates using trillateration algorithm
      * @param wifiPointsLocationInf list of distances to three closest Wi-Fi access points with corresponding geo coordinates
      * @return current geo coordinates
      */
@@ -403,6 +401,11 @@ public class WifiPosition implements ActionInterface {
         return calculatedPosition;
     }
 
+    /**
+     * Handle answer from api
+     * @param jsonObject data from api
+     * @param actionString identification
+     */
     @Override
     public void onCompletedAction(JSONObject jsonObject, String actionString) {
         switch (actionString) {
@@ -424,32 +427,6 @@ public class WifiPosition implements ActionInterface {
                     e.printStackTrace();
                 }
                 break;
-            // TODO: remove the following case
-            /*case Api.ALL_PATH_POINTS:
-                try {
-                    if(jsonObject != null){
-                        model = new ArrayList<Edge>();
-                        JSONArray jsonArrayPath = jsonObject.getJSONArray("pathPoints");
-                        //Traverse first level
-                        for(int i = 0; i < jsonArrayPath.length(); i++){
-                            //Save firstPoint in array
-                            JSONObject firstPoint = jsonArrayPath.getJSONObject(i).getJSONObject("coordinate");
-                            Vertex<Point> firstVertex = new Vertex<>(new Point(firstPoint.getDouble("lat"), firstPoint.getDouble("lng"), firstPoint.getInt("alt")));
-                            allPathPoints.add(new Point(firstPoint.getDouble("lat"), firstPoint.getDouble("lng"), firstPoint.getInt("alt")));
-
-                            JSONArray jsonArrayNeighbours = jsonArrayPath.getJSONObject(i).getJSONArray("neighbours");
-                            //Traverse second level
-                            for(int j = 0; j < jsonArrayNeighbours.length(); j++){
-                                JSONObject secondPoint = jsonArrayNeighbours.getJSONObject(j).getJSONObject("coordinate");
-                                Vertex<Point> secondVertex = new Vertex<>(new Point(secondPoint.getDouble("lat"), secondPoint.getDouble("lng"), secondPoint.getInt("alt")));
-                                model.add(new Edge(firstVertex, secondVertex, jsonArrayNeighbours.getJSONObject(j).getInt("distance")));
-                            }
-                        }
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                break;*/
         }
     }
 
@@ -458,6 +435,10 @@ public class WifiPosition implements ActionInterface {
 
     }
 
+    /**
+     * Build model for calculating shortest path from start point to destination point (Dijkstra's algorithm)
+     * @param pathPointJson information about all pathpoints
+     */
     private void buildPathPointModel(String pathPointJson) {
         try {
             JSONObject jsonObject = new JSONObject(pathPointJson);
@@ -487,7 +468,7 @@ public class WifiPosition implements ActionInterface {
     }
 
     /**
-     * Generate list with "path points" to plot the route on the map
+     * Generate list with "path points" to plot the route on the map (positioning on)
      * @param destination geo coordinates of destination point
      * @return list with "path points" from start to destination
      * @throws PathNotFoundException
@@ -507,7 +488,7 @@ public class WifiPosition implements ActionInterface {
     }
 
     /**
-     * Generate list with "path points" to plot the route on the map
+     * Generate list with "path points" to plot the route on the map (positioning off)
      * @param position geo coordinates of start point
      * @param destination geo coordinates of destination point
      * @return list with "path points" from start to destination
@@ -520,6 +501,13 @@ public class WifiPosition implements ActionInterface {
         return result;
     }
 
+    /**
+     * Find shortest the route from start point to destination point
+     * @param position geo coordinates of start point
+     * @param destination geo coordinates of destination point
+     * @return list with "path points" from start to destination
+     * @throws PathNotFoundException
+     */
     public List<Point> generateRoute(Point position, Point destination) throws PathNotFoundException {
         HashMap<Point, Double> closestPathPoint = findClosestPathPoint(position);
         Point[] point = (Point[]) closestPathPoint.keySet().toArray(new Point[closestPathPoint.size()]);
@@ -563,8 +551,6 @@ public class WifiPosition implements ActionInterface {
         }
 
         Float minDist = Collections.min(distances);
-        int tmp = distances.indexOf(minDist);
-        Point p = allPathPoints.get(tmp);
         result.put(allPathPoints.get(distances.indexOf(minDist)), Double.valueOf(minDist));
         return result;
     }

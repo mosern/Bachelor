@@ -3,13 +3,19 @@ package no.hesa.positionlibrary;
 import java.util.Objects;
 
 /**
- * Created by evgeniia on 08.04.16.
+ * Point class that is used to store geo coordinates (latitude and longitude) and floor number (altitude)
  */
 public class Point {
-    private double latitude;
-    private double longitude;
-    private int floor;
+    private double latitude; //latitude
+    private double longitude; //longitude
+    private int floor; //floor
 
+    /**
+     * Create Point object
+     * @param latitude
+     * @param longitude
+     * @param floor
+     */
     public Point (double latitude, double longitude, int floor){
         this.latitude = latitude;
         this.longitude = longitude;
@@ -41,15 +47,27 @@ public class Point {
         return result;
     }
 
+    /**
+     * Get latitude
+     * @return latitude
+     */
     public double getLatitude(){
 
         return latitude;
     }
 
+    /**
+     * Get longitude
+     * @return longitude
+     */
     public double getLongitude(){
         return longitude;
     }
 
+    /**
+     * Get floor
+     * @return floor
+     */
     public int getFloor(){
         return floor;
     }
