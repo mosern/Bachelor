@@ -1,7 +1,7 @@
 package no.hesa.veiviserenuitnarvik.dataclasses;
 
 /**
- * Created by rhymf on 16.04.2016.
+ * Type data class
  */
 public class Type{
 

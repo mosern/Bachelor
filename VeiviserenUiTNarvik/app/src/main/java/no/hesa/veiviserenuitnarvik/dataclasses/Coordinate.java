@@ -1,7 +1,7 @@
 package no.hesa.veiviserenuitnarvik.dataclasses;
 
 /**
- * Created by rhymf on 16.04.2016.
+ * Coordinate class that is used to store geo coordinates (latitude and longitude) and floor number (altitude)
  */
 public class Coordinate{
 
@@ -11,9 +11,8 @@ public class Coordinate{
     private int id;
 
     public Coordinate() {
-
     }
-/*
+
     public Coordinate(int id, double lat, double lng, double alt)
     {
         this.id = id;
@@ -21,7 +20,7 @@ public class Coordinate{
         this.lng = lng;
         this.alt = alt;
     }
-*/
+
     @Override
     public String toString()
     {

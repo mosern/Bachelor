@@ -84,7 +84,7 @@ public class AuthenticationActivity extends AppCompatActivity implements SimpleG
                     edit.putBoolean("LoggedInThisSession", true);
                     edit.commit();
                     Toast.makeText(getApplicationContext(), "Authorization Code is: " + authCode, Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                    Intent intent = new Intent(getApplicationContext(), MapActivity.class);
                     startActivity(intent);
 
                 } else if (url.contains("error=access_denied")) {

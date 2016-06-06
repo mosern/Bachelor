@@ -126,6 +126,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private PositionLibrary positionLibrary = null;
     private BroadcastReceiver positionLibOutputReceiver = null;
     private Api api;
+    private Toolbar toolbar;
 
     // global variables (necessary due to lifecycle changes, used in many methods, etc)
     private Menu menuRef = null;
@@ -165,18 +166,22 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         mIALocationManager = IALocationManager.create(this);
         mResourceManager = IAResourceManager.create(this);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar); // TODO: crashes pre android 5.0
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
+            toolbar = (Toolbar) findViewById(R.id.toolbar);
+            setSupportActionBar(toolbar); // crashes pre android 5.0
 
-        getSupportActionBar().setDisplayShowTitleEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
+            getSupportActionBar().setDisplayShowTitleEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        // changes the UiT logo based on system locale
-        if(getResources().getConfiguration().locale.getISO3Country().compareTo("NOR") == 0) {
-            getSupportActionBar().setIcon(R.mipmap.ic_uit_logo_nor);
+            // changes the UiT logo based on system locale
+            if (getResources().getConfiguration().locale.getISO3Country().compareTo("NOR") == 0) {
+                getSupportActionBar().setIcon(R.mipmap.ic_uit_logo_nor);
+            } else {
+                getSupportActionBar().setIcon(R.mipmap.ic_uit_logo);
+            }
         }
-        else {
-            getSupportActionBar().setIcon(R.mipmap.ic_uit_logo);
+        else{
+            // does not load toolbar, fix late in development, no replacement functionality
         }
 
         fetchMapSpinner = (ProgressBar)findViewById(R.id.fetch_map_progress_bar);
@@ -648,37 +653,34 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng point) {
-                // TODO: remove marker for launch)
-                if (mMarker != null) {
-                    mMarker.remove();
-                }
-
-                //Posisjoneringsstatistikk kode
-                /*CircleOptions c5 = new CircleOptions()
-                        .center(new LatLng(point.latitude, point.longitude))
-                        .radius(5)
-                        .strokeColor(Color.RED)
-                        .zIndex(0.5f);
-
-                CircleOptions c7 = new CircleOptions()
-                        .center(new LatLng(point.latitude, point.longitude))
-                        .radius(7)
-                        .strokeColor(Color.RED)
-                        .zIndex(0.5f);*/
-
-                mMarker = mMap.addMarker(new MarkerOptions().position(point).title("Lat: " + point.latitude + " Lng: " + point.longitude));
-                //mMap.addCircle(c5);
-                //mMap.addCircle(c7);
-
-                mMarker.setDraggable(true);
-                mMarker.showInfoWindow();
-
                 currentPosition = new LatLng(point.latitude, point.longitude);
                 //todo: set currentFloor
+                changeCurrentFloorBasedOnCurrentFloorplan();
                 clearDrawnPaths();
                 drawUserPosition();
             }
         });
+    }
+
+    /**
+     * Changes the the current floor to correspond with the currently loaded floorplan,
+     * necessary because clicking on the map  for manual posisonly provides data for 2 dimensional positioning.
+     */
+    // this method is a fast and quick method of determining the current floor when a user clicks the map,
+    // there as no time to devise a more robust method that can handle a varying amount of floors.
+    private void changeCurrentFloorBasedOnCurrentFloorplan()
+    {
+        if (currentFloorPlan != null) {
+            if (currentFloorPlan.compareTo(getResources().getString(R.string.indooratlas_floor_1_floorplanid)) == 0)
+            {
+                currentFloor = 1;
+            }
+
+            if (currentFloorPlan.compareTo(getResources().getString(R.string.indooratlas_floor_2_floorplanid)) == 0)
+            {
+                currentFloor = 2;
+            }
+        }
     }
 
     /**
@@ -742,7 +744,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                                 Point currentPoint = new Point(latLng.latitude, latLng.longitude, floor);
                                 if (arrivedAtFinalLocation(currentPoint, path.get(path.size() - 1))) //gets final point
                                 {
-                                    // TODO: clear map after arriving at destination
+                                    // TODO: clear map/unbind etc after arriving at destination
                                     // unbind targetPosition etc etc
                                 }
                             }
@@ -1026,12 +1028,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     @Override
     public void onCompletedAction(JSONObject jsonObject, String actionString) {
         switch (actionString) {
-            /* // TODO: remove Api.ALL_USERS
-            case Api.ALL_USERS:
-                //JSONObject dummyObject = jsonObject;
-                break;
-                */
-            // API has returned all pathpoints
             case Api.ALL_PATH_POINTS:
                 try {
                     if(jsonObject != null){
@@ -1110,9 +1106,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             if(resultCode == SEARCH_RETURNED_COORDINATE_RESULT) { // checks the result code
                 targetPosition = new LatLng(data.getDoubleExtra("lat", 0), data.getDoubleExtra("lng", 0));
                 targetFloor = (int) data.getDoubleExtra("floor", 1.0);
-
-                // todo: remove toast
-                showCustomToast(getApplicationContext(), targetPosition.toString() + ", " + targetFloor, Toast.LENGTH_SHORT);
 
                 if (targetFloor != currentFloor) {
                     changeFloor(currentFloor);
